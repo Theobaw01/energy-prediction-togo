@@ -1,7 +1,8 @@
-# Données
-data/
-/models/
+# Données volumineuses (modèles binaires)
 *.joblib
+
+# Garder les CSV (nécessaires pour Streamlit Cloud)
+# data/ et models/ sont inclus
 
 # Python
 __pycache__/
