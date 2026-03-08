@@ -1,6 +1,6 @@
 # Données
 data/
-models/
+/models/
 *.joblib
 
 # Python
