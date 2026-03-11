@@ -1,6 +1,6 @@
 """
-Dashboard BI — Population et Demande Electrique
-Togo & Zone UEMOA
+Dashboard BI — Anticipation de la Demande Electrique au Togo
+Pipeline : Extraction (Banque Mondiale) -> Transformation -> Modele IA -> Predictions 2045
 """
 import os
 import pandas as pd
@@ -11,25 +11,38 @@ import streamlit as st
 
 # ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Demande Electrique — Togo",
+    page_title="Demande Electrique — Togo 2045",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMPL = "plotly_dark"
+FOCUS = "TG"
 
 C = {
     "pop": "#2E86C1",
     "kwh": "#E67E22",
     "gwh": "#1ABC9C",
     "proj": "#9B59B6",
-    "ci": "rgba(155,89,182,0.12)",
+    "ci": "rgba(155,89,182,0.15)",
     "grid": "#1E2A35",
     "muted": "#7F8C8D",
     "good": "#27AE60",
     "warn": "#E74C3C",
     "bg": "#0E1117",
+    "accent": "#3498DB",
+}
+
+IND_LABELS = {
+    "SP.POP.TOTL": "Population totale",
+    "SP.POP.GROW": "Croissance demographique (%)",
+    "SP.URB.TOTL.IN.ZS": "Taux d'urbanisation (%)",
+    "EG.USE.ELEC.KH.PC": "Consommation electrique (kWh/hab)",
+    "EG.ELC.ACCS.ZS": "Acces a l'electricite (%)",
+    "EG.ELC.ACCS.UR.ZS": "Acces electricite urbain (%)",
+    "EG.ELC.ACCS.RU.ZS": "Acces electricite rural (%)",
+    "NY.GDP.PCAP.CD": "PIB par habitant (USD)",
 }
 
 
@@ -40,32 +53,49 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-.block-container { padding-top: 1rem; max-width: 1300px; }
+.block-container { padding-top: 0.8rem; max-width: 1350px; }
 
 .hdr {
-    background: linear-gradient(135deg, #1B3A4B 0%, #2E6F8E 100%);
-    padding: 20px 28px; border-radius: 6px; margin-bottom: 20px;
+    background: linear-gradient(135deg, #1B3A4B 0%, #1B6B50 100%);
+    padding: 18px 28px; border-radius: 6px; margin-bottom: 16px;
     border-bottom: 2px solid #E67E22;
 }
-.hdr h1 { color: #fff; margin: 0; font-size: 1.35em; font-weight: 600; }
-.hdr p { color: #B0C4CE; margin: 4px 0 0; font-size: 0.82em; font-weight: 300; }
+.hdr h1 { color: #fff; margin: 0; font-size: 1.3em; font-weight: 600; }
+.hdr p { color: #B0C4CE; margin: 4px 0 0; font-size: 0.8em; font-weight: 300; }
 
 .card {
-    background: #161B22; border-radius: 6px; padding: 14px 16px;
+    background: #161B22; border-radius: 6px; padding: 13px 15px;
     border-left: 3px solid #2E86C1;
 }
-.card .t { color: #7F8C8D; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-.card .v { color: #ECF0F1; font-size: 1.4em; font-weight: 700; line-height: 1.15; }
-.card .d { font-size: 0.78em; margin-top: 3px; font-weight: 500; }
+.card .t { color: #7F8C8D; font-size: 0.68em; text-transform: uppercase;
+           letter-spacing: 0.8px; margin-bottom: 4px; }
+.card .v { color: #ECF0F1; font-size: 1.35em; font-weight: 700; line-height: 1.15; }
+.card .d { font-size: 0.76em; margin-top: 3px; font-weight: 500; }
 .card .d.up { color: #27AE60; }
 .card .d.dn { color: #E74C3C; }
-.card .ctx { color: #5D6D7E; font-size: 0.68em; margin-top: 2px; }
+.card .ctx { color: #5D6D7E; font-size: 0.66em; margin-top: 2px; }
 
-.sec { color: #D5DBE1; font-size: 1em; font-weight: 600; border-bottom: 1px solid #2E6F8E;
-       padding-bottom: 5px; margin: 20px 0 12px 0; }
+.sec { color: #D5DBE1; font-size: 1em; font-weight: 600;
+       border-bottom: 1px solid #2E6F8E;
+       padding-bottom: 5px; margin: 18px 0 10px 0; }
+
+.step-box {
+    background: #161B22; border: 1px solid #2E6F8E; border-radius: 6px;
+    padding: 12px 16px; margin-bottom: 10px;
+}
+.step-box .step-n { color: #3498DB; font-size: 0.72em; font-weight: 700;
+                    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.step-box .step-t { color: #ECF0F1; font-weight: 600; font-size: 0.92em; }
+.step-box .step-d { color: #7F8C8D; font-size: 0.76em; margin-top: 2px; }
 
 .foot { text-align: center; color: #5D6D7E; font-size: 0.7em; padding: 14px 0;
-        margin-top: 24px; border-top: 1px solid #1E2A35; }
+        margin-top: 20px; border-top: 1px solid #1E2A35; }
+
+.yr-badge {
+    display: inline-block; background: #9B59B6; color: #fff;
+    padding: 3px 10px; border-radius: 12px; font-weight: 600;
+    font-size: 0.85em; margin-right: 8px;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -88,11 +118,16 @@ def load():
 
 
 def fmt(v, u=""):
-    if pd.isna(v): return "—"
-    if abs(v) >= 1e9: s = f"{v/1e9:,.2f} Mrd"
-    elif abs(v) >= 1e6: s = f"{v/1e6:,.1f} M"
-    elif abs(v) >= 1e3: s = f"{v:,.0f}"
-    else: s = f"{v:,.1f}"
+    if pd.isna(v):
+        return "—"
+    if abs(v) >= 1e9:
+        s = f"{v/1e9:,.2f} Mrd"
+    elif abs(v) >= 1e6:
+        s = f"{v/1e6:,.1f} M"
+    elif abs(v) >= 1e3:
+        s = f"{v:,.0f}"
+    else:
+        s = f"{v:,.1f}"
     return f"{s} {u}".strip() if u else s
 
 
@@ -101,8 +136,9 @@ def fmt(v, u=""):
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hdr">
-    <h1>Population et Demande Electrique</h1>
-    <p>La population croit — combien d'electricite faudra-t-il demain ?   |   Togo & UEMOA</p>
+    <h1>Anticipation de la Demande Electrique — Togo</h1>
+    <p>La population croit, combien d'electricite faudra-t-il demain ?
+       &nbsp;|&nbsp; Donnees : Banque Mondiale (WDI) &nbsp;|&nbsp; Horizon 2045</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -111,39 +147,71 @@ if "df" not in data:
     st.error("Donnees absentes. Executez le pipeline ETL d'abord.")
     st.stop()
 
-df = data["df"]
-raw = data.get("raw")
-pred = data.get("pred")
-proj = data.get("proj")
+# --- Filter Togo only everywhere ---
+df_all = data["df"]
+df = df_all[df_all["country_code"] == FOCUS].copy()
+
+raw_all = data.get("raw")
+raw = raw_all[raw_all["country_code"] == FOCUS].copy() if raw_all is not None else None
+
+pred_all = data.get("pred")
+pred = pred_all[pred_all["country_code"] == FOCUS].copy() if pred_all is not None else None
+
+proj_all = data.get("proj")
+proj = proj_all[proj_all["country_code"] == FOCUS].copy() if proj_all is not None else None
+
 res = data.get("res")
 
+if df.empty:
+    st.error("Aucune donnee pour le Togo.")
+    st.stop()
+
 # ─────────────────────────────────────────────────────────────────────────────
-# SIDEBAR
+# SIDEBAR — FILTRES
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### Parametres")
-    all_cc = sorted(df["country_code"].unique())
-    focus = st.selectbox(
-        "Pays",
-        all_cc,
-        format_func=lambda c: df[df["country_code"]==c]["country_name"].iloc[0],
-        index=all_cc.index("TG") if "TG" in all_cc else 0,
-    )
-    y_min, y_max = int(df["year"].min()), int(df["year"].max())
-    yr = st.slider("Periode", y_min, y_max, (y_min, y_max))
+    st.markdown("### Togo")
+    st.markdown("Filtrer les donnees par annee.")
+    st.divider()
+
+    y_min_h, y_max_h = int(df["year"].min()), int(df["year"].max())
+    yr = st.slider("Periode historique", y_min_h, y_max_h, (y_min_h, y_max_h),
+                   key="yr_hist")
+
+    proj_years = []
+    if proj is not None and not proj.empty:
+        proj_years = sorted(proj["year"].unique().astype(int).tolist())
+    if proj_years:
+        proj_yr = st.select_slider(
+            "Horizon de projection",
+            options=proj_years,
+            value=proj_years[-1],
+            key="yr_proj",
+        )
+    else:
+        proj_yr = None
 
     st.divider()
-    focus_name = df[df["country_code"]==focus]["country_name"].iloc[0]
-    st.markdown(f"**{focus_name}**  \n{yr[0]} — {yr[1]}")
+    st.markdown(f"**Historique** : {yr[0]} — {yr[1]}")
+    if proj_yr:
+        st.markdown(f"**Projection jusqu'a** : {proj_yr}")
 
+    st.divider()
+    st.markdown("##### Exports")
+    if raw is not None:
+        st.download_button("Donnees brutes", raw.to_csv(index=False).encode(),
+                           "togo_brut.csv", key="dl_raw")
+    st.download_button("Donnees transformees", df.to_csv(index=False).encode(),
+                       "togo_transforme.csv", key="dl_transf")
     if pred is not None:
-        st.download_button("Exporter predictions", pred.to_csv(index=False).encode(), "predictions.csv")
+        st.download_button("Predictions", pred.to_csv(index=False).encode(),
+                           "togo_predictions.csv", key="dl_pred")
     if proj is not None:
-        st.download_button("Exporter projections", proj.to_csv(index=False).encode(), "projections.csv")
+        st.download_button("Projections 2045", proj.to_csv(index=False).encode(),
+                           "togo_projections.csv", key="dl_proj")
 
-# Filter
-dff = df[(df["year"].between(*yr))]
-tg = dff[dff["country_code"]==focus].sort_values("year")
+# Apply year filter
+tg = df[df["year"].between(*yr)].sort_values("year")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # KPIs
@@ -153,42 +221,45 @@ if not tg.empty:
     first = tg.iloc[0]
 
     cards = []
-    # Population
     if "SP.POP.TOTL" in tg.columns:
         pop_now = last["SP.POP.TOTL"]
-        pop_before = first["SP.POP.TOTL"]
-        growth = ((pop_now / pop_before) - 1) * 100 if pop_before > 0 else 0
-        cards.append(("Population", fmt(pop_now), f"+{growth:.0f}% depuis {yr[0]}", "up", C["pop"]))
+        pop_bef = first["SP.POP.TOTL"]
+        gr = ((pop_now / pop_bef) - 1) * 100 if pop_bef > 0 else 0
+        cards.append(("Population", fmt(pop_now), f"+{gr:.0f}% depuis {yr[0]}", "up", C["pop"]))
 
-    # kWh / hab
     if "EG.USE.ELEC.KH.PC" in tg.columns:
         kwh = last["EG.USE.ELEC.KH.PC"]
         kwh0 = first["EG.USE.ELEC.KH.PC"]
         d = kwh - kwh0
-        css = "up" if d > 0 else "dn"
-        cards.append(("kWh / habitant", fmt(kwh, "kWh"), f"{d:+.0f} kWh vs {yr[0]}", css, C["kwh"]))
+        cards.append(("kWh / habitant", fmt(kwh, "kWh"),
+                      f"{d:+.0f} kWh vs {yr[0]}", "up" if d > 0 else "dn", C["kwh"]))
 
-    # Conso totale
     if "conso_totale_gwh" in tg.columns:
         gwh = last["conso_totale_gwh"]
         gwh0 = first["conso_totale_gwh"]
         d = ((gwh / gwh0) - 1) * 100 if gwh0 > 0 else 0
-        cards.append(("Demande totale", fmt(gwh, "GWh"), f"+{d:.0f}% depuis {yr[0]}", "up", C["gwh"]))
+        cards.append(("Demande (GWh)", fmt(gwh, "GWh"),
+                      f"+{d:.0f}% depuis {yr[0]}", "up", C["gwh"]))
 
-    # Acces electricite
     if "EG.ELC.ACCS.ZS" in tg.columns:
         acc = last["EG.ELC.ACCS.ZS"]
         acc0 = first["EG.ELC.ACCS.ZS"]
         d = acc - acc0
-        css = "up" if d > 0 else "dn"
-        cards.append(("Acces electricite", f"{acc:.1f}%", f"{d:+.1f} pts vs {yr[0]}", css, C["good"]))
+        cards.append(("Acces electrique", f"{acc:.1f}%",
+                      f"{d:+.1f} pts vs {yr[0]}", "up" if d > 0 else "dn", C["good"]))
 
-    # R2 du modele
+    if proj_yr and proj is not None and not proj.empty:
+        row_p = proj[proj["year"] == proj_yr]
+        if not row_p.empty:
+            gp = row_p.iloc[0]["predicted_gwh"]
+            cards.append(("Prediction " + str(proj_yr), fmt(gp, "GWh"),
+                          "Projection IA", "up", C["proj"]))
+
     if res is not None and not res.empty:
         best = res.sort_values("r2", ascending=False).iloc[0]
-        cards.append(("Modele IA", f"R2 {best['r2']:.3f}", best["model"], "up", C["proj"]))
+        cards.append(("Modele", f"R2 {best['r2']:.3f}", best["model"], "up", C["accent"]))
 
-    html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:18px;">'
+    html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:8px;margin-bottom:14px;">'
     for title, val, delta, css, color in cards:
         html += f'''<div class="card" style="border-left-color:{color};">
             <div class="t">{title}</div><div class="v">{val}</div>
@@ -199,18 +270,196 @@ if not tg.empty:
 # ─────────────────────────────────────────────────────────────────────────────
 # TABS
 # ─────────────────────────────────────────────────────────────────────────────
-t1, t2, t3, t4 = st.tabs(["Hier — Tendances", "Aujourd'hui — Analyse", "Demain — Projections 2045", "Donnees"])
+t1, t2, t3, t4 = st.tabs([
+    "1. Extraction",
+    "2. Transformation",
+    "3. Analyse et Modele",
+    "4. Predictions 2045",
+])
 
-# ── TAB 1 : HIER ────────────────────────────────────────────────────────────
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 1 — EXTRACTION
+# ═════════════════════════════════════════════════════════════════════════════
 with t1:
-    st.markdown('<div class="sec">Evolution historique</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="step-box">
+        <div class="step-n">Etape 1 — Extract</div>
+        <div class="step-t">Donnees brutes extraites de la Banque Mondiale (WDI)</div>
+        <div class="step-d">API World Bank → 8 indicateurs pour le Togo (2000-2023)</div>
+    </div>""", unsafe_allow_html=True)
+
+    if raw is not None and not raw.empty:
+        # Filter by year
+        raw_f = raw[raw["year"].between(*yr)].sort_values("year")
+        st.markdown(f"**{len(raw_f)} enregistrements** sur la periode {yr[0]} — {yr[1]}")
+
+        # Indicateurs extraits
+        st.markdown('<div class="sec">Indicateurs releves</div>', unsafe_allow_html=True)
+        if "indicator_code" in raw_f.columns:
+            ind_counts = raw_f.groupby("indicator_code").agg(
+                observations=("value", "count"),
+                valeur_min=("value", "min"),
+                valeur_max=("value", "max"),
+            ).reset_index()
+            ind_counts["Indicateur"] = ind_counts["indicator_code"].map(
+                lambda c: IND_LABELS.get(c, c))
+            ind_counts = ind_counts.rename(columns={
+                "indicator_code": "Code WDI",
+                "observations": "Observations",
+                "valeur_min": "Min",
+                "valeur_max": "Max",
+            })
+            st.dataframe(ind_counts[["Code WDI", "Indicateur", "Observations", "Min", "Max"]],
+                         height=320)
+
+        st.divider()
+
+        # Visualisation par indicateur
+        st.markdown('<div class="sec">Donnees brutes par indicateur</div>', unsafe_allow_html=True)
+        if "indicator_code" in raw_f.columns:
+            ind_codes = raw_f["indicator_code"].unique().tolist()
+            sel_ind = st.selectbox("Indicateur", ind_codes,
+                                   format_func=lambda c: IND_LABELS.get(c, c),
+                                   key="raw_ind")
+            raw_ind = raw_f[raw_f["indicator_code"] == sel_ind].sort_values("year")
+
+            c1, c2 = st.columns([3, 2])
+            with c1:
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(
+                    x=raw_ind["year"], y=raw_ind["value"],
+                    mode="lines+markers", line=dict(color=C["accent"], width=2.5),
+                    marker=dict(size=5), name=IND_LABELS.get(sel_ind, sel_ind),
+                ))
+                fig.update_layout(
+                    title=f"{IND_LABELS.get(sel_ind, sel_ind)} — Togo",
+                    template=TMPL, height=340, margin=dict(t=35),
+                    hovermode="x unified",
+                )
+                st.plotly_chart(fig, key="raw_chart")
+
+            with c2:
+                st.markdown("##### Donnees brutes")
+                disp_raw = raw_ind[["year", "value"]].copy()
+                disp_raw.columns = ["Annee", "Valeur"]
+                st.dataframe(disp_raw, height=300)
+
+        st.divider()
+
+        # Table complete
+        with st.expander("Table complete des donnees brutes", expanded=False):
+            st.dataframe(raw_f, height=400)
+
+    else:
+        st.info("Fichier brut non disponible. Executez python src/etl/extract.py")
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 2 — TRANSFORMATION
+# ═════════════════════════════════════════════════════════════════════════════
+with t2:
+    st.markdown("""
+    <div class="step-box">
+        <div class="step-n">Etape 2 — Transform</div>
+        <div class="step-t">Pivot, nettoyage et creation de features</div>
+        <div class="step-d">Donnees brutes pivotees en colonnes, valeurs manquantes comblees,
+                            features derivees : conso_totale_gwh, ecart urbain/rural, pop. urbaine, etc.</div>
+    </div>""", unsafe_allow_html=True)
 
     if not tg.empty:
-        # Population + Conso totale (double axe)
+        st.markdown(f"**{len(tg)} lignes x {len(tg.columns)} colonnes** — Togo ({yr[0]}-{yr[1]})")
+
+        # Indicateurs principaux en colonnes lisibles
+        st.markdown('<div class="sec">Variables principales</div>', unsafe_allow_html=True)
+        main_cols = ["year", "SP.POP.TOTL", "EG.USE.ELEC.KH.PC", "conso_totale_gwh",
+                     "EG.ELC.ACCS.ZS", "EG.ELC.ACCS.UR.ZS", "EG.ELC.ACCS.RU.ZS",
+                     "NY.GDP.PCAP.CD", "gap_acces_urb_rur", "pop_urbaine"]
+        avail = [c for c in main_cols if c in tg.columns]
+        rename_map = {
+            "year": "Annee", "SP.POP.TOTL": "Population",
+            "EG.USE.ELEC.KH.PC": "kWh/hab", "conso_totale_gwh": "Demande (GWh)",
+            "EG.ELC.ACCS.ZS": "Acces (%)", "EG.ELC.ACCS.UR.ZS": "Acces urbain (%)",
+            "EG.ELC.ACCS.RU.ZS": "Acces rural (%)", "NY.GDP.PCAP.CD": "PIB/hab (USD)",
+            "gap_acces_urb_rur": "Ecart urb/rur (pts)", "pop_urbaine": "Pop. urbaine",
+        }
+        disp_main = tg[avail].copy()
+        disp_main = disp_main.rename(columns={c: rename_map.get(c, c) for c in avail})
+        st.dataframe(disp_main, height=380)
+
+        st.divider()
+
+        # Features derivees (lags, changes, ma3)
+        st.markdown('<div class="sec">Features d\'ingenierie</div>', unsafe_allow_html=True)
+        eng_cols = [c for c in tg.columns if any(x in c for x in ["_lag", "_chg", "_ma3",
+                    "year_norm", "intensite"])]
+        if eng_cols:
+            disp_eng = tg[["year"] + eng_cols].copy()
+            rename_eng = {"year": "Annee"}
+            disp_eng = disp_eng.rename(columns=rename_eng)
+            st.dataframe(disp_eng, height=300)
+        else:
+            st.info("Pas de features d'ingenierie detectees.")
+
+        st.divider()
+
+        # Stats descriptives
+        st.markdown('<div class="sec">Statistiques descriptives</div>', unsafe_allow_html=True)
+        num_cols = tg.select_dtypes(include=[np.number]).columns.tolist()
+        stats = tg[num_cols].describe().T
+        stats = stats[["count", "mean", "std", "min", "25%", "50%", "75%", "max"]].round(2)
+        st.dataframe(stats, height=350)
+
+        # Consultation par annee
+        st.divider()
+        st.markdown('<div class="sec">Consulter une annee</div>', unsafe_allow_html=True)
+        years_avail = sorted(tg["year"].unique().astype(int).tolist())
+        sel_year = st.selectbox("Annee", years_avail,
+                                index=len(years_avail) - 1, key="tr_year")
+        row_yr = tg[tg["year"] == sel_year]
+        if not row_yr.empty:
+            r = row_yr.iloc[0]
+            cc1, cc2, cc3, cc4 = st.columns(4)
+            with cc1:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['pop']};">
+                    <div class="t">Population</div>
+                    <div class="v">{fmt(r.get('SP.POP.TOTL', np.nan))}</div></div>""",
+                    unsafe_allow_html=True)
+            with cc2:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['kwh']};">
+                    <div class="t">kWh / habitant</div>
+                    <div class="v">{fmt(r.get('EG.USE.ELEC.KH.PC', np.nan), 'kWh')}</div></div>""",
+                    unsafe_allow_html=True)
+            with cc3:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['gwh']};">
+                    <div class="t">Demande totale</div>
+                    <div class="v">{fmt(r.get('conso_totale_gwh', np.nan), 'GWh')}</div></div>""",
+                    unsafe_allow_html=True)
+            with cc4:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['good']};">
+                    <div class="t">Acces electrique</div>
+                    <div class="v">{r.get('EG.ELC.ACCS.ZS', 0):.1f}%</div></div>""",
+                    unsafe_allow_html=True)
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 3 — ANALYSE ET MODELE
+# ═════════════════════════════════════════════════════════════════════════════
+with t3:
+    st.markdown("""
+    <div class="step-box">
+        <div class="step-n">Etape 3 — Analyse et Entrainement</div>
+        <div class="step-t">Tendances historiques et validation du modele IA</div>
+        <div class="step-d">Exploration des correlations population/energie,
+                            entrainement de 4 algorithmes, selection du meilleur modele.</div>
+    </div>""", unsafe_allow_html=True)
+
+    if not tg.empty:
+        # Tendance Population + GWh
+        st.markdown('<div class="sec">Population et demande electrique</div>', unsafe_allow_html=True)
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         if "SP.POP.TOTL" in tg.columns:
             fig.add_trace(go.Bar(
-                x=tg["year"], y=tg["SP.POP.TOTL"]/1e6, name="Population (M)",
+                x=tg["year"], y=tg["SP.POP.TOTL"] / 1e6, name="Population (M)",
                 marker_color=C["pop"], opacity=0.35,
             ), secondary_y=False)
         if "conso_totale_gwh" in tg.columns:
@@ -220,15 +469,15 @@ with t1:
                 marker=dict(size=4),
             ), secondary_y=True)
         fig.update_layout(
-            title=f"{focus_name} — Population et demande electrique",
-            template=TMPL, height=400, hovermode="x unified", margin=dict(t=40),
+            title="Togo — Population et demande electrique",
+            template=TMPL, height=380, hovermode="x unified", margin=dict(t=40),
             legend=dict(orientation="h", y=-0.15, font_size=10),
         )
         fig.update_yaxes(title_text="Population (millions)", secondary_y=False)
         fig.update_yaxes(title_text="GWh", secondary_y=True)
-        st.plotly_chart(fig, key="hist_pop_gwh")
+        st.plotly_chart(fig, key="an_pop_gwh")
 
-        # kWh/hab evolution
+        # kWh/hab + Acces
         c1, c2 = st.columns(2)
         with c1:
             if "EG.USE.ELEC.KH.PC" in tg.columns:
@@ -237,12 +486,11 @@ with t1:
                     x=tg["year"], y=tg["EG.USE.ELEC.KH.PC"],
                     mode="lines+markers", fill="tozeroy",
                     line=dict(color=C["kwh"], width=2),
-                    fillcolor="rgba(230,126,34,0.08)",
-                    name="kWh / hab",
+                    fillcolor="rgba(230,126,34,0.08)", name="kWh/hab",
                 ))
                 fig.update_layout(title="Consommation par habitant", template=TMPL,
-                                  height=300, margin=dict(t=35), yaxis_title="kWh/hab")
-                st.plotly_chart(fig, key="hist_kwh")
+                                  height=280, margin=dict(t=35), yaxis_title="kWh/hab")
+                st.plotly_chart(fig, key="an_kwh")
 
         with c2:
             if "EG.ELC.ACCS.ZS" in tg.columns:
@@ -257,329 +505,250 @@ with t1:
                                              line=dict(color=C["warn"], width=2)))
                 fig.add_trace(go.Scatter(x=tg["year"], y=tg["EG.ELC.ACCS.ZS"],
                                          name="Total", line=dict(color=C["pop"], width=2, dash="dash")))
-                fig.update_layout(title="Acces electricite (%)", template=TMPL, height=300,
+                fig.update_layout(title="Acces electricite (%)", template=TMPL, height=280,
                                   margin=dict(t=35), yaxis_title="%",
                                   legend=dict(orientation="h", y=-0.18, font_size=10))
-                st.plotly_chart(fig, key="hist_acces")
+                st.plotly_chart(fig, key="an_acces")
 
-        # Table
-        with st.expander("Donnees", expanded=False):
-            show_cols = ["year", "SP.POP.TOTL", "EG.USE.ELEC.KH.PC", "conso_totale_gwh", "EG.ELC.ACCS.ZS"]
-            show_cols = [c for c in show_cols if c in tg.columns]
-            display = tg[show_cols].copy()
-            display.columns = [{"year": "Annee", "SP.POP.TOTL": "Population",
-                                "EG.USE.ELEC.KH.PC": "kWh/hab", "conso_totale_gwh": "Demande GWh",
-                                "EG.ELC.ACCS.ZS": "Acces %"}.get(c, c) for c in show_cols]
-            st.dataframe(display, height=300)
+        # Correlation
+        st.divider()
+        st.markdown('<div class="sec">Correlation et elasticite</div>', unsafe_allow_html=True)
+        if len(tg) > 3 and "SP.POP.TOTL" in tg.columns and "conso_totale_gwh" in tg.columns:
+            corr = tg["SP.POP.TOTL"].corr(tg["conso_totale_gwh"])
+            pop_chg = (tg["SP.POP.TOTL"].iloc[-1] / tg["SP.POP.TOTL"].iloc[0] - 1) * 100
+            gwh_chg = (tg["conso_totale_gwh"].iloc[-1] / tg["conso_totale_gwh"].iloc[0] - 1) * 100 \
+                if tg["conso_totale_gwh"].iloc[0] > 0 else 0
+            elast = gwh_chg / pop_chg if pop_chg > 0 else 0
 
-
-# ── TAB 2 : AUJOURD'HUI ─────────────────────────────────────────────────────
-with t2:
-    st.markdown('<div class="sec">Correlation population / energie</div>', unsafe_allow_html=True)
-
-    if "SP.POP.TOTL" in dff.columns and "conso_totale_gwh" in dff.columns:
-        latest_yr = int(dff["year"].max())
-
-        c1, c2 = st.columns([3, 2])
-        with c1:
-            # Scatter : pop vs conso totale (tous pays, derniere annee)
-            snap = dff[dff["year"]==latest_yr].dropna(subset=["SP.POP.TOTL","conso_totale_gwh"])
-            fig = go.Figure()
-            for _, r in snap.iterrows():
-                is_f = r["country_code"] == focus
-                fig.add_trace(go.Scatter(
-                    x=[r["SP.POP.TOTL"]/1e6], y=[r["conso_totale_gwh"]],
-                    mode="markers+text", text=[r["country_name"]],
-                    textposition="top center", textfont=dict(size=9 if not is_f else 11),
-                    marker=dict(size=14 if is_f else 8,
-                                color=C["gwh"] if is_f else C["muted"],
-                                line=dict(width=2 if is_f else 0, color="#fff")),
-                    showlegend=False,
-                ))
-            # Trendline
-            if len(snap) > 2:
-                x_arr = snap["SP.POP.TOTL"].values / 1e6
-                y_arr = snap["conso_totale_gwh"].values
-                z = np.polyfit(x_arr, y_arr, 1)
-                xr = np.linspace(x_arr.min(), x_arr.max(), 80)
-                fig.add_trace(go.Scatter(x=xr, y=z[0]*xr+z[1], mode="lines",
-                                         line=dict(dash="dash", color=C["muted"], width=1),
-                                         showlegend=False))
-            fig.update_layout(
-                title=f"Population vs Demande electrique — UEMOA {latest_yr}",
-                xaxis_title="Population (millions)", yaxis_title="Demande (GWh)",
-                template=TMPL, height=400, margin=dict(t=40),
-            )
-            st.plotly_chart(fig, key="scatter_pop_gwh")
-
-        with c2:
-            # Correlation stats
-            if not tg.empty and len(tg) > 3:
-                corr = tg["SP.POP.TOTL"].corr(tg["conso_totale_gwh"])
-                st.markdown(f"""
-                <div class="card" style="border-left-color:{C['gwh']}; margin-bottom:10px;">
-                    <div class="t">Correlation</div>
+            cc1, cc2, cc3 = st.columns(3)
+            with cc1:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['gwh']};">
+                    <div class="t">Correlation Pearson</div>
                     <div class="v">{corr:.3f}</div>
-                    <div class="ctx">Pearson — population vs demande GWh</div>
-                </div>""", unsafe_allow_html=True)
-
-                # Elasticites
-                pop_chg = (tg["SP.POP.TOTL"].iloc[-1] / tg["SP.POP.TOTL"].iloc[0] - 1) * 100
-                gwh_chg = (tg["conso_totale_gwh"].iloc[-1] / tg["conso_totale_gwh"].iloc[0] - 1) * 100 if tg["conso_totale_gwh"].iloc[0] > 0 else 0
-                elast = gwh_chg / pop_chg if pop_chg > 0 else 0
-
-                st.markdown(f"""
-                <div class="card" style="border-left-color:{C['kwh']}; margin-bottom:10px;">
+                    <div class="ctx">Population vs Demande GWh</div></div>""",
+                    unsafe_allow_html=True)
+            with cc2:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['kwh']};">
                     <div class="t">Elasticite</div>
                     <div class="v">{elast:.2f}</div>
-                    <div class="ctx">+1% pop = +{elast:.2f}% demande electrique</div>
-                </div>""", unsafe_allow_html=True)
-
-                st.markdown(f"""
-                <div class="card" style="border-left-color:{C['pop']};">
+                    <div class="ctx">+1% pop = +{elast:.2f}% demande</div></div>""",
+                    unsafe_allow_html=True)
+            with cc3:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['pop']};">
                     <div class="t">Croissance pop.</div>
                     <div class="v">+{pop_chg:.0f}%</div>
-                    <div class="ctx">{yr[0]} — {yr[1]}</div>
-                </div>""", unsafe_allow_html=True)
+                    <div class="ctx">{yr[0]} — {yr[1]}</div></div>""",
+                    unsafe_allow_html=True)
 
-    st.divider()
+        # Validation du modele
+        if pred is not None and not pred.empty:
+            st.divider()
+            st.markdown('<div class="sec">Validation du modele (observe vs predit)</div>',
+                        unsafe_allow_html=True)
 
-    # Classement UEMOA
-    st.markdown('<div class="sec">Classement UEMOA</div>', unsafe_allow_html=True)
-    if "conso_totale_gwh" in dff.columns:
-        latest_yr = int(dff["year"].max())
-        rank = dff[dff["year"]==latest_yr].dropna(subset=["conso_totale_gwh"]).sort_values("conso_totale_gwh", ascending=True)
-        fig = go.Figure()
-        colors = [C["gwh"] if r["country_code"]==focus else C["muted"] for _, r in rank.iterrows()]
-        fig.add_trace(go.Bar(
-            x=rank["conso_totale_gwh"], y=rank["country_name"], orientation="h",
-            marker_color=colors,
-            text=[f"{v:,.0f} GWh" for v in rank["conso_totale_gwh"]], textposition="outside",
-            textfont_size=10,
-        ))
-        fig.update_layout(title=f"Demande electrique totale — {latest_yr}", template=TMPL,
-                          height=300, margin=dict(l=10, r=60, t=35, b=10),
-                          xaxis=dict(showticklabels=False))
-        st.plotly_chart(fig, key="rank_gwh")
-
-    # Predictions historiques (validation)
-    if pred is not None and not pred.empty:
-        st.markdown('<div class="sec">Validation du modele</div>', unsafe_allow_html=True)
-        tg_pred = pred[pred["country_code"]==focus]
-        if not tg_pred.empty:
             fig = go.Figure()
-            fig.add_trace(go.Scatter(x=tg_pred["year"], y=tg_pred["actual"],
+            fig.add_trace(go.Scatter(x=pred["year"], y=pred["actual"],
                                      name="Observe", mode="lines+markers",
                                      line=dict(color=C["gwh"], width=2.5)))
-            fig.add_trace(go.Scatter(x=tg_pred["year"], y=tg_pred["predicted"],
+            fig.add_trace(go.Scatter(x=pred["year"], y=pred["predicted"],
                                      name="Predit (IA)", mode="lines+markers",
                                      line=dict(color=C["proj"], width=2, dash="dash")))
-            fig.update_layout(title=f"Observe vs Predit — {focus_name}",
-                              yaxis_title="GWh", template=TMPL, height=350,
+            fig.update_layout(title="Togo — Observe vs Predit",
+                              yaxis_title="GWh", template=TMPL, height=340,
                               hovermode="x unified", margin=dict(t=40),
                               legend=dict(orientation="h", y=-0.15, font_size=10))
-            st.plotly_chart(fig, key="valid")
+            st.plotly_chart(fig, key="an_valid")
 
-            # Metriques
-            mae = tg_pred["error"].abs().mean()
-            rmse = np.sqrt((tg_pred["error"]**2).mean())
+            mae = pred["error"].abs().mean()
+            rmse = np.sqrt((pred["error"] ** 2).mean())
             mc = st.columns(3)
             mc[0].metric("MAE", f"{mae:.1f} GWh")
             mc[1].metric("RMSE", f"{rmse:.1f} GWh")
             if res is not None:
                 mc[2].metric("R2", f"{res.sort_values('r2', ascending=False).iloc[0]['r2']:.4f}")
 
+            with st.expander("Predictions detaillees", expanded=False):
+                dp = pred[["year", "actual", "predicted", "error", "error_pct"]].copy()
+                dp.columns = ["Annee", "Observe (GWh)", "Predit (GWh)", "Erreur", "Erreur (%)"]
+                st.dataframe(dp, height=300)
 
-# ── TAB 3 : DEMAIN ──────────────────────────────────────────────────────────
-with t3:
-    st.markdown('<div class="sec">Projections de demande electrique</div>', unsafe_allow_html=True)
+        # Comparaison modeles
+        if res is not None and not res.empty:
+            st.divider()
+            st.markdown('<div class="sec">Comparaison des algorithmes</div>', unsafe_allow_html=True)
+            r2_vals = res.sort_values("r2", ascending=False)
+            fig = go.Figure()
+            colors = [C["good"] if v > 0.85 else C["kwh"] if v > 0.7 else C["warn"]
+                      for v in r2_vals["r2"]]
+            fig.add_trace(go.Bar(
+                x=r2_vals["model"], y=r2_vals["r2"], marker_color=colors,
+                text=[f"{v:.3f}" for v in r2_vals["r2"]], textposition="outside",
+                textfont_size=11,
+            ))
+            fig.update_layout(title="R2 par modele", yaxis_title="R2",
+                              yaxis_range=[0, 1.08], template=TMPL, height=300,
+                              margin=dict(t=40))
+            st.plotly_chart(fig, key="an_models")
+
+            with st.expander("Detail des performances", expanded=False):
+                st.dataframe(res, height=200)
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# TAB 4 — PREDICTIONS 2045
+# ═════════════════════════════════════════════════════════════════════════════
+with t4:
+    st.markdown("""
+    <div class="step-box">
+        <div class="step-n">Etape 4 — Predict</div>
+        <div class="step-t">Projections de la demande electrique — Togo 2024 a 2045</div>
+        <div class="step-d">Le modele IA extrapole les tendances demographiques et energetiques
+                            pour anticiper la demande future en electricite.</div>
+    </div>""", unsafe_allow_html=True)
 
     if proj is not None and not proj.empty:
-        tg_proj = proj[proj["country_code"]==focus].sort_values("year")
+        # Filter projections by selected horizon
+        proj_f = proj[proj["year"] <= proj_yr].sort_values("year") if proj_yr else proj.sort_values("year")
 
-        if not tg_proj.empty:
-            # Concatenate historique + projections
-            fig = go.Figure()
+        # --- Graphique principal : historique + projections ---
+        st.markdown('<div class="sec">Trajectoire historique et projections</div>',
+                    unsafe_allow_html=True)
+        fig = go.Figure()
 
-            # Historique
-            if not tg.empty and "conso_totale_gwh" in tg.columns:
-                fig.add_trace(go.Scatter(
-                    x=tg["year"], y=tg["conso_totale_gwh"],
-                    name="Historique", mode="lines+markers",
-                    line=dict(color=C["gwh"], width=2.5), marker=dict(size=4),
-                ))
-
-            # Projections
+        # Historique
+        if not tg.empty and "conso_totale_gwh" in tg.columns:
             fig.add_trace(go.Scatter(
-                x=tg_proj["year"], y=tg_proj["predicted_gwh"],
-                name="Projection IA", mode="lines+markers",
-                line=dict(color=C["proj"], width=2.5),
-                marker=dict(size=7, symbol="diamond"),
+                x=tg["year"], y=tg["conso_totale_gwh"],
+                name="Historique", mode="lines+markers",
+                line=dict(color=C["gwh"], width=2.5), marker=dict(size=4),
             ))
 
-            # IC
-            fig.add_trace(go.Scatter(
-                x=pd.concat([tg_proj["year"], tg_proj["year"][::-1]]),
-                y=pd.concat([tg_proj["ci_upper"], tg_proj["ci_lower"][::-1]]),
-                fill="toself", fillcolor=C["ci"],
-                line=dict(color="rgba(0,0,0,0)"), name="IC 95%",
-            ))
+        # Projections
+        fig.add_trace(go.Scatter(
+            x=proj_f["year"], y=proj_f["predicted_gwh"],
+            name="Projection IA", mode="lines+markers",
+            line=dict(color=C["proj"], width=2.5),
+            marker=dict(size=6, symbol="diamond"),
+        ))
 
-            fig.update_layout(
-                title=f"{focus_name} — Demande electrique : historique et projections",
-                yaxis_title="GWh", template=TMPL, height=420,
+        # IC
+        fig.add_trace(go.Scatter(
+            x=pd.concat([proj_f["year"], proj_f["year"][::-1]]),
+            y=pd.concat([proj_f["ci_upper"], proj_f["ci_lower"][::-1]]),
+            fill="toself", fillcolor=C["ci"],
+            line=dict(color="rgba(0,0,0,0)"), name="IC 95%",
+        ))
+
+        # Ligne verticale : "aujourd'hui"
+        fig.add_vline(x=y_max_h + 0.5, line_dash="dot", line_color=C["muted"],
+                      annotation_text="Aujourd'hui", annotation_position="top left",
+                      annotation_font_color=C["muted"], annotation_font_size=10)
+
+        fig.update_layout(
+            title=f"Togo — Demande electrique : {yr[0]} a {proj_yr}",
+            yaxis_title="GWh", template=TMPL, height=440,
+            hovermode="x unified", margin=dict(t=40),
+            legend=dict(orientation="h", y=-0.12, font_size=10),
+        )
+        st.plotly_chart(fig, key="pred_main")
+
+        # --- Population projetee ---
+        if "pop_projected" in proj_f.columns and proj_f["pop_projected"].notna().any():
+            st.markdown('<div class="sec">Population projetee</div>', unsafe_allow_html=True)
+
+            fig2 = make_subplots(specs=[[{"secondary_y": True}]])
+            # Historique pop
+            if "SP.POP.TOTL" in tg.columns:
+                fig2.add_trace(go.Bar(
+                    x=tg["year"], y=tg["SP.POP.TOTL"] / 1e6, name="Historique (M)",
+                    marker_color=C["pop"], opacity=0.35,
+                ), secondary_y=False)
+            # Projection pop
+            fig2.add_trace(go.Bar(
+                x=proj_f["year"], y=proj_f["pop_projected"] / 1e6, name="Projetee (M)",
+                marker_color=C["proj"], opacity=0.45,
+            ), secondary_y=False)
+            # GWh projetee
+            fig2.add_trace(go.Scatter(
+                x=proj_f["year"], y=proj_f["predicted_gwh"], name="Demande (GWh)",
+                mode="lines+markers", line=dict(color=C["gwh"], width=2),
+                marker=dict(size=4),
+            ), secondary_y=True)
+            fig2.update_layout(
+                title="Population et demande projetees", template=TMPL, height=360,
                 hovermode="x unified", margin=dict(t=40),
                 legend=dict(orientation="h", y=-0.15, font_size=10),
             )
-            st.plotly_chart(fig, key="proj_main")
+            fig2.update_yaxes(title_text="Population (millions)", secondary_y=False)
+            fig2.update_yaxes(title_text="GWh", secondary_y=True)
+            st.plotly_chart(fig2, key="pred_pop")
 
-            # Table projections
-            st.markdown("##### Detail des projections")
-            disp = tg_proj[["year", "predicted_gwh", "ci_lower", "ci_upper", "pop_projected"]].copy()
-            disp.columns = ["Annee", "Demande (GWh)", "IC bas", "IC haut", "Population projetee"]
-            disp["Population projetee"] = disp["Population projetee"].apply(
-                lambda v: f"{v/1e6:.2f} M" if pd.notna(v) else "—"
-            )
-            st.dataframe(disp, height=280)
-
-            # Insight
-            if "pop_projected" in tg_proj.columns and tg_proj["pop_projected"].notna().any():
-                last_proj = tg_proj.iloc[-1]
-                last_hist_gwh = tg["conso_totale_gwh"].iloc[-1] if "conso_totale_gwh" in tg.columns else 0
-                growth_gwh = ((last_proj["predicted_gwh"] / last_hist_gwh) - 1) * 100 if last_hist_gwh > 0 else 0
-                last_pop_hist = tg["SP.POP.TOTL"].iloc[-1] if "SP.POP.TOTL" in tg.columns else 0
-                growth_pop = ((last_proj["pop_projected"] / last_pop_hist) - 1) * 100 if last_pop_hist > 0 else 0
-
-                c1, c2 = st.columns(2)
-                with c1:
-                    st.markdown(f"""
-                    <div class="card" style="border-left-color:{C['proj']};">
-                        <div class="t">Horizon {int(last_proj['year'])}</div>
-                        <div class="v">{last_proj['predicted_gwh']:.0f} GWh</div>
-                        <div class="d up">+{growth_gwh:.0f}% vs {yr[1]}</div>
-                        <div class="ctx">Population projetee : {last_proj['pop_projected']/1e6:.1f} M (+{growth_pop:.0f}%)</div>
-                    </div>""", unsafe_allow_html=True)
-
-                with c2:
-                    kwh_proj = last_proj["predicted_gwh"] * 1e6 / last_proj["pop_projected"] if last_proj["pop_projected"] > 0 else 0
-                    st.markdown(f"""
-                    <div class="card" style="border-left-color:{C['kwh']};">
-                        <div class="t">kWh / hab projete</div>
-                        <div class="v">{kwh_proj:.0f} kWh</div>
-                        <div class="ctx">Si toute la demande est satisfaite</div>
-                    </div>""", unsafe_allow_html=True)
-
-        # Comparaison UEMOA
         st.divider()
-        st.markdown('<div class="sec">Projections UEMOA</div>', unsafe_allow_html=True)
-        last_year_proj = int(proj["year"].max())
-        all_proj_last = proj[proj["year"]==last_year_proj].sort_values("predicted_gwh", ascending=True)
-        if not all_proj_last.empty:
-            colors = [C["proj"] if r["country_code"]==focus else C["muted"] for _, r in all_proj_last.iterrows()]
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=all_proj_last["predicted_gwh"], y=all_proj_last["country_name"],
-                orientation="h", marker_color=colors,
-                text=[f"{v:,.0f} GWh" for v in all_proj_last["predicted_gwh"]],
-                textposition="outside", textfont_size=10,
-            ))
-            fig.update_layout(title=f"Demande projetee — {last_year_proj}",
-                              template=TMPL, height=300,
-                              margin=dict(l=10, r=60, t=35, b=10),
-                              xaxis=dict(showticklabels=False))
-            st.plotly_chart(fig, key="proj_uemoa")
+
+        # --- Consultation directe par annee ---
+        st.markdown('<div class="sec">Consulter une annee de projection</div>',
+                    unsafe_allow_html=True)
+        proj_years_sel = sorted(proj_f["year"].unique().astype(int).tolist())
+        sel_proj_yr = st.select_slider("Annee projetee", options=proj_years_sel,
+                                       value=proj_years_sel[-1], key="pred_yr_sel")
+        row_sel = proj_f[proj_f["year"] == sel_proj_yr]
+        if not row_sel.empty:
+            r = row_sel.iloc[0]
+            last_hist_gwh = tg["conso_totale_gwh"].iloc[-1] if (
+                not tg.empty and "conso_totale_gwh" in tg.columns) else 0
+            gr_gwh = ((r["predicted_gwh"] / last_hist_gwh) - 1) * 100 if last_hist_gwh > 0 else 0
+            last_pop = tg["SP.POP.TOTL"].iloc[-1] if (
+                not tg.empty and "SP.POP.TOTL" in tg.columns) else 0
+            gr_pop = ((r["pop_projected"] / last_pop) - 1) * 100 if (
+                pd.notna(r.get("pop_projected")) and last_pop > 0) else 0
+            kwh_proj = r["predicted_gwh"] * 1e6 / r["pop_projected"] if (
+                pd.notna(r.get("pop_projected")) and r["pop_projected"] > 0) else 0
+
+            cc1, cc2, cc3, cc4 = st.columns(4)
+            with cc1:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['proj']};">
+                    <div class="t">Demande {sel_proj_yr}</div>
+                    <div class="v">{r['predicted_gwh']:,.0f} GWh</div>
+                    <div class="d up">+{gr_gwh:.0f}% vs {y_max_h}</div></div>""",
+                    unsafe_allow_html=True)
+            with cc2:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['pop']};">
+                    <div class="t">Population</div>
+                    <div class="v">{r['pop_projected']/1e6:.1f} M</div>
+                    <div class="d up">+{gr_pop:.0f}% vs {y_max_h}</div></div>""",
+                    unsafe_allow_html=True)
+            with cc3:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['kwh']};">
+                    <div class="t">kWh / hab projete</div>
+                    <div class="v">{kwh_proj:.0f} kWh</div>
+                    <div class="ctx">Demande / Population</div></div>""",
+                    unsafe_allow_html=True)
+            with cc4:
+                st.markdown(f"""<div class="card" style="border-left-color:{C['good']};">
+                    <div class="t">Intervalle de confiance</div>
+                    <div class="v">{r['ci_lower']:,.0f} — {r['ci_upper']:,.0f}</div>
+                    <div class="ctx">GWh (IC 95%)</div></div>""",
+                    unsafe_allow_html=True)
+
+        st.divider()
+
+        # --- Table complete ---
+        st.markdown('<div class="sec">Table complete des projections</div>', unsafe_allow_html=True)
+        disp = proj_f[["year", "predicted_gwh", "ci_lower", "ci_upper", "pop_projected"]].copy()
+        disp.columns = ["Annee", "Demande (GWh)", "IC bas (GWh)", "IC haut (GWh)", "Population"]
+        disp["Population"] = disp["Population"].apply(
+            lambda v: f"{v/1e6:.2f} M" if pd.notna(v) else "—")
+        st.dataframe(disp, height=500)
 
     else:
         st.info("Executez python src/models/predict.py pour generer les projections.")
-
-    # Model perf
-    if res is not None and not res.empty:
-        st.divider()
-        st.markdown('<div class="sec">Comparaison des algorithmes</div>', unsafe_allow_html=True)
-        fig = go.Figure()
-        r2_vals = res.sort_values("r2", ascending=False)
-        colors = [C["good"] if v > 0.85 else C["kwh"] if v > 0.7 else C["warn"] for v in r2_vals["r2"]]
-        fig.add_trace(go.Bar(
-            x=r2_vals["model"], y=r2_vals["r2"], marker_color=colors,
-            text=[f"{v:.3f}" for v in r2_vals["r2"]], textposition="outside", textfont_size=11,
-        ))
-        fig.update_layout(title="R2 par modele", yaxis_title="R2", yaxis_range=[0, 1.08],
-                          template=TMPL, height=320, margin=dict(t=40))
-        st.plotly_chart(fig, key="model_cmp")
-
-# ── TAB 4 : DONNEES ──────────────────────────────────────────────────────────
-with t4:
-    st.markdown('<div class="sec">Donnees utilisees dans le pipeline</div>', unsafe_allow_html=True)
-
-    d_sub = st.tabs(["Donnees brutes (API)", "Donnees transformees", "Predictions", "Projections"])
-
-    with d_sub[0]:
-        st.markdown("Donnees extraites de l'API Banque Mondiale (WDI) — avant transformation.")
-        if raw is not None and not raw.empty:
-            st.markdown(f"**{len(raw):,} enregistrements** | {int(raw['year'].min())} — {int(raw['year'].max())}")
-            raw_focus = raw[raw["country_code"]==focus] if "country_code" in raw.columns else raw
-            st.dataframe(raw_focus, height=450)
-            st.download_button("Telecharger brut (CSV)", raw.to_csv(index=False).encode(), "donnees_brutes.csv", key="dl_raw")
-        else:
-            st.info("Fichier brut non disponible.")
-
-    with d_sub[1]:
-        st.markdown("Donnees apres pivot, nettoyage et feature engineering.")
-        if not df.empty:
-            df_focus = dff[dff["country_code"]==focus].sort_values("year")
-            st.markdown(f"**{len(df_focus)} lignes x {len(df_focus.columns)} colonnes** — {focus_name}")
-
-            col_labels = {
-                "year": "Annee", "country_code": "Code", "country_name": "Pays",
-                "SP.POP.TOTL": "Population", "SP.POP.GROW": "Croiss. pop (%)",
-                "SP.URB.TOTL.IN.ZS": "Urbanisation (%)",
-                "EG.USE.ELEC.KH.PC": "kWh/hab", "EG.ELC.ACCS.ZS": "Acces electr. (%)",
-                "EG.ELC.ACCS.UR.ZS": "Acces urbain (%)", "EG.ELC.ACCS.RU.ZS": "Acces rural (%)",
-                "NY.GDP.PCAP.CD": "PIB/hab (USD)", "conso_totale_gwh": "Demande (GWh)",
-                "gap_acces_urb_rur": "Ecart urb/rur", "pop_urbaine": "Pop. urbaine",
-                "intensite_kwh_pib": "Intensite kWh/PIB",
-            }
-            disp_df = df_focus.copy()
-            disp_df = disp_df.rename(columns={c: col_labels.get(c, c) for c in disp_df.columns})
-            st.dataframe(disp_df, height=450)
-            st.download_button("Telecharger transforme (CSV)", df_focus.to_csv(index=False).encode(), "donnees_transformees.csv", key="dl_proc")
-
-            # Stats descriptives
-            with st.expander("Statistiques descriptives", expanded=False):
-                num_cols = df_focus.select_dtypes(include=[np.number]).columns.tolist()
-                st.dataframe(df_focus[num_cols].describe().T.round(2), height=350)
-
-    with d_sub[2]:
-        st.markdown("Predictions du modele sur les donnees historiques (validation).")
-        if pred is not None and not pred.empty:
-            pred_focus = pred[pred["country_code"]==focus]
-            st.markdown(f"**{len(pred_focus)} lignes** — {focus_name}")
-            disp_pred = pred_focus[["year", "actual", "predicted", "error", "error_pct"]].copy()
-            disp_pred.columns = ["Annee", "Observe (GWh)", "Predit (GWh)", "Erreur", "Erreur (%)"]
-            st.dataframe(disp_pred, height=400)
-            st.download_button("Telecharger predictions (CSV)", pred.to_csv(index=False).encode(), "predictions.csv", key="dl_pred")
-        else:
-            st.info("Predictions non disponibles.")
-
-    with d_sub[3]:
-        st.markdown("Projections futures du modele IA (2024 — 2045).")
-        if proj is not None and not proj.empty:
-            proj_focus = proj[proj["country_code"]==focus].sort_values("year")
-            st.markdown(f"**{len(proj_focus)} annees projetees** — {focus_name}")
-            disp_proj = proj_focus[["year", "predicted_gwh", "ci_lower", "ci_upper", "pop_projected"]].copy()
-            disp_proj.columns = ["Annee", "Demande (GWh)", "IC bas", "IC haut", "Population"]
-            disp_proj["Population"] = disp_proj["Population"].apply(
-                lambda v: f"{v/1e6:.2f} M" if pd.notna(v) else "—")
-            st.dataframe(disp_proj, height=500)
-            st.download_button("Telecharger projections (CSV)", proj.to_csv(index=False).encode(), "projections.csv", key="dl_proj")
-        else:
-            st.info("Projections non disponibles.")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="foot">
-Source : Banque Mondiale (WDI)  |  Modeles : scikit-learn, XGBoost, LightGBM  |  Streamlit + Plotly
+Source : Banque Mondiale (WDI)  |  Modeles : scikit-learn, XGBoost, LightGBM
+|  Pipeline ETL Python  |  Streamlit + Plotly
 </div>
 """, unsafe_allow_html=True)
