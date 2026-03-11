@@ -35,14 +35,31 @@ C = {
 }
 
 IND_LABELS = {
+    # Demographie
     "SP.POP.TOTL": "Population totale",
     "SP.POP.GROW": "Croissance demographique (%)",
     "SP.URB.TOTL.IN.ZS": "Taux d'urbanisation (%)",
+    "SP.DYN.TFRT.IN": "Taux de fecondite (naissances/femme)",
+    "SP.DYN.LE00.IN": "Esperance de vie (annees)",
+    "SP.POP.0014.TO.ZS": "Population 0-14 ans (%)",
+    "SP.POP.1564.TO.ZS": "Population 15-64 ans (%)",
+    # Energie
     "EG.USE.ELEC.KH.PC": "Consommation electrique (kWh/hab)",
     "EG.ELC.ACCS.ZS": "Acces a l'electricite (%)",
     "EG.ELC.ACCS.UR.ZS": "Acces electricite urbain (%)",
     "EG.ELC.ACCS.RU.ZS": "Acces electricite rural (%)",
+    "EG.FEC.RNEW.ZS": "Energie renouvelable (% conso finale)",
+    "EG.USE.PCAP.KG.OE": "Utilisation energie (kg petrole eq./hab)",
+    # Economie
     "NY.GDP.PCAP.CD": "PIB par habitant (USD)",
+    "NY.GDP.MKTP.CD": "PIB total (USD courants)",
+    "NY.GDP.MKTP.KD.ZG": "Croissance PIB (%)",
+    "NV.IND.TOTL.ZS": "Part industrie (% PIB)",
+    "FP.CPI.TOTL.ZG": "Inflation IPC (%)",
+    # Social / Infrastructure
+    "IT.CEL.SETS.P2": "Abonnements mobile (/100 hab)",
+    "SE.ADT.LITR.ZS": "Taux alphabetisation adultes (%)",
+    "SL.UEM.TOTL.ZS": "Chomage (%)",
 }
 
 
@@ -147,12 +164,12 @@ if "df" not in data:
     st.error("Donnees absentes. Executez le pipeline ETL d'abord.")
     st.stop()
 
-# --- Filter Togo only everywhere ---
+# --- Data ---
 df_all = data["df"]
 df = df_all[df_all["country_code"] == FOCUS].copy()
 
-raw_all = data.get("raw")
-raw = raw_all[raw_all["country_code"] == FOCUS].copy() if raw_all is not None else None
+raw_all = data.get("raw")  # ALL countries (full extraction)
+raw_tg = raw_all[raw_all["country_code"] == FOCUS].copy() if raw_all is not None else None
 
 pred_all = data.get("pred")
 pred = pred_all[pred_all["country_code"] == FOCUS].copy() if pred_all is not None else None
@@ -198,9 +215,9 @@ with st.sidebar:
 
     st.divider()
     st.markdown("##### Exports")
-    if raw is not None:
-        st.download_button("Donnees brutes", raw.to_csv(index=False).encode(),
-                           "togo_brut.csv", key="dl_raw")
+    if raw_all is not None:
+        st.download_button("Donnees brutes (UEMOA)", raw_all.to_csv(index=False).encode(),
+                           "uemoa_brut.csv", key="dl_raw")
     st.download_button("Donnees transformees", df.to_csv(index=False).encode(),
                        "togo_transforme.csv", key="dl_transf")
     if pred is not None:
@@ -281,74 +298,134 @@ t1, t2, t3, t4 = st.tabs([
 # TAB 1 — EXTRACTION
 # ═════════════════════════════════════════════════════════════════════════════
 with t1:
-    st.markdown("""
+    n_ind = len(raw_all["indicator_code"].unique()) if raw_all is not None else 0
+    n_pays = len(raw_all["country_code"].unique()) if raw_all is not None else 0
+    n_raw = len(raw_all) if raw_all is not None else 0
+    yr_min_raw = int(raw_all["year"].min()) if raw_all is not None else 0
+    yr_max_raw = int(raw_all["year"].max()) if raw_all is not None else 0
+
+    st.markdown(f"""
     <div class="step-box">
         <div class="step-n">Etape 1 — Extract</div>
         <div class="step-t">Donnees brutes extraites de la Banque Mondiale (WDI)</div>
-        <div class="step-d">API World Bank → 8 indicateurs pour le Togo (2000-2023)</div>
+        <div class="step-d">API World Bank &rarr; {n_ind} indicateurs, {n_pays} pays UEMOA, {yr_min_raw}-{yr_max_raw}
+              &rarr; <strong>{n_raw:,} enregistrements</strong></div>
     </div>""", unsafe_allow_html=True)
 
-    if raw is not None and not raw.empty:
-        # Filter by year
-        raw_f = raw[raw["year"].between(*yr)].sort_values("year")
-        st.markdown(f"**{len(raw_f)} enregistrements** sur la periode {yr[0]} — {yr[1]}")
+    if raw_all is not None and not raw_all.empty:
+        # Volume cards
+        vc = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
+        vc += f'<div class="card" style="border-left-color:{C["accent"]};">' \
+              f'<div class="t">Enregistrements</div><div class="v">{n_raw:,}</div></div>'
+        vc += f'<div class="card" style="border-left-color:{C["pop"]};">' \
+              f'<div class="t">Indicateurs</div><div class="v">{n_ind}</div></div>'
+        vc += f'<div class="card" style="border-left-color:{C["kwh"]};">' \
+              f'<div class="t">Pays UEMOA</div><div class="v">{n_pays}</div></div>'
+        vc += f'<div class="card" style="border-left-color:{C["gwh"]};">' \
+              f'<div class="t">Periode</div><div class="v">{yr_max_raw - yr_min_raw + 1} ans</div></div>'
+        vc += '</div>'
+        st.markdown(vc, unsafe_allow_html=True)
 
-        # Indicateurs extraits
-        st.markdown('<div class="sec">Indicateurs releves</div>', unsafe_allow_html=True)
-        if "indicator_code" in raw_f.columns:
-            ind_counts = raw_f.groupby("indicator_code").agg(
+        # Sub-tabs: All UEMOA vs Togo
+        ext_all, ext_tg = st.tabs(["Extraction complete (UEMOA)", "Togo uniquement"])
+
+        # ---- ALL UEMOA -----
+        with ext_all:
+            raw_f_all = raw_all[raw_all["year"].between(*yr)].sort_values(["country_code", "year"])
+            st.markdown(f"**{len(raw_f_all):,} enregistrements** — {n_pays} pays, {yr[0]}-{yr[1]}")
+
+            # Summary per country
+            st.markdown('<div class="sec">Volume par pays</div>', unsafe_allow_html=True)
+            vol = raw_f_all.groupby("country_code").agg(
+                pays=("country_name", "first"),
                 observations=("value", "count"),
+                indicateurs=("indicator_code", "nunique"),
+            ).reset_index().rename(columns={"country_code": "Code", "pays": "Pays",
+                                             "observations": "Observations",
+                                             "indicateurs": "Indicateurs"})
+            st.dataframe(vol, height=320)
+
+            # Summary per indicator
+            st.markdown('<div class="sec">Volume par indicateur</div>', unsafe_allow_html=True)
+            ind_vol = raw_f_all.groupby("indicator_code").agg(
+                observations=("value", "count"),
+                pays=("country_code", "nunique"),
                 valeur_min=("value", "min"),
                 valeur_max=("value", "max"),
             ).reset_index()
-            ind_counts["Indicateur"] = ind_counts["indicator_code"].map(
+            ind_vol["Indicateur"] = ind_vol["indicator_code"].map(
                 lambda c: IND_LABELS.get(c, c))
-            ind_counts = ind_counts.rename(columns={
-                "indicator_code": "Code WDI",
-                "observations": "Observations",
-                "valeur_min": "Min",
-                "valeur_max": "Max",
+            ind_vol = ind_vol.rename(columns={
+                "indicator_code": "Code WDI", "observations": "Observations",
+                "pays": "Pays", "valeur_min": "Min", "valeur_max": "Max",
             })
-            st.dataframe(ind_counts[["Code WDI", "Indicateur", "Observations", "Min", "Max"]],
-                         height=320)
+            st.dataframe(ind_vol[["Code WDI", "Indicateur", "Observations", "Pays", "Min", "Max"]],
+                         height=500)
 
-        st.divider()
+            with st.expander("Table brute complete (toutes les donnees)", expanded=False):
+                st.dataframe(raw_f_all, height=500)
 
-        # Visualisation par indicateur
-        st.markdown('<div class="sec">Donnees brutes par indicateur</div>', unsafe_allow_html=True)
-        if "indicator_code" in raw_f.columns:
-            ind_codes = raw_f["indicator_code"].unique().tolist()
-            sel_ind = st.selectbox("Indicateur", ind_codes,
-                                   format_func=lambda c: IND_LABELS.get(c, c),
-                                   key="raw_ind")
-            raw_ind = raw_f[raw_f["indicator_code"] == sel_ind].sort_values("year")
+        # ---- TOGO -----
+        with ext_tg:
+            raw_f = raw_tg[raw_tg["year"].between(*yr)].sort_values("year") if raw_tg is not None else pd.DataFrame()
+            st.markdown(f"**{len(raw_f)} enregistrements** — Togo, {yr[0]}-{yr[1]}")
 
-            c1, c2 = st.columns([3, 2])
-            with c1:
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(
-                    x=raw_ind["year"], y=raw_ind["value"],
-                    mode="lines+markers", line=dict(color=C["accent"], width=2.5),
-                    marker=dict(size=5), name=IND_LABELS.get(sel_ind, sel_ind),
-                ))
-                fig.update_layout(
-                    title=f"{IND_LABELS.get(sel_ind, sel_ind)} — Togo",
-                    template=TMPL, height=340, margin=dict(t=35),
-                    hovermode="x unified",
-                )
-                st.plotly_chart(fig, key="raw_chart")
+            # Indicateurs extraits
+            st.markdown('<div class="sec">Indicateurs releves</div>', unsafe_allow_html=True)
+            if "indicator_code" in raw_f.columns:
+                ind_counts = raw_f.groupby("indicator_code").agg(
+                    observations=("value", "count"),
+                    valeur_min=("value", "min"),
+                    valeur_max=("value", "max"),
+                ).reset_index()
+                ind_counts["Indicateur"] = ind_counts["indicator_code"].map(
+                    lambda c: IND_LABELS.get(c, c))
+                ind_counts = ind_counts.rename(columns={
+                    "indicator_code": "Code WDI",
+                    "observations": "Observations",
+                    "valeur_min": "Min",
+                    "valeur_max": "Max",
+                })
+                st.dataframe(ind_counts[["Code WDI", "Indicateur", "Observations", "Min", "Max"]],
+                             height=420)
 
-            with c2:
-                st.markdown("##### Donnees brutes")
-                disp_raw = raw_ind[["year", "value"]].copy()
-                disp_raw.columns = ["Annee", "Valeur"]
-                st.dataframe(disp_raw, height=300)
+            st.divider()
 
-        st.divider()
+            # Visualisation par indicateur
+            st.markdown('<div class="sec">Donnees brutes par indicateur</div>', unsafe_allow_html=True)
+            if "indicator_code" in raw_f.columns:
+                ind_codes = raw_f["indicator_code"].unique().tolist()
+                sel_ind = st.selectbox("Indicateur", ind_codes,
+                                       format_func=lambda c: IND_LABELS.get(c, c),
+                                       key="raw_ind")
+                raw_ind = raw_f[raw_f["indicator_code"] == sel_ind].sort_values("year")
 
-        # Table complete
-        with st.expander("Table complete des donnees brutes", expanded=False):
-            st.dataframe(raw_f, height=400)
+                c1, c2 = st.columns([3, 2])
+                with c1:
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(
+                        x=raw_ind["year"], y=raw_ind["value"],
+                        mode="lines+markers", line=dict(color=C["accent"], width=2.5),
+                        marker=dict(size=5), name=IND_LABELS.get(sel_ind, sel_ind),
+                    ))
+                    fig.update_layout(
+                        title=f"{IND_LABELS.get(sel_ind, sel_ind)} — Togo",
+                        template=TMPL, height=340, margin=dict(t=35),
+                        hovermode="x unified",
+                    )
+                    st.plotly_chart(fig, key="raw_chart")
+
+                with c2:
+                    st.markdown("##### Donnees brutes")
+                    disp_raw = raw_ind[["year", "value"]].copy()
+                    disp_raw.columns = ["Annee", "Valeur"]
+                    st.dataframe(disp_raw, height=300)
+
+            st.divider()
+
+            # Table complete
+            with st.expander("Table complete des donnees brutes Togo", expanded=False):
+                st.dataframe(raw_f, height=400)
 
     else:
         st.info("Fichier brut non disponible. Executez python src/etl/extract.py")
@@ -363,94 +440,135 @@ with t2:
         <div class="step-n">Etape 2 — Transform</div>
         <div class="step-t">Pivot, nettoyage et creation de features</div>
         <div class="step-d">Donnees brutes pivotees en colonnes, valeurs manquantes comblees,
-                            features derivees : conso_totale_gwh, ecart urbain/rural, pop. urbaine, etc.</div>
+                            features d'ingenierie : {len(df_all.columns)} colonnes derivees
+                            pour {len(df_all)} lignes (8 pays UEMOA x 34 ans).</div>
     </div>""", unsafe_allow_html=True)
 
+    # Volume cards
+    n_rows_all = len(df_all)
+    n_cols_all = len(df_all.columns)
+    n_rows_tg = len(tg)
+    eng_cols_all = [c for c in df_all.columns if any(x in c for x in ["_lag", "_chg", "_ma3", "_ma5",
+                    "year_norm", "intensite", "pop_urbaine", "gap_acces", "pop_active",
+                    "ratio_dependance", "pib_par_hab", "renew_x_acces", "mobile_total"])]
+    vc = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">'
+    vc += f'<div class="card" style="border-left-color:{C["accent"]};"><div class="t">Dataset complet</div><div class="v">{n_rows_all} x {n_cols_all}</div></div>'
+    vc += f'<div class="card" style="border-left-color:{C["pop"]};"><div class="t">Togo filtre</div><div class="v">{n_rows_tg} lignes</div></div>'
+    vc += f'<div class="card" style="border-left-color:{C["kwh"]};"><div class="t">Features brutes</div><div class="v">{n_cols_all - len(eng_cols_all)}</div></div>'
+    vc += f'<div class="card" style="border-left-color:{C["gwh"]};"><div class="t">Features derivees</div><div class="v">{len(eng_cols_all)}</div></div>'
+    vc += '</div>'
+    st.markdown(vc, unsafe_allow_html=True)
+
     if not tg.empty:
-        st.markdown(f"**{len(tg)} lignes x {len(tg.columns)} colonnes** — Togo ({yr[0]}-{yr[1]})")
+        # Sub-tabs
+        tr_all, tr_tg = st.tabs(["Data UEMOA (training)", "Togo uniquement"])
 
-        # Indicateurs principaux en colonnes lisibles
-        st.markdown('<div class="sec">Variables principales</div>', unsafe_allow_html=True)
-        main_cols = ["year", "SP.POP.TOTL", "EG.USE.ELEC.KH.PC", "conso_totale_gwh",
-                     "EG.ELC.ACCS.ZS", "EG.ELC.ACCS.UR.ZS", "EG.ELC.ACCS.RU.ZS",
-                     "NY.GDP.PCAP.CD", "gap_acces_urb_rur", "pop_urbaine"]
-        avail = [c for c in main_cols if c in tg.columns]
-        rename_map = {
-            "year": "Annee", "SP.POP.TOTL": "Population",
-            "EG.USE.ELEC.KH.PC": "kWh/hab", "conso_totale_gwh": "Demande (GWh)",
-            "EG.ELC.ACCS.ZS": "Acces (%)", "EG.ELC.ACCS.UR.ZS": "Acces urbain (%)",
-            "EG.ELC.ACCS.RU.ZS": "Acces rural (%)", "NY.GDP.PCAP.CD": "PIB/hab (USD)",
-            "gap_acces_urb_rur": "Ecart urb/rur (pts)", "pop_urbaine": "Pop. urbaine",
-        }
-        disp_main = tg[avail].copy()
-        disp_main = disp_main.rename(columns={c: rename_map.get(c, c) for c in avail})
-        st.dataframe(disp_main, height=380)
+        with tr_all:
+            df_all_f = df_all[df_all["year"].between(*yr)].sort_values(["country_code", "year"])
+            st.markdown(f"**{len(df_all_f)} lignes x {n_cols_all} colonnes** — 8 pays UEMOA ({yr[0]}-{yr[1]})")
+            st.markdown("Ce dataset complet sert a l'entrainement du modele IA (plus de donnees = meilleure precision).")
+            main_cols_all = ["year", "country_code", "country_name", "SP.POP.TOTL",
+                             "EG.USE.ELEC.KH.PC", "conso_totale_gwh", "EG.ELC.ACCS.ZS",
+                             "NY.GDP.PCAP.CD", "SP.DYN.TFRT.IN", "SP.DYN.LE00.IN",
+                             "IT.CEL.SETS.P2", "EG.FEC.RNEW.ZS"]
+            avail_all = [c for c in main_cols_all if c in df_all_f.columns]
+            st.dataframe(df_all_f[avail_all], height=450)
 
-        st.divider()
+            with st.expander("Toutes les colonnes", expanded=False):
+                st.dataframe(df_all_f, height=400)
 
-        # Features derivees (lags, changes, ma3)
-        st.markdown('<div class="sec">Features d\'ingenierie</div>', unsafe_allow_html=True)
-        eng_cols = [c for c in tg.columns if any(x in c for x in ["_lag", "_chg", "_ma3",
-                    "year_norm", "intensite"])]
-        if eng_cols:
-            disp_eng = tg[["year"] + eng_cols].copy()
-            rename_eng = {"year": "Annee"}
-            disp_eng = disp_eng.rename(columns=rename_eng)
-            st.dataframe(disp_eng, height=300)
-        else:
-            st.info("Pas de features d'ingenierie detectees.")
+        with tr_tg:
+            st.markdown(f"**{len(tg)} lignes x {len(tg.columns)} colonnes** — Togo ({yr[0]}-{yr[1]})")
 
-        st.divider()
+            # Indicateurs principaux en colonnes lisibles
+            st.markdown('<div class="sec">Variables principales</div>', unsafe_allow_html=True)
+            main_cols = ["year", "SP.POP.TOTL", "EG.USE.ELEC.KH.PC", "conso_totale_gwh",
+                         "EG.ELC.ACCS.ZS", "EG.ELC.ACCS.UR.ZS", "EG.ELC.ACCS.RU.ZS",
+                         "NY.GDP.PCAP.CD", "SP.DYN.TFRT.IN", "SP.DYN.LE00.IN",
+                         "IT.CEL.SETS.P2", "gap_acces_urb_rur", "pop_urbaine"]
+            avail = [c for c in main_cols if c in tg.columns]
+            rename_map = {
+                "year": "Annee", "SP.POP.TOTL": "Population",
+                "EG.USE.ELEC.KH.PC": "kWh/hab", "conso_totale_gwh": "Demande (GWh)",
+                "EG.ELC.ACCS.ZS": "Acces (%)", "EG.ELC.ACCS.UR.ZS": "Acces urbain (%)",
+                "EG.ELC.ACCS.RU.ZS": "Acces rural (%)", "NY.GDP.PCAP.CD": "PIB/hab (USD)",
+                "gap_acces_urb_rur": "Ecart urb/rur (pts)", "pop_urbaine": "Pop. urbaine",
+                "SP.DYN.TFRT.IN": "Fecondite", "SP.DYN.LE00.IN": "Esp. vie",
+                "IT.CEL.SETS.P2": "Mobile/100hab",
+            }
+            disp_main = tg[avail].copy()
+            disp_main = disp_main.rename(columns={c: rename_map.get(c, c) for c in avail})
+            st.dataframe(disp_main, height=380)
 
-        # Stats descriptives
-        st.markdown('<div class="sec">Statistiques descriptives</div>', unsafe_allow_html=True)
-        num_cols = tg.select_dtypes(include=[np.number]).columns.tolist()
-        stats = tg[num_cols].describe().T
-        stats = stats[["count", "mean", "std", "min", "25%", "50%", "75%", "max"]].round(2)
-        st.dataframe(stats, height=350)
+            st.divider()
 
-        # Consultation par annee
-        st.divider()
-        st.markdown('<div class="sec">Consulter une annee</div>', unsafe_allow_html=True)
-        years_avail = sorted(tg["year"].unique().astype(int).tolist())
-        sel_year = st.selectbox("Annee", years_avail,
-                                index=len(years_avail) - 1, key="tr_year")
-        row_yr = tg[tg["year"] == sel_year]
-        if not row_yr.empty:
-            r = row_yr.iloc[0]
-            cc1, cc2, cc3, cc4 = st.columns(4)
-            with cc1:
-                st.markdown(f"""<div class="card" style="border-left-color:{C['pop']};">
-                    <div class="t">Population</div>
-                    <div class="v">{fmt(r.get('SP.POP.TOTL', np.nan))}</div></div>""",
-                    unsafe_allow_html=True)
-            with cc2:
-                st.markdown(f"""<div class="card" style="border-left-color:{C['kwh']};">
-                    <div class="t">kWh / habitant</div>
-                    <div class="v">{fmt(r.get('EG.USE.ELEC.KH.PC', np.nan), 'kWh')}</div></div>""",
-                    unsafe_allow_html=True)
-            with cc3:
-                st.markdown(f"""<div class="card" style="border-left-color:{C['gwh']};">
-                    <div class="t">Demande totale</div>
-                    <div class="v">{fmt(r.get('conso_totale_gwh', np.nan), 'GWh')}</div></div>""",
-                    unsafe_allow_html=True)
-            with cc4:
-                st.markdown(f"""<div class="card" style="border-left-color:{C['good']};">
-                    <div class="t">Acces electrique</div>
-                    <div class="v">{r.get('EG.ELC.ACCS.ZS', 0):.1f}%</div></div>""",
-                    unsafe_allow_html=True)
+            # Features derivees (lags, changes, ma3, ma5)
+            st.markdown('<div class="sec">Features d\'ingenierie</div>', unsafe_allow_html=True)
+            eng_cols = [c for c in tg.columns if any(x in c for x in ["_lag", "_chg", "_ma3",
+                        "_ma5", "year_norm", "intensite", "pop_active", "ratio_dependance",
+                        "pib_par_hab_calc", "renew_x_acces", "mobile_total"])]
+            if eng_cols:
+                disp_eng = tg[["year"] + eng_cols].copy()
+                rename_eng = {"year": "Annee"}
+                disp_eng = disp_eng.rename(columns=rename_eng)
+                st.dataframe(disp_eng, height=300)
+            else:
+                st.info("Pas de features d'ingenierie detectees.")
+
+            st.divider()
+
+            # Stats descriptives
+            st.markdown('<div class="sec">Statistiques descriptives</div>', unsafe_allow_html=True)
+            num_cols = tg.select_dtypes(include=[np.number]).columns.tolist()
+            stats = tg[num_cols].describe().T
+            stats = stats[["count", "mean", "std", "min", "25%", "50%", "75%", "max"]].round(2)
+            st.dataframe(stats, height=350)
+
+            # Consultation par annee
+            st.divider()
+            st.markdown('<div class="sec">Consulter une annee</div>', unsafe_allow_html=True)
+            years_avail = sorted(tg["year"].unique().astype(int).tolist())
+            sel_year = st.selectbox("Annee", years_avail,
+                                    index=len(years_avail) - 1, key="tr_year")
+            row_yr = tg[tg["year"] == sel_year]
+            if not row_yr.empty:
+                r = row_yr.iloc[0]
+                cc1, cc2, cc3, cc4 = st.columns(4)
+                with cc1:
+                    st.markdown(f"""<div class="card" style="border-left-color:{C['pop']};">
+                        <div class="t">Population</div>
+                        <div class="v">{fmt(r.get('SP.POP.TOTL', np.nan))}</div></div>""",
+                        unsafe_allow_html=True)
+                with cc2:
+                    st.markdown(f"""<div class="card" style="border-left-color:{C['kwh']};">
+                        <div class="t">kWh / habitant</div>
+                        <div class="v">{fmt(r.get('EG.USE.ELEC.KH.PC', np.nan), 'kWh')}</div></div>""",
+                        unsafe_allow_html=True)
+                with cc3:
+                    st.markdown(f"""<div class="card" style="border-left-color:{C['gwh']};">
+                        <div class="t">Demande totale</div>
+                        <div class="v">{fmt(r.get('conso_totale_gwh', np.nan), 'GWh')}</div></div>""",
+                        unsafe_allow_html=True)
+                with cc4:
+                    st.markdown(f"""<div class="card" style="border-left-color:{C['good']};">
+                        <div class="t">Acces electrique</div>
+                        <div class="v">{r.get('EG.ELC.ACCS.ZS', 0):.1f}%</div></div>""",
+                        unsafe_allow_html=True)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
 # TAB 3 — ANALYSE ET MODELE
 # ═════════════════════════════════════════════════════════════════════════════
 with t3:
-    st.markdown("""
+    n_feat = len([c for c in df_all.columns if c not in ['country_code', 'country_name', 'year', 'conso_totale_gwh', 'EG.USE.ELEC.KH.PC'] and df_all[c].dtype in ['float64', 'int64', 'float32', 'int32']
+                   and not c.startswith('EG.USE.ELEC.KH.PC')])
+    st.markdown(f"""
     <div class="step-box">
         <div class="step-n">Etape 3 — Analyse et Entrainement</div>
         <div class="step-t">Tendances historiques et validation du modele IA</div>
-        <div class="step-d">Exploration des correlations population/energie,
-                            entrainement de 4 algorithmes, selection du meilleur modele.</div>
+        <div class="step-d">{n_rows_all} observations d'entrainement (8 pays UEMOA),
+                            {n_feat} features, 4 algorithmes testes.
+                            Focus : Togo.</div>
     </div>""", unsafe_allow_html=True)
 
     if not tg.empty:

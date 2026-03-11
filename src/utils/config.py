@@ -34,19 +34,33 @@ COUNTRIES = {
 }
 
 # ── Indicateurs Banque Mondiale ──────────────────────────────────────────────
-# On ne garde que ce qui sert : population et consommation
+# 21 indicateurs — demographie, energie, economie, social
 INDICATORS = {
-    # Demographie
+    # --- Demographie (7) ---
     'SP.POP.TOTL':        'Population totale',
     'SP.POP.GROW':        'Croissance demographique (%)',
     'SP.URB.TOTL.IN.ZS':  'Taux urbanisation (%)',
-    # Energie
+    'SP.DYN.TFRT.IN':     'Taux de fecondite (naissances/femme)',
+    'SP.DYN.LE00.IN':     'Esperance de vie (annees)',
+    'SP.POP.0014.TO.ZS':  'Population 0-14 ans (%)',
+    'SP.POP.1564.TO.ZS':  'Population 15-64 ans (%)',
+    # --- Energie (6) ---
     'EG.USE.ELEC.KH.PC':  'Consommation electrique (kWh/hab)',
     'EG.ELC.ACCS.ZS':     'Acces electricite (%)',
     'EG.ELC.ACCS.UR.ZS':  'Acces electricite urbain (%)',
     'EG.ELC.ACCS.RU.ZS':  'Acces electricite rural (%)',
-    # Economie (contexte)
+    'EG.FEC.RNEW.ZS':     'Energie renouvelable (% conso finale)',
+    'EG.USE.PCAP.KG.OE':  'Utilisation energie (kg petrole eq./hab)',
+    # --- Economie (5) ---
     'NY.GDP.PCAP.CD':     'PIB par habitant (USD)',
+    'NY.GDP.MKTP.CD':     'PIB total (USD courants)',
+    'NY.GDP.MKTP.KD.ZG':  'Croissance PIB (%)',
+    'NV.IND.TOTL.ZS':     'Part industrie (% PIB)',
+    'FP.CPI.TOTL.ZG':     'Inflation IPC (%)',
+    # --- Social / Infrastructure (3) ---
+    'IT.CEL.SETS.P2':     'Abonnements mobile (/100 hab)',
+    'SE.ADT.LITR.ZS':     'Taux alphabetisation adultes (%)',
+    'SL.UEM.TOTL.ZS':     'Chomage (%)',
 }
 
 COUNTRY_NAME_FR = {
@@ -61,7 +75,7 @@ COUNTRY_NAME_FR = {
 }
 
 # ── Parametres ───────────────────────────────────────────────────────────────
-START_YEAR = 2000
+START_YEAR = 1990
 END_YEAR = 2023
 RANDOM_STATE = 42
 TEST_SIZE = 0.2

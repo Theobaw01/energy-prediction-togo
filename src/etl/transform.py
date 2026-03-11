@@ -58,16 +58,6 @@ def engineer(df):
     y_min, y_max = out['year'].min(), out['year'].max()
     out['year_norm'] = (out['year'] - y_min) / (y_max - y_min) if y_max > y_min else 0
 
-    # Features par pays : lags, variations, moyennes mobiles
-    key_cols = ['SP.POP.TOTL', 'EG.USE.ELEC.KH.PC', 'EG.ELC.ACCS.ZS', 'NY.GDP.PCAP.CD']
-    key_cols = [c for c in key_cols if c in out.columns]
-
-    for col in key_cols:
-        grp = out.groupby('country_code')[col]
-        out[f'{col}_lag1'] = grp.shift(1)
-        out[f'{col}_chg'] = grp.pct_change() * 100
-        out[f'{col}_ma3'] = grp.transform(lambda x: x.rolling(3, min_periods=1).mean())
-
     # Population urbaine estimee
     if 'SP.POP.TOTL' in out.columns and 'SP.URB.TOTL.IN.ZS' in out.columns:
         out['pop_urbaine'] = out['SP.POP.TOTL'] * out['SP.URB.TOTL.IN.ZS'] / 100
@@ -75,6 +65,40 @@ def engineer(df):
     # Ratio conso / PIB  (intensite energetique)
     if 'EG.USE.ELEC.KH.PC' in out.columns and 'NY.GDP.PCAP.CD' in out.columns:
         out['intensite_kwh_pib'] = out['EG.USE.ELEC.KH.PC'] / out['NY.GDP.PCAP.CD'].replace(0, np.nan)
+
+    # Part population active (15-64) absolute
+    if 'SP.POP.TOTL' in out.columns and 'SP.POP.1564.TO.ZS' in out.columns:
+        out['pop_active'] = out['SP.POP.TOTL'] * out['SP.POP.1564.TO.ZS'] / 100
+
+    # Ratio dependance (0-14 / 15-64)
+    if 'SP.POP.0014.TO.ZS' in out.columns and 'SP.POP.1564.TO.ZS' in out.columns:
+        out['ratio_dependance'] = out['SP.POP.0014.TO.ZS'] / out['SP.POP.1564.TO.ZS'].replace(0, np.nan)
+
+    # PIB total par habitant verifie
+    if 'NY.GDP.MKTP.CD' in out.columns and 'SP.POP.TOTL' in out.columns:
+        out['pib_par_hab_calc'] = out['NY.GDP.MKTP.CD'] / out['SP.POP.TOTL'].replace(0, np.nan)
+
+    # Energie renouvelable x acces
+    if 'EG.FEC.RNEW.ZS' in out.columns and 'EG.ELC.ACCS.ZS' in out.columns:
+        out['renew_x_acces'] = out['EG.FEC.RNEW.ZS'] * out['EG.ELC.ACCS.ZS'] / 100
+
+    # Mobile par hab (proxy modernisation)
+    if 'IT.CEL.SETS.P2' in out.columns and 'SP.POP.TOTL' in out.columns:
+        out['mobile_total'] = out['IT.CEL.SETS.P2'] * out['SP.POP.TOTL'] / 100
+
+    # Features par pays : lags, variations, moyennes mobiles
+    key_cols = ['SP.POP.TOTL', 'EG.USE.ELEC.KH.PC', 'EG.ELC.ACCS.ZS',
+                'NY.GDP.PCAP.CD', 'SP.URB.TOTL.IN.ZS', 'IT.CEL.SETS.P2',
+                'EG.USE.PCAP.KG.OE', 'NY.GDP.MKTP.KD.ZG']
+    key_cols = [c for c in key_cols if c in out.columns]
+
+    for col in key_cols:
+        grp = out.groupby('country_code')[col]
+        out[f'{col}_lag1'] = grp.shift(1)
+        out[f'{col}_lag2'] = grp.shift(2)
+        out[f'{col}_chg'] = grp.pct_change() * 100
+        out[f'{col}_ma3'] = grp.transform(lambda x: x.rolling(3, min_periods=1).mean())
+        out[f'{col}_ma5'] = grp.transform(lambda x: x.rolling(5, min_periods=1).mean())
 
     return out
 
