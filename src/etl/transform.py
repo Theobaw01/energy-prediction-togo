@@ -1,11 +1,7 @@
 """
-ETL — Transform : Nettoyage, enrichissement et feature engineering.
-
-Pipeline de transformation multi-niveaux :
-1. Pivot des indicateurs (long → wide)
-2. Interpolation intelligente des valeurs manquantes
-3. Feature engineering avancé (lags, tendances, ratios dérivés)
-4. Calcul de scores composites (lien énergie-développement)
+ETL — Transform
+Pivot, nettoyage, feature engineering cible :
+  Population -> Consommation electrique totale
 """
 import os
 import pandas as pd
@@ -13,259 +9,117 @@ import numpy as np
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from utils.config import (
-    RAW_DIR, PROCESSED_DIR, COUNTRIES, FOCUS_COUNTRY,
-    TARGET_INDICATOR, INDICATOR_GROUPS
-)
+from utils.config import RAW_DIR, PROCESSED_DIR, FOCUS_COUNTRY
 
 
-def load_raw_data() -> pd.DataFrame:
-    """Charge les données brutes extraites."""
+def load_raw():
     path = os.path.join(RAW_DIR, 'energy_data_raw.csv')
     if not os.path.exists(path):
-        raise FileNotFoundError(
-            f"Données non trouvées : {path}\n"
-            f"→ Exécutez d'abord : python src/etl/extract.py"
-        )
+        raise FileNotFoundError(f"Fichier manquant : {path}\n  -> python src/etl/extract.py")
     return pd.read_csv(path)
 
 
-def pivot_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Pivote les données : une ligne par (pays, année), une colonne par indicateur.
-    Élimine les doublons via aggfunc='first'.
-    """
-    pivoted = df.pivot_table(
+def pivot(df):
+    """Une ligne = un pays x une annee, une colonne par indicateur."""
+    p = df.pivot_table(
         index=['country_code', 'country_name', 'year'],
-        columns='indicator_code',
-        values='value',
-        aggfunc='first'
+        columns='indicator_code', values='value', aggfunc='first',
     ).reset_index()
-    pivoted.columns.name = None
-    return pivoted
+    p.columns.name = None
+    return p
 
 
-def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Gestion multi-stratégie des valeurs manquantes :
-    - Interpolation linéaire par pays (pour série temporelle)
-    - Forward/backward fill pour les extrémités
-    - Médiane du groupe UEMOA pour les pays très incomplets
-    """
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    numeric_cols = [c for c in numeric_cols if c != 'year']
-
-    # 1. Interpolation linéaire par pays
-    for country in df['country_code'].unique():
-        mask = df['country_code'] == country
-        df.loc[mask, numeric_cols] = (
-            df.loc[mask, numeric_cols]
-            .interpolate(method='linear', limit_direction='both')
-        )
-
-    # 2. Forward/backward fill résiduel
-    for country in df['country_code'].unique():
-        mask = df['country_code'] == country
-        df.loc[mask, numeric_cols] = (
-            df.loc[mask, numeric_cols].ffill().bfill()
-        )
-
-    # 3. Médiane régionale pour les colonnes entièrement vides
-    for col in numeric_cols:
-        if df[col].isna().any():
-            median_val = df[col].median()
-            df[col] = df[col].fillna(median_val)
-
+def fill_missing(df):
+    """Interpolation lineaire par pays, puis fill, puis mediane regionale."""
+    num = [c for c in df.select_dtypes(include=[np.number]).columns if c != 'year']
+    for cc in df['country_code'].unique():
+        m = df['country_code'] == cc
+        df.loc[m, num] = df.loc[m, num].interpolate(method='linear', limit_direction='both')
+        df.loc[m, num] = df.loc[m, num].ffill().bfill()
+    for c in num:
+        if df[c].isna().any():
+            df[c] = df[c].fillna(df[c].median())
     return df
 
 
-def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Feature engineering temporel :
-    - Tendance normalisée
-    - Variations annuelles (%)
-    - Moyennes mobiles 3 et 5 ans
-    - Lags (t-1, t-2)
-    """
-    features = df.copy()
+def engineer(df):
+    """Features derives pour la prediction de demande energetique."""
+    out = df.copy()
 
-    # Tendance temporelle normalisée [0, 1]
-    year_min, year_max = features['year'].min(), features['year'].max()
-    if year_max > year_min:
-        features['year_norm'] = (features['year'] - year_min) / (year_max - year_min)
-    else:
-        features['year_norm'] = 0
+    # Consommation totale = population x kWh/hab  (en GWh)
+    if 'SP.POP.TOTL' in out.columns and 'EG.USE.ELEC.KH.PC' in out.columns:
+        out['conso_totale_gwh'] = out['SP.POP.TOTL'] * out['EG.USE.ELEC.KH.PC'] / 1e6
 
-    # Pour chaque indicateur numérique, créer des features dérivées
-    base_indicators = [c for c in features.select_dtypes(include=[np.number]).columns
-                       if c not in ['year', 'year_norm'] and '_' not in c[-4:]]
+    # Gap acces urbain / rural
+    if 'EG.ELC.ACCS.UR.ZS' in out.columns and 'EG.ELC.ACCS.RU.ZS' in out.columns:
+        out['gap_acces_urb_rur'] = out['EG.ELC.ACCS.UR.ZS'] - out['EG.ELC.ACCS.RU.ZS']
 
-    # Limiter aux indicateurs principaux pour éviter l'explosion de features
-    key_indicators = [
-        'EG.USE.ELEC.KH.PC', 'EG.ELC.ACCS.ZS', 'NY.GDP.PCAP.CD',
-        'FP.CPI.TOTL.ZG', 'SP.POP.TOTL', 'SH.DYN.MORT',
-        'SP.DYN.LE00.IN', 'SP.URB.TOTL.IN.ZS'
-    ]
-    key_indicators = [k for k in key_indicators if k in features.columns]
+    # Tendance temporelle normalisee
+    y_min, y_max = out['year'].min(), out['year'].max()
+    out['year_norm'] = (out['year'] - y_min) / (y_max - y_min) if y_max > y_min else 0
 
-    for col in key_indicators:
-        grp = features.groupby('country_code')[col]
+    # Features par pays : lags, variations, moyennes mobiles
+    key_cols = ['SP.POP.TOTL', 'EG.USE.ELEC.KH.PC', 'EG.ELC.ACCS.ZS', 'NY.GDP.PCAP.CD']
+    key_cols = [c for c in key_cols if c in out.columns]
 
-        # Variation annuelle (%)
-        features[f'{col}_chg'] = grp.pct_change() * 100
+    for col in key_cols:
+        grp = out.groupby('country_code')[col]
+        out[f'{col}_lag1'] = grp.shift(1)
+        out[f'{col}_chg'] = grp.pct_change() * 100
+        out[f'{col}_ma3'] = grp.transform(lambda x: x.rolling(3, min_periods=1).mean())
 
-        # Moyennes mobiles
-        features[f'{col}_ma3'] = grp.transform(
-            lambda x: x.rolling(3, min_periods=1).mean()
-        )
-        features[f'{col}_ma5'] = grp.transform(
-            lambda x: x.rolling(5, min_periods=1).mean()
-        )
+    # Population urbaine estimee
+    if 'SP.POP.TOTL' in out.columns and 'SP.URB.TOTL.IN.ZS' in out.columns:
+        out['pop_urbaine'] = out['SP.POP.TOTL'] * out['SP.URB.TOTL.IN.ZS'] / 100
 
-        # Lags
-        features[f'{col}_lag1'] = grp.shift(1)
-        features[f'{col}_lag2'] = grp.shift(2)
+    # Ratio conso / PIB  (intensite energetique)
+    if 'EG.USE.ELEC.KH.PC' in out.columns and 'NY.GDP.PCAP.CD' in out.columns:
+        out['intensite_kwh_pib'] = out['EG.USE.ELEC.KH.PC'] / out['NY.GDP.PCAP.CD'].replace(0, np.nan)
 
-    return features
-
-
-def add_derived_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Indicateurs dérivés à forte valeur analytique :
-    - Gap électrique urbain/rural
-    - Intensité énergétique (énergie/PIB)
-    - Score de développement composite
-    - Corrélation énergie-santé
-    """
-    derived = df.copy()
-
-    # Gap d'accès électrique urbain/rural (indicateur clé développement)
-    if 'EG.ELC.ACCS.UR.ZS' in derived.columns and 'EG.ELC.ACCS.RU.ZS' in derived.columns:
-        derived['gap_elec_urbain_rural'] = (
-            derived['EG.ELC.ACCS.UR.ZS'] - derived['EG.ELC.ACCS.RU.ZS']
-        )
-
-    # Intensité énergétique (kWh consommé par dollar de PIB/hab)
-    if 'EG.USE.ELEC.KH.PC' in derived.columns and 'NY.GDP.PCAP.CD' in derived.columns:
-        derived['intensite_energetique'] = (
-            derived['EG.USE.ELEC.KH.PC'] /
-            derived['NY.GDP.PCAP.CD'].replace(0, np.nan)
-        )
-
-    # Balance commerciale simplifiée (exports - imports)
-    if 'NE.EXP.GNFS.ZS' in derived.columns and 'NE.IMP.GNFS.ZS' in derived.columns:
-        derived['balance_commerciale'] = (
-            derived['NE.EXP.GNFS.ZS'] - derived['NE.IMP.GNFS.ZS']
-        )
-
-    # Score énergie-santé (accès électricité vs mortalité infantile inversée)
-    if 'EG.ELC.ACCS.ZS' in derived.columns and 'SH.DYN.MORT' in derived.columns:
-        # Plus l'accès augmente et la mortalité baisse, meilleur est le score
-        mort_max = derived['SH.DYN.MORT'].max()
-        if mort_max > 0:
-            derived['score_energie_sante'] = (
-                derived['EG.ELC.ACCS.ZS'] *
-                (1 - derived['SH.DYN.MORT'] / mort_max)
-            )
-
-    # Pression démographique sur l'énergie (population * conso)
-    if 'SP.POP.TOTL' in derived.columns and 'EG.USE.ELEC.KH.PC' in derived.columns:
-        derived['demande_elec_totale'] = (
-            derived['SP.POP.TOTL'] * derived['EG.USE.ELEC.KH.PC'] / 1e6
-        )  # en millions de kWh
-
-    return derived
-
-
-def add_country_ranking(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Classement annuel des pays UEMOA par indicateur clé.
-    Utile pour le dashboard BCEAO (benchmark).
-    """
-    ranked = df.copy()
-
-    rank_indicators = ['EG.USE.ELEC.KH.PC', 'EG.ELC.ACCS.ZS',
-                       'NY.GDP.PCAP.CD', 'SH.DYN.MORT']
-    rank_indicators = [r for r in rank_indicators if r in ranked.columns]
-
-    for col in rank_indicators:
-        ascending = True if col == 'SH.DYN.MORT' else False  # Mortalité: bas = mieux
-        ranked[f'{col}_rank'] = ranked.groupby('year')[col].rank(
-            ascending=not ascending, method='min'
-        )
-
-    return ranked
+    return out
 
 
 def transform():
-    """Pipeline de transformation complet."""
-    print("=" * 70)
-    print("  TRANSFORMATION DES DONNÉES — Togo & Zone UEMOA")
-    print("=" * 70)
+    print("=" * 60)
+    print("  TRANSFORMATION — Population & Energie")
+    print("=" * 60)
 
-    # 1. Charger
-    print("\n  1. Chargement des données brutes...")
-    raw = load_raw_data()
-    print(f"     {len(raw):,} enregistrements, "
-          f"{raw['indicator_code'].nunique()} indicateurs, "
-          f"{raw['country_code'].nunique()} pays")
+    raw = load_raw()
+    print(f"  Brut : {len(raw):,} lignes")
 
-    # 2. Pivoter
-    print("\n  2. Pivot (1 ligne = 1 pays × 1 année)...")
-    pivoted = pivot_indicators(raw)
-    print(f"     {len(pivoted)} lignes × {len(pivoted.columns)} colonnes")
+    df = pivot(raw)
+    print(f"  Pivot : {df.shape[0]} x {df.shape[1]}")
 
-    # 3. Valeurs manquantes
-    print("\n  3. Gestion des valeurs manquantes...")
-    missing_before = pivoted.isnull().sum().sum()
-    cleaned = handle_missing_values(pivoted)
-    missing_after = cleaned.isnull().sum().sum()
-    print(f"     Valeurs manquantes : {missing_before} → {missing_after}")
+    df = fill_missing(df)
+    print(f"  Missing combles")
 
-    # 4. Features temporelles
-    print("\n  4. Feature engineering temporel...")
-    featured = add_temporal_features(cleaned)
-    print(f"     {len(featured.columns)} colonnes après features temporelles")
+    df = engineer(df)
+    print(f"  Features : {df.shape[1]} colonnes")
 
-    # 5. Indicateurs dérivés
-    print("\n  5. Indicateurs dérivés (gap, scores, ratios)...")
-    enriched = add_derived_indicators(featured)
-    print(f"     {len(enriched.columns)} colonnes après enrichissement")
+    # Nettoyage final
+    df = df.replace([np.inf, -np.inf], np.nan).fillna(0)
 
-    # 6. Rankings
-    print("\n  6. Classement UEMOA...")
-    final = add_country_ranking(enriched)
+    path = os.path.join(PROCESSED_DIR, 'energy_data_processed.csv')
+    df.to_csv(path, index=False, encoding='utf-8')
+    print(f"  Dimensions : {df.shape[0]} x {df.shape[1]}")
+    print(f"  Fichier : {path}")
 
-    # 7. Nettoyage final
-    final = final.replace([np.inf, -np.inf], np.nan)
-    final = final.fillna(0)
-
-    # 8. Sauvegarder
-    output_path = os.path.join(PROCESSED_DIR, 'energy_data_processed.csv')
-    final.to_csv(output_path, index=False, encoding='utf-8')
-
-    print(f"\n  {'─' * 50}")
-    print(f"  Dimensions finales : {final.shape[0]} lignes × {final.shape[1]} colonnes")
-    print(f"  Fichier : {output_path}")
-
-    # Stats Togo
-    togo = final[final['country_code'] == FOCUS_COUNTRY]
-    if not togo.empty:
-        print(f"\n  ── Focus Togo ──")
+    # Apercu Togo
+    tg = df[df['country_code'] == FOCUS_COUNTRY]
+    if not tg.empty:
+        last = tg[tg['year'] == tg['year'].max()].iloc[0]
+        print(f"\n  Togo (derniere annee) :")
         for col, label in [
-            ('EG.USE.ELEC.KH.PC', 'Conso. élec.'),
-            ('EG.ELC.ACCS.ZS', 'Accès élec.'),
-            ('gap_elec_urbain_rural', 'Gap urb./rur.'),
-            ('NY.GDP.PCAP.CD', 'PIB/hab'),
-            ('SH.DYN.MORT', 'Mort. infantile'),
+            ('SP.POP.TOTL', 'Population'),
+            ('EG.USE.ELEC.KH.PC', 'kWh/hab'),
+            ('conso_totale_gwh', 'Conso totale (GWh)'),
+            ('EG.ELC.ACCS.ZS', 'Acces electr. (%)'),
         ]:
-            if col in togo.columns:
-                latest = togo[togo['year'] == togo['year'].max()][col].values
-                if len(latest) > 0:
-                    print(f"     {label:20s} : {latest[0]:.1f}")
+            if col in last.index:
+                print(f"    {label:25s} : {last[col]:,.1f}")
 
-    print(f"\n  ✓ Transformation terminée.")
-    return final
+    print(f"  Termine.")
+    return df
 
 
 if __name__ == '__main__':

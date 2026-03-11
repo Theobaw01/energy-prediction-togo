@@ -1,10 +1,6 @@
 """
-Prédictions multi-cibles + Projections futures (2024-2028).
-
-Génère :
-1. Prédictions sur les données historiques (validation)
-2. Projections futures avec intervalles de confiance
-3. Analyse d'impact : lien énergie ↔ santé ↔ économie
+Predictions historiques + Projections 2024-2030
+Cible unique : demande electrique totale (GWh) = f(population, contexte)
 """
 import os
 import sys
@@ -16,207 +12,137 @@ warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from utils.config import (
-    MODELS_DIR, PREDICTIONS_DIR, COUNTRIES, FOCUS_COUNTRY,
-    PREDICTION_TARGETS, FORECAST_HORIZON
+    MODELS_DIR, PREDICTIONS_DIR, COUNTRIES, FOCUS_COUNTRY, FORECAST_HORIZON
 )
-from etl.load import load_processed_data, prepare_features
+from etl.load import load_processed, prepare_features
 
 
-def load_model(target_key: str) -> dict:
-    """Charge un modèle sauvegardé pour une cible donnée."""
-    path = os.path.join(MODELS_DIR, f'model_{target_key}.joblib')
+def load_model():
+    path = os.path.join(MODELS_DIR, 'model_energy.joblib')
     if not os.path.exists(path):
-        raise FileNotFoundError(
-            f"Modèle non trouvé : {path}\n"
-            f"→ Exécutez d'abord : python src/models/train.py"
-        )
+        raise FileNotFoundError(f"Manquant : {path}\n  -> python src/models/train.py")
     return joblib.load(path)
 
 
-def predict_historical(df: pd.DataFrame, target_key: str) -> pd.DataFrame:
-    """
-    Génère les prédictions sur les données historiques.
-    Utile pour évaluer la qualité des modèles visuellement.
-    """
-    saved = load_model(target_key)
+def predict_historical(df):
+    """Predictions sur les donnees historiques (validation visuelle)."""
+    saved = load_model()
     model = saved['model']
     scaler = saved['scaler']
-    target_info = saved['target_info']
-    indicator = target_info['indicator']
 
-    X, y, _ = prepare_features(df, indicator)
+    X, y, _ = prepare_features(df)
     X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
-    X_scaled = scaler.transform(X)
+    X_sc = scaler.transform(X)
+    preds = model.predict(X_sc)
 
-    predictions = model.predict(X_scaled)
-
-    results = df[['country_code', 'country_name', 'year']].copy()
-    results['target'] = target_key
-    results['target_name'] = target_info['name']
-    results['unit'] = target_info['unit']
-    results['actual'] = y
-    results['predicted'] = predictions
-    results['error'] = results['actual'] - results['predicted']
-    results['error_pct'] = np.where(
-        results['actual'] != 0,
-        (results['error'] / results['actual'] * 100).round(2),
-        0
-    )
-
-    return results
+    out = df[['country_code', 'country_name', 'year']].copy()
+    out['actual'] = y
+    out['predicted'] = preds
+    out['error'] = out['actual'] - out['predicted']
+    out['error_pct'] = np.where(out['actual'] != 0,
+                                 (out['error'] / out['actual'] * 100).round(2), 0)
+    return out
 
 
-def project_future(df: pd.DataFrame, target_key: str,
-                   horizon: int = FORECAST_HORIZON) -> pd.DataFrame:
+def project_future(df, horizon=FORECAST_HORIZON):
     """
-    Projections futures par pays avec intervalles de confiance.
-
-    Méthode : on utilise les tendances récentes pour extrapoler les features,
-    puis on applique le modèle entraîné.
+    Projections futures par pays.
+    On extrapole les features par tendance lineaire sur les 5 dernieres annees,
+    puis on applique le modele.
     """
-    saved = load_model(target_key)
+    saved = load_model()
     model = saved['model']
     scaler = saved['scaler']
-    feature_names = saved['feature_names']
-    target_info = saved['target_info']
-    indicator = target_info['indicator']
+    feat_names = saved['feature_names']
 
-    projections = []
     max_year = int(df['year'].max())
+    rows = []
 
     for code, name in COUNTRIES.items():
-        country_df = df[df['country_code'] == code].sort_values('year')
-        if country_df.empty or len(country_df) < 5:
+        cdf = df[df['country_code'] == code].sort_values('year')
+        if cdf.empty or len(cdf) < 5:
             continue
-
-        # Utiliser les 5 dernières années pour estimer les tendances
-        recent = country_df.tail(5)
+        recent = cdf.tail(5)
 
         for h in range(1, horizon + 1):
-            future_year = max_year + h
-            future_row = {}
-
-            # Extrapoler chaque feature par tendance linéaire
-            for feat in feature_names:
-                if feat in recent.columns:
-                    vals = recent[feat].values
-                    # Tendance linéaire simple
+            future = {}
+            for f in feat_names:
+                if f in recent.columns:
+                    vals = recent[f].values
                     if len(vals) >= 2 and not np.all(np.isnan(vals)):
-                        trend = np.polyfit(range(len(vals)), vals, 1)
-                        future_row[feat] = trend[0] * (len(vals) - 1 + h) + trend[1]
+                        t = np.polyfit(range(len(vals)), vals, 1)
+                        future[f] = t[0] * (len(vals) - 1 + h) + t[1]
                     else:
-                        future_row[feat] = vals[-1] if len(vals) > 0 else 0
+                        future[f] = vals[-1] if len(vals) > 0 else 0
                 else:
-                    future_row[feat] = 0
+                    future[f] = 0
 
-            # Construire le vecteur de features
-            X_future = np.array([[future_row.get(f, 0) for f in feature_names]])
-            X_future = np.nan_to_num(X_future, nan=0.0, posinf=0.0, neginf=0.0)
-            X_future_scaled = scaler.transform(X_future)
+            X = np.array([[future.get(f, 0) for f in feat_names]])
+            X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
+            pred = model.predict(scaler.transform(X))[0]
 
-            pred = model.predict(X_future_scaled)[0]
-
-            # Intervalle de confiance naïf basé sur la volatilité récente
-            if indicator in recent.columns:
-                recent_vals = recent[indicator].values
-                std = np.std(recent_vals) if len(recent_vals) > 1 else 0
-                ci_factor = 1.96 * std * np.sqrt(h)  # Croît avec l'horizon
+            # IC simplifie
+            if 'conso_totale_gwh' in recent.columns:
+                std = np.std(recent['conso_totale_gwh'].values)
+                ci = 1.96 * std * np.sqrt(h)
             else:
-                ci_factor = 0
+                ci = 0
 
-            projections.append({
+            # Population projetee (pour info)
+            pop_proj = None
+            if 'SP.POP.TOTL' in recent.columns:
+                pvals = recent['SP.POP.TOTL'].values
+                if len(pvals) >= 2:
+                    pt = np.polyfit(range(len(pvals)), pvals, 1)
+                    pop_proj = pt[0] * (len(pvals) - 1 + h) + pt[1]
+
+            rows.append({
                 'country_code': code,
                 'country_name': name,
-                'year': future_year,
-                'target': target_key,
-                'target_name': target_info['name'],
-                'unit': target_info['unit'],
-                'predicted': pred,
-                'ci_lower': pred - ci_factor,
-                'ci_upper': pred + ci_factor,
+                'year': max_year + h,
+                'predicted_gwh': round(pred, 2),
+                'ci_lower': round(pred - ci, 2),
+                'ci_upper': round(pred + ci, 2),
+                'pop_projected': round(pop_proj) if pop_proj else None,
                 'horizon': h,
             })
 
-    return pd.DataFrame(projections)
+    return pd.DataFrame(rows)
 
 
 def predict():
-    """Pipeline de prédiction complet multi-cibles."""
-    print("=" * 70)
-    print("  PRÉDICTIONS & PROJECTIONS — Togo & Zone UEMOA")
-    print("=" * 70)
+    print("=" * 60)
+    print("  PREDICTIONS — Demande electrique (GWh)")
+    print("=" * 60)
 
-    df = load_processed_data()
-    all_historical = []
-    all_projections = []
+    df = load_processed()
 
-    for target_key, target_info in PREDICTION_TARGETS.items():
-        model_path = os.path.join(MODELS_DIR, f'model_{target_key}.joblib')
-        if not os.path.exists(model_path):
-            print(f"\n  ⚠ Modèle manquant pour '{target_key}' — saut")
-            continue
+    # 1. Historique
+    hist = predict_historical(df)
+    hist_path = os.path.join(PREDICTIONS_DIR, 'predictions.csv')
+    hist.to_csv(hist_path, index=False)
+    print(f"  Predictions historiques : {len(hist)} lignes -> {hist_path}")
 
-        print(f"\n  ▸ {target_info['name']}")
+    tg_h = hist[hist['country_code'] == FOCUS_COUNTRY]
+    if not tg_h.empty:
+        mae = tg_h['error'].abs().mean()
+        print(f"  MAE Togo : {mae:.1f} GWh")
 
-        # 1. Prédictions historiques
-        hist = predict_historical(df, target_key)
-        all_historical.append(hist)
+    # 2. Projections
+    proj = project_future(df)
+    proj_path = os.path.join(PREDICTIONS_DIR, 'projections.csv')
+    proj.to_csv(proj_path, index=False)
+    print(f"  Projections : {len(proj)} lignes -> {proj_path}")
 
-        # Focus Togo
-        togo_hist = hist[hist['country_code'] == FOCUS_COUNTRY]
-        if not togo_hist.empty:
-            mae = togo_hist['error'].abs().mean()
-            print(f"    Togo — MAE historique : {mae:.2f} {target_info['unit']}")
+    tg_p = proj[proj['country_code'] == FOCUS_COUNTRY]
+    if not tg_p.empty:
+        print(f"\n  Togo — Projections :")
+        for _, r in tg_p.iterrows():
+            pop_str = f"  pop {r['pop_projected']/1e6:.1f}M" if r['pop_projected'] else ""
+            print(f"    {int(r['year'])} : {r['predicted_gwh']:.1f} GWh "
+                  f"[{r['ci_lower']:.1f} - {r['ci_upper']:.1f}]{pop_str}")
 
-        # 2. Projections futures
-        proj = project_future(df, target_key)
-        all_projections.append(proj)
-
-        # Focus Togo projections
-        togo_proj = proj[proj['country_code'] == FOCUS_COUNTRY]
-        if not togo_proj.empty:
-            print(f"    Togo — Projections {int(togo_proj['year'].min())}-"
-                  f"{int(togo_proj['year'].max())} :")
-            for _, row in togo_proj.iterrows():
-                print(f"      {int(row['year'])} : {row['predicted']:.1f} "
-                      f"[{row['ci_lower']:.1f} — {row['ci_upper']:.1f}] "
-                      f"{target_info['unit']}")
-
-    # Sauvegarder
-    if all_historical:
-        hist_df = pd.concat(all_historical, ignore_index=True)
-        hist_path = os.path.join(PREDICTIONS_DIR, 'predictions.csv')
-        hist_df.to_csv(hist_path, index=False, encoding='utf-8')
-        print(f"\n  ✓ Prédictions historiques : {hist_path}")
-
-    if all_projections:
-        proj_df = pd.concat(all_projections, ignore_index=True)
-        proj_path = os.path.join(PREDICTIONS_DIR, 'projections.csv')
-        proj_df.to_csv(proj_path, index=False, encoding='utf-8')
-        print(f"  ✓ Projections futures    : {proj_path}")
-
-    # Analyse d'impact énergie ↔ santé
-    print(f"\n  ── Analyse d'Impact Énergie ↔ Développement (Togo) ──")
-    togo = df[df['country_code'] == FOCUS_COUNTRY].sort_values('year')
-    if not togo.empty:
-        if 'EG.ELC.ACCS.ZS' in togo.columns and 'SH.DYN.MORT' in togo.columns:
-            first = togo.iloc[0]
-            last = togo.iloc[-1]
-            acc_change = last.get('EG.ELC.ACCS.ZS', 0) - first.get('EG.ELC.ACCS.ZS', 0)
-            mort_change = last.get('SH.DYN.MORT', 0) - first.get('SH.DYN.MORT', 0)
-            print(f"    Accès électricité : {first.get('EG.ELC.ACCS.ZS', 0):.1f}% → "
-                  f"{last.get('EG.ELC.ACCS.ZS', 0):.1f}% "
-                  f"({'↑' if acc_change > 0 else '↓'} {abs(acc_change):.1f} pts)")
-            print(f"    Mortalité infant. : {first.get('SH.DYN.MORT', 0):.1f} → "
-                  f"{last.get('SH.DYN.MORT', 0):.1f} "
-                  f"({'↓' if mort_change < 0 else '↑'} {abs(mort_change):.1f})")
-            if acc_change != 0:
-                ratio = mort_change / acc_change
-                print(f"    Impact estimé : {abs(ratio):.2f} points de mortalité "
-                      f"par point d'accès électrique")
-
-    print(f"\n  ✓ Prédictions terminées.")
-    return hist_df if all_historical else None
+    print(f"  Termine.")
 
 
 if __name__ == '__main__':

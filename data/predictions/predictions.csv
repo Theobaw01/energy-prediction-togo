@@ -1,577 +1,193 @@
-country_code,country_name,year,target,target_name,unit,actual,predicted,error,error_pct
-BF,Burkina Faso,2000,energy,Consommation électrique (kWh/hab),kWh/hab,28.5940786275111,-23.777074938672204,52.3711535661833,183.15
-BF,Burkina Faso,2001,energy,Consommation électrique (kWh/hab),kWh/hab,30.0121976403255,25.288917637227165,4.723280003098335,15.74
-BF,Burkina Faso,2002,energy,Consommation électrique (kWh/hab),kWh/hab,33.0418266152623,27.179660874233182,5.86216574102912,17.74
-BF,Burkina Faso,2003,energy,Consommation électrique (kWh/hab),kWh/hab,34.0148222071996,26.73374622048322,7.281075986716381,21.41
-BF,Burkina Faso,2004,energy,Consommation électrique (kWh/hab),kWh/hab,36.5911479198636,33.099325588469185,3.491822331394417,9.54
-BF,Burkina Faso,2005,energy,Consommation électrique (kWh/hab),kWh/hab,40.194879129333,37.04520599365955,3.149673135673453,7.84
-BF,Burkina Faso,2006,energy,Consommation électrique (kWh/hab),kWh/hab,41.8820280669419,35.377592776145704,6.504435290796195,15.53
-BF,Burkina Faso,2007,energy,Consommation électrique (kWh/hab),kWh/hab,42.723196812809,38.930585329767375,3.7926114830416253,8.88
-BF,Burkina Faso,2008,energy,Consommation électrique (kWh/hab),kWh/hab,43.3212721930585,33.390005409743864,9.931266783314634,22.92
-BF,Burkina Faso,2009,energy,Consommation électrique (kWh/hab),kWh/hab,47.294518049765,35.48188571251096,11.812632337254044,24.98
-BF,Burkina Faso,2010,energy,Consommation électrique (kWh/hab),kWh/hab,68.4326113105568,69.27927152292801,-0.8466602123712192,-1.24
-BF,Burkina Faso,2011,energy,Consommation électrique (kWh/hab),kWh/hab,75.6215914767985,77.09451454518752,-1.4729230683890222,-1.95
-BF,Burkina Faso,2012,energy,Consommation électrique (kWh/hab),kWh/hab,86.2436086701789,93.40477717928107,-7.161168509102168,-8.3
-BF,Burkina Faso,2013,energy,Consommation électrique (kWh/hab),kWh/hab,92.0577761158276,88.17814073043954,3.879635385388056,4.21
-BF,Burkina Faso,2014,energy,Consommation électrique (kWh/hab),kWh/hab,97.8635627240981,90.09979119839535,7.763771525702751,7.93
-BF,Burkina Faso,2015,energy,Consommation électrique (kWh/hab),kWh/hab,112.794646056738,123.3862581494827,-10.591612092744697,-9.39
-BF,Burkina Faso,2016,energy,Consommation électrique (kWh/hab),kWh/hab,108.612135513189,107.62786640440495,0.9842691087840478,0.91
-BF,Burkina Faso,2017,energy,Consommation électrique (kWh/hab),kWh/hab,111.890743966382,120.17710606668267,-8.286362100300664,-7.41
-BF,Burkina Faso,2018,energy,Consommation électrique (kWh/hab),kWh/hab,117.475592867661,131.540620493961,-14.065027626299994,-11.97
-BF,Burkina Faso,2019,energy,Consommation électrique (kWh/hab),kWh/hab,122.555380338625,137.34170997912253,-14.786329640497527,-12.07
-BF,Burkina Faso,2020,energy,Consommation électrique (kWh/hab),kWh/hab,130.36176787318,130.13526247004253,0.22650540313748024,0.17
-BF,Burkina Faso,2021,energy,Consommation électrique (kWh/hab),kWh/hab,129.709864992171,140.42139013841572,-10.711525146244725,-8.26
-BF,Burkina Faso,2022,energy,Consommation électrique (kWh/hab),kWh/hab,131.191746177691,144.84789047762212,-13.656144299931128,-10.41
-BF,Burkina Faso,2023,energy,Consommation électrique (kWh/hab),kWh/hab,131.191746177691,142.02589060712947,-10.834144429438481,-8.26
-BJ,Bénin,2000,energy,Consommation électrique (kWh/hab),kWh/hab,55.2507685603464,11.962936647753793,43.28783191259261,78.35
-BJ,Bénin,2001,energy,Consommation électrique (kWh/hab),kWh/hab,58.4237984440735,29.62668737276231,28.79711107131119,49.29
-BJ,Bénin,2002,energy,Consommation électrique (kWh/hab),kWh/hab,64.8823921955602,61.12993451617077,3.7524576793894298,5.78
-BJ,Bénin,2003,energy,Consommation électrique (kWh/hab),kWh/hab,61.4173765681335,61.78902870827177,-0.3716521401382735,-0.61
-BJ,Bénin,2004,energy,Consommation électrique (kWh/hab),kWh/hab,66.7966320770419,67.88314413469361,-1.086512057651703,-1.63
-BJ,Bénin,2005,energy,Consommation électrique (kWh/hab),kWh/hab,69.9014875606209,73.80849045730534,-3.907002896684446,-5.59
-BJ,Bénin,2006,energy,Consommation électrique (kWh/hab),kWh/hab,70.9746720498521,58.106977038466134,12.867695011385969,18.13
-BJ,Bénin,2007,energy,Consommation électrique (kWh/hab),kWh/hab,75.2738813368686,65.10169977960454,10.172181557264054,13.51
-BJ,Bénin,2008,energy,Consommation électrique (kWh/hab),kWh/hab,81.3786386599896,89.71301366730265,-8.334375007313042,-10.24
-BJ,Bénin,2009,energy,Consommation électrique (kWh/hab),kWh/hab,82.6548571874445,83.36401573230302,-0.7091585448585107,-0.86
-BJ,Bénin,2010,energy,Consommation électrique (kWh/hab),kWh/hab,86.042498257716,89.04544575304145,-3.0029474953254436,-3.49
-BJ,Bénin,2011,energy,Consommation électrique (kWh/hab),kWh/hab,87.4809768504332,90.69244083452266,-3.2114639840894625,-3.67
-BJ,Bénin,2012,energy,Consommation électrique (kWh/hab),kWh/hab,85.5000314013051,83.4635353295889,2.0364960717162006,2.38
-BJ,Bénin,2013,energy,Consommation électrique (kWh/hab),kWh/hab,91.5132310389721,90.88099768017435,0.6322333587977482,0.69
-BJ,Bénin,2014,energy,Consommation électrique (kWh/hab),kWh/hab,104.261068264345,114.89875268870124,-10.637684424356237,-10.2
-BJ,Bénin,2015,energy,Consommation électrique (kWh/hab),kWh/hab,96.9132044108975,100.59071385163254,-3.6775094407350366,-3.79
-BJ,Bénin,2016,energy,Consommation électrique (kWh/hab),kWh/hab,92.068263531,88.72899007586321,3.339273455136791,3.63
-BJ,Bénin,2017,energy,Consommation électrique (kWh/hab),kWh/hab,95.1014055074096,102.8811563470314,-7.779750839621812,-8.18
-BJ,Bénin,2018,energy,Consommation électrique (kWh/hab),kWh/hab,96.9043345066564,108.61854718714044,-11.714212680484039,-12.09
-BJ,Bénin,2019,energy,Consommation électrique (kWh/hab),kWh/hab,98.6897288428983,114.89797605293379,-16.20824721003548,-16.42
-BJ,Bénin,2020,energy,Consommation électrique (kWh/hab),kWh/hab,98.4685048831427,135.3171542795243,-36.84864939638159,-37.42
-BJ,Bénin,2021,energy,Consommation électrique (kWh/hab),kWh/hab,113.244820465956,154.70019222489688,-41.455371758940885,-36.61
-BJ,Bénin,2022,energy,Consommation électrique (kWh/hab),kWh/hab,105.309051541913,147.83207282809948,-42.52302128618648,-40.38
-BJ,Bénin,2023,energy,Consommation électrique (kWh/hab),kWh/hab,105.309051541913,248.81809737744487,-143.50904583553188,-136.27
-CI,Côte d'Ivoire,2000,energy,Consommation électrique (kWh/hab),kWh/hab,161.76051488547,177.3270143679585,-15.566499482488496,-9.62
-CI,Côte d'Ivoire,2001,energy,Consommation électrique (kWh/hab),kWh/hab,168.931992798469,187.2568296487994,-18.3248368503304,-10.85
-CI,Côte d'Ivoire,2002,energy,Consommation électrique (kWh/hab),kWh/hab,163.175415018496,169.09471098911126,-5.919295970615252,-3.63
-CI,Côte d'Ivoire,2003,energy,Consommation électrique (kWh/hab),kWh/hab,160.466040648678,160.9035234121501,-0.43748276347210435,-0.27
-CI,Côte d'Ivoire,2004,energy,Consommation électrique (kWh/hab),kWh/hab,159.020158203623,152.67146887634445,6.348689327278549,3.99
-CI,Côte d'Ivoire,2005,energy,Consommation électrique (kWh/hab),kWh/hab,157.012561702548,151.61771430452893,5.394847398019067,3.44
-CI,Côte d'Ivoire,2006,energy,Consommation électrique (kWh/hab),kWh/hab,165.865228077829,171.65170676223633,-5.786478684407342,-3.49
-CI,Côte d'Ivoire,2007,energy,Consommation électrique (kWh/hab),kWh/hab,170.561332704534,168.12199224132178,2.4393404632122326,1.43
-CI,Côte d'Ivoire,2008,energy,Consommation électrique (kWh/hab),kWh/hab,178.298862452328,174.09243615555263,4.206426296775362,2.36
-CI,Côte d'Ivoire,2009,energy,Consommation électrique (kWh/hab),kWh/hab,182.835301850991,183.4403589480317,-0.6050570970407136,-0.33
-CI,Côte d'Ivoire,2010,energy,Consommation électrique (kWh/hab),kWh/hab,196.326362450482,219.02040359113877,-22.694041140656765,-11.56
-CI,Côte d'Ivoire,2011,energy,Consommation électrique (kWh/hab),kWh/hab,180.184492211296,160.56111333119432,19.623378880101683,10.89
-CI,Côte d'Ivoire,2012,energy,Consommation électrique (kWh/hab),kWh/hab,215.578607613611,258.27282626324984,-42.69421864963883,-19.8
-CI,Côte d'Ivoire,2013,energy,Consommation électrique (kWh/hab),kWh/hab,215.12315800796,203.23946093133895,11.883697076621047,5.52
-CI,Côte d'Ivoire,2014,energy,Consommation électrique (kWh/hab),kWh/hab,253.675533011149,280.77784906164095,-27.102316050491936,-10.68
-CI,Côte d'Ivoire,2015,energy,Consommation électrique (kWh/hab),kWh/hab,242.371746370227,247.4984528597497,-5.126706489522718,-2.12
-CI,Côte d'Ivoire,2016,energy,Consommation électrique (kWh/hab),kWh/hab,239.674590472541,230.18116583492224,9.493424637618773,3.96
-CI,Côte d'Ivoire,2017,energy,Consommation électrique (kWh/hab),kWh/hab,272.618059554926,298.82952237628615,-26.211462821360158,-9.61
-CI,Côte d'Ivoire,2018,energy,Consommation électrique (kWh/hab),kWh/hab,259.756592707161,262.77041647408976,-3.0138237669287378,-1.16
-CI,Côte d'Ivoire,2019,energy,Consommation électrique (kWh/hab),kWh/hab,278.827988881925,259.3675638034455,19.460425078479545,6.98
-CI,Côte d'Ivoire,2020,energy,Consommation électrique (kWh/hab),kWh/hab,290.017976203655,266.7454022099488,23.272573993706203,8.02
-CI,Côte d'Ivoire,2021,energy,Consommation électrique (kWh/hab),kWh/hab,308.099910201629,259.6931912705261,48.40671893110289,15.71
-CI,Côte d'Ivoire,2022,energy,Consommation électrique (kWh/hab),kWh/hab,323.704535370651,258.7178172071493,64.98671816350168,20.08
-CI,Côte d'Ivoire,2023,energy,Consommation électrique (kWh/hab),kWh/hab,323.704535370651,250.83585416638024,72.86868120427076,22.51
-GW,Guinée-Bissau,2000,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,143.82769793668794,-38.64633172020093,-36.74
-GW,Guinée-Bissau,2001,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,116.3039918812116,-11.122625664724595,-10.57
-GW,Guinée-Bissau,2002,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,106.86116908201552,-1.679802865528515,-1.6
-GW,Guinée-Bissau,2003,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,109.76671413519361,-4.585347918706603,-4.36
-GW,Guinée-Bissau,2004,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,108.00019328680035,-2.818827070313347,-2.68
-GW,Guinée-Bissau,2005,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,111.01729717848792,-5.835930962000916,-5.55
-GW,Guinée-Bissau,2006,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,111.04154368673684,-5.8601774702498375,-5.57
-GW,Guinée-Bissau,2007,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,108.39836260179713,-3.216996385310125,-3.06
-GW,Guinée-Bissau,2008,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,105.64366168593266,-0.4622954694456496,-0.44
-GW,Guinée-Bissau,2009,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,104.63934341711628,0.5420227993707272,0.52
-GW,Guinée-Bissau,2010,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,106.49612602349607,-1.314759807009068,-1.25
-GW,Guinée-Bissau,2011,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,104.65665405511982,0.5247121613671908,0.5
-GW,Guinée-Bissau,2012,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,106.98895546918044,-1.8075892526934325,-1.72
-GW,Guinée-Bissau,2013,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,108.48626759948252,-3.30490138299551,-3.14
-GW,Guinée-Bissau,2014,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,107.75504883396485,-2.573682617477843,-2.45
-GW,Guinée-Bissau,2015,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,107.99235550395265,-2.8109892874656452,-2.67
-GW,Guinée-Bissau,2016,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,105.91731411355296,-0.7359478970659552,-0.7
-GW,Guinée-Bissau,2017,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,100.49693226006882,4.684433956418189,4.45
-GW,Guinée-Bissau,2018,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,106.95366132315175,-1.7722951066647425,-1.68
-GW,Guinée-Bissau,2019,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,100.64145576040649,4.53991045608052,4.32
-GW,Guinée-Bissau,2020,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,112.06513473673775,-6.88376852025074,-6.54
-GW,Guinée-Bissau,2021,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,92.61178565525546,12.569580561231547,11.95
-GW,Guinée-Bissau,2022,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,89.17039675400842,16.010969462478585,15.22
-GW,Guinée-Bissau,2023,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,79.99146563987212,25.18990057661489,23.95
-ML,Mali,2000,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,148.30024311268193,-43.11887689619492,-40.99
-ML,Mali,2001,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,137.15806796887944,-31.97670175239243,-30.4
-ML,Mali,2002,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,112.21558372861308,-7.034217512126077,-6.69
-ML,Mali,2003,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,114.1588366130376,-8.977470396550586,-8.54
-ML,Mali,2004,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,115.85562310647194,-10.674256889984932,-10.15
-ML,Mali,2005,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,117.70528736295398,-12.523921146466975,-11.91
-ML,Mali,2006,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,109.25349396487061,-4.072127748383608,-3.87
-ML,Mali,2007,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,108.49873406381997,-3.31736784733296,-3.15
-ML,Mali,2008,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,105.63444558139093,-0.4530793649039282,-0.43
-ML,Mali,2009,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,111.91548588177822,-6.734119665291217,-6.4
-ML,Mali,2010,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,107.81767818434163,-2.636311967854624,-2.51
-ML,Mali,2011,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,115.981217956504,-10.79985174001699,-10.27
-ML,Mali,2012,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,108.09346316483614,-2.912096948349131,-2.77
-ML,Mali,2013,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,112.15230116793094,-6.970934951443937,-6.63
-ML,Mali,2014,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,111.52214804236887,-6.340781825881862,-6.03
-ML,Mali,2015,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,109.63652145600447,-4.455155239517467,-4.24
-ML,Mali,2016,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,101.17966640292954,4.001699813557465,3.8
-ML,Mali,2017,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,101.19328784626438,3.988078370222624,3.79
-ML,Mali,2018,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,43.00455686109065,62.17680935539636,59.11
-ML,Mali,2019,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,121.92873643835155,-16.747370221864543,-15.92
-ML,Mali,2020,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,81.29327394796356,23.88809226852345,22.71
-ML,Mali,2021,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,115.38608044428581,-10.204714227798803,-9.7
-ML,Mali,2022,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,114.55532164105234,-9.373955424565338,-8.91
-ML,Mali,2023,energy,Consommation électrique (kWh/hab),kWh/hab,105.181366216487,151.81811644457525,-46.636750228088246,-44.34
-NE,Niger,2000,energy,Consommation électrique (kWh/hab),kWh/hab,32.2338771967474,28.539598820120503,3.6942783766268974,11.46
-NE,Niger,2001,energy,Consommation électrique (kWh/hab),kWh/hab,30.3674792148446,25.300713883838217,5.066765331006383,16.68
-NE,Niger,2002,energy,Consommation électrique (kWh/hab),kWh/hab,30.0425681326576,27.663160972231243,2.379407160426357,7.92
-NE,Niger,2003,energy,Consommation électrique (kWh/hab),kWh/hab,29.4600665281757,25.62791239994823,3.8321541282274723,13.01
-NE,Niger,2004,energy,Consommation électrique (kWh/hab),kWh/hab,33.1679058899869,31.695855287911883,1.472050602075015,4.44
-NE,Niger,2005,energy,Consommation électrique (kWh/hab),kWh/hab,36.3472681974779,38.25814081235228,-1.9108726148743784,-5.26
-NE,Niger,2006,energy,Consommation électrique (kWh/hab),kWh/hab,34.5514385768283,30.724664807863405,3.826773768964898,11.08
-NE,Niger,2007,energy,Consommation électrique (kWh/hab),kWh/hab,38.774325992106,38.165289866001686,0.6090361261043142,1.57
-NE,Niger,2008,energy,Consommation électrique (kWh/hab),kWh/hab,38.9274384085578,36.130247775540624,2.7971906330171734,7.19
-NE,Niger,2009,energy,Consommation électrique (kWh/hab),kWh/hab,42.3365378433768,39.42736573281941,2.9091721105573924,6.87
-NE,Niger,2010,energy,Consommation électrique (kWh/hab),kWh/hab,43.9910120561357,43.46996909977616,0.521042956359544,1.18
-NE,Niger,2011,energy,Consommation électrique (kWh/hab),kWh/hab,47.2162690845278,41.423670401292426,5.792598683235376,12.27
-NE,Niger,2012,energy,Consommation électrique (kWh/hab),kWh/hab,49.2241616180599,47.40910204655296,1.8150595715069429,3.69
-NE,Niger,2013,energy,Consommation électrique (kWh/hab),kWh/hab,48.2184081143427,44.38237538425585,3.836032730086849,7.96
-NE,Niger,2014,energy,Consommation électrique (kWh/hab),kWh/hab,51.2596099409089,46.04121035026588,5.218399590643024,10.18
-NE,Niger,2015,energy,Consommation électrique (kWh/hab),kWh/hab,55.3674922006562,54.282494112208575,1.0849980884476267,1.96
-NE,Niger,2016,energy,Consommation électrique (kWh/hab),kWh/hab,65.2139663467895,80.76867255476947,-15.554706207979962,-23.85
-NE,Niger,2017,energy,Consommation électrique (kWh/hab),kWh/hab,56.1686470157887,41.421719791830476,14.746927223958224,26.25
-NE,Niger,2018,energy,Consommation électrique (kWh/hab),kWh/hab,55.615475145674,50.746996191824714,4.868478953849284,8.75
-NE,Niger,2019,energy,Consommation électrique (kWh/hab),kWh/hab,61.6182226437207,68.55308903645383,-6.934866392733127,-11.25
-NE,Niger,2020,energy,Consommation électrique (kWh/hab),kWh/hab,61.2203260083551,59.94492152298373,1.275404485371375,2.08
-NE,Niger,2021,energy,Consommation électrique (kWh/hab),kWh/hab,61.1375169679057,44.148742036906775,16.98877493099892,27.79
-NE,Niger,2022,energy,Consommation électrique (kWh/hab),kWh/hab,62.4210526773239,61.77538519444197,0.6456674828819331,1.03
-NE,Niger,2023,energy,Consommation électrique (kWh/hab),kWh/hab,62.4210526773239,62.359932625259425,0.06112005206447435,0.1
-SN,Sénégal,2000,energy,Consommation électrique (kWh/hab),kWh/hab,100.820002688533,84.52015497704686,16.299847711486137,16.17
-SN,Sénégal,2001,energy,Consommation électrique (kWh/hab),kWh/hab,122.393723571523,125.41166887195412,-3.0179453004311227,-2.47
-SN,Sénégal,2002,energy,Consommation électrique (kWh/hab),kWh/hab,144.751483201089,177.5321130543619,-32.7806298532729,-22.65
-SN,Sénégal,2003,energy,Consommation électrique (kWh/hab),kWh/hab,125.359382217025,122.45827096220083,2.9011112548241726,2.31
-SN,Sénégal,2004,energy,Consommation électrique (kWh/hab),kWh/hab,138.214368754843,152.50591925593278,-14.291550501089773,-10.34
-SN,Sénégal,2005,energy,Consommation électrique (kWh/hab),kWh/hab,158.159799606105,185.70341830006893,-27.543618693963936,-17.42
-SN,Sénégal,2006,energy,Consommation électrique (kWh/hab),kWh/hab,157.911752721326,174.484883789121,-16.573131067795003,-10.5
-SN,Sénégal,2007,energy,Consommation électrique (kWh/hab),kWh/hab,182.747420126379,207.48859720878062,-24.741177082401606,-13.54
-SN,Sénégal,2008,energy,Consommation électrique (kWh/hab),kWh/hab,160.345802487999,158.00631520704934,2.339487280949669,1.46
-SN,Sénégal,2009,energy,Consommation électrique (kWh/hab),kWh/hab,211.714164155803,215.13771359358464,-3.423549437781645,-1.62
-SN,Sénégal,2010,energy,Consommation électrique (kWh/hab),kWh/hab,223.577970898142,257.0379361711331,-33.45996527299107,-14.97
-SN,Sénégal,2011,energy,Consommation électrique (kWh/hab),kWh/hab,224.787649751364,233.06683587518148,-8.279186123817482,-3.68
-SN,Sénégal,2012,energy,Consommation électrique (kWh/hab),kWh/hab,238.758964260908,255.50118274106356,-16.74221848015557,-7.01
-SN,Sénégal,2013,energy,Consommation électrique (kWh/hab),kWh/hab,238.934875586479,247.76771033221203,-8.832834745733038,-3.7
-SN,Sénégal,2014,energy,Consommation électrique (kWh/hab),kWh/hab,255.227103365988,261.1923461347985,-5.965242768810526,-2.34
-SN,Sénégal,2015,energy,Consommation électrique (kWh/hab),kWh/hab,264.024711013544,277.78051832573374,-13.755807312189745,-5.21
-SN,Sénégal,2016,energy,Consommation électrique (kWh/hab),kWh/hab,275.831867207475,299.72841331225993,-23.89654610478493,-8.66
-SN,Sénégal,2017,energy,Consommation électrique (kWh/hab),kWh/hab,263.069432882787,274.25712183641406,-11.18768895362706,-4.25
-SN,Sénégal,2018,energy,Consommation électrique (kWh/hab),kWh/hab,271.6391054245,287.54372895963047,-15.904623535130497,-5.86
-SN,Sénégal,2019,energy,Consommation électrique (kWh/hab),kWh/hab,310.52554399758,272.79106975632124,37.73447424125874,12.15
-SN,Sénégal,2020,energy,Consommation électrique (kWh/hab),kWh/hab,312.164609920211,269.0142179778712,43.15039194233975,13.82
-SN,Sénégal,2021,energy,Consommation électrique (kWh/hab),kWh/hab,329.600129888931,275.5894793564519,54.01065053247913,16.39
-SN,Sénégal,2022,energy,Consommation électrique (kWh/hab),kWh/hab,399.521774928173,263.108265961828,136.41350896634498,34.14
-SN,Sénégal,2023,energy,Consommation électrique (kWh/hab),kWh/hab,410.176742198745,262.2357951481307,147.94094705061428,36.07
-TG,Togo,2000,energy,Consommation électrique (kWh/hab),kWh/hab,91.2444793685337,107.09718441872285,-15.852705050189144,-17.37
-TG,Togo,2001,energy,Consommation électrique (kWh/hab),kWh/hab,94.7439469039763,94.41072161387751,0.3332252900987811,0.35
-TG,Togo,2002,energy,Consommation électrique (kWh/hab),kWh/hab,92.5502754894727,85.71536434015597,6.834911149316724,7.39
-TG,Togo,2003,energy,Consommation électrique (kWh/hab),kWh/hab,98.8803110569261,99.88489237363468,-1.004581316708581,-1.02
-TG,Togo,2004,energy,Consommation électrique (kWh/hab),kWh/hab,103.045585119866,109.87941905925467,-6.8338339393886685,-6.63
-TG,Togo,2005,energy,Consommation électrique (kWh/hab),kWh/hab,105.053680891061,118.70568462741215,-13.652003736351148,-13.0
-TG,Togo,2006,energy,Consommation électrique (kWh/hab),kWh/hab,104.148157908572,113.01218935595297,-8.864031447380967,-8.51
-TG,Togo,2007,energy,Consommation électrique (kWh/hab),kWh/hab,97.9260364323638,93.33789890421069,4.588137528153112,4.69
-TG,Togo,2008,energy,Consommation électrique (kWh/hab),kWh/hab,100.175668554826,106.55193382661226,-6.376265271786252,-6.37
-TG,Togo,2009,energy,Consommation électrique (kWh/hab),kWh/hab,118.439558812643,120.24610801509537,-1.8065492024523735,-1.53
-TG,Togo,2010,energy,Consommation électrique (kWh/hab),kWh/hab,118.379405251174,120.78490821216995,-2.405502960995946,-2.03
-TG,Togo,2011,energy,Consommation électrique (kWh/hab),kWh/hab,128.678283183021,143.60812473048915,-14.929841547468158,-11.6
-TG,Togo,2012,energy,Consommation électrique (kWh/hab),kWh/hab,147.308673354424,188.33459859350904,-41.02592523908504,-27.85
-TG,Togo,2013,energy,Consommation électrique (kWh/hab),kWh/hab,86.8856000775245,59.250943669626196,27.634656407898305,31.81
-TG,Togo,2014,energy,Consommation électrique (kWh/hab),kWh/hab,173.035617501623,231.3689057748732,-58.33328827325022,-33.71
-TG,Togo,2015,energy,Consommation électrique (kWh/hab),kWh/hab,91.6066992944849,25.37391084054572,66.23278845393918,72.3
-TG,Togo,2016,energy,Consommation électrique (kWh/hab),kWh/hab,126.617893538912,88.5761480613254,38.0417454775866,30.04
-TG,Togo,2017,energy,Consommation électrique (kWh/hab),kWh/hab,170.40786184676,214.0891810565257,-43.68131920976569,-25.63
-TG,Togo,2018,energy,Consommation électrique (kWh/hab),kWh/hab,125.442286982408,69.223260315546,56.21902666686201,44.82
-TG,Togo,2019,energy,Consommation électrique (kWh/hab),kWh/hab,167.078889121534,201.34463471381602,-34.26574559228203,-20.51
-TG,Togo,2020,energy,Consommation électrique (kWh/hab),kWh/hab,162.058290233133,194.28586256440695,-32.22757233127396,-19.89
-TG,Togo,2021,energy,Consommation électrique (kWh/hab),kWh/hab,161.515970426583,166.84440851455724,-5.328438087974234,-3.3
-TG,Togo,2022,energy,Consommation électrique (kWh/hab),kWh/hab,191.864716012717,195.44602456090678,-3.5813085481897815,-1.87
-TG,Togo,2023,energy,Consommation électrique (kWh/hab),kWh/hab,191.864716012717,199.72220243958873,-7.857486426871731,-4.1
-BF,Burkina Faso,2000,health,Mortalité infantile,pour 1 000,178.1,178.4748088081042,-0.3748088081042056,-0.21
-BF,Burkina Faso,2001,health,Mortalité infantile,pour 1 000,174.0,176.91762604522523,-2.9176260452252336,-1.68
-BF,Burkina Faso,2002,health,Mortalité infantile,pour 1 000,169.3,168.66776168093293,0.6322383190670848,0.37
-BF,Burkina Faso,2003,health,Mortalité infantile,pour 1 000,164.3,164.36075877557695,-0.06075877557694298,-0.04
-BF,Burkina Faso,2004,health,Mortalité infantile,pour 1 000,158.6,159.17565634881166,-0.5756563488116626,-0.36
-BF,Burkina Faso,2005,health,Mortalité infantile,pour 1 000,152.3,152.92391256431122,-0.6239125643112118,-0.41
-BF,Burkina Faso,2006,health,Mortalité infantile,pour 1 000,145.7,146.0515140662278,-0.35151406622782133,-0.24
-BF,Burkina Faso,2007,health,Mortalité infantile,pour 1 000,139.0,138.00921678027123,0.9907832197287689,0.71
-BF,Burkina Faso,2008,health,Mortalité infantile,pour 1 000,132.7,132.40381605479658,0.29618394520340985,0.22
-BF,Burkina Faso,2009,health,Mortalité infantile,pour 1 000,126.8,126.9232748966171,-0.12327489661710445,-0.1
-BF,Burkina Faso,2010,health,Mortalité infantile,pour 1 000,121.5,120.81561312252474,0.6843868774752622,0.56
-BF,Burkina Faso,2011,health,Mortalité infantile,pour 1 000,116.8,117.08958893454361,-0.289588934543616,-0.25
-BF,Burkina Faso,2012,health,Mortalité infantile,pour 1 000,112.6,112.83201901882701,-0.23201901882701748,-0.21
-BF,Burkina Faso,2013,health,Mortalité infantile,pour 1 000,108.6,108.20318106202053,0.3968189379794609,0.37
-BF,Burkina Faso,2014,health,Mortalité infantile,pour 1 000,104.7,104.5733524405805,0.1266475594194958,0.12
-BF,Burkina Faso,2015,health,Mortalité infantile,pour 1 000,101.1,101.11866565401223,-0.01866565401223852,-0.02
-BF,Burkina Faso,2016,health,Mortalité infantile,pour 1 000,97.7,97.59567085753837,0.10432914246163705,0.11
-BF,Burkina Faso,2017,health,Mortalité infantile,pour 1 000,94.3,94.73089681553745,-0.4308968155374515,-0.46
-BF,Burkina Faso,2018,health,Mortalité infantile,pour 1 000,91.2,90.67383221042071,0.52616778957929,0.58
-BF,Burkina Faso,2019,health,Mortalité infantile,pour 1 000,88.2,84.11178233909426,4.088217660905741,4.64
-BF,Burkina Faso,2020,health,Mortalité infantile,pour 1 000,85.3,85.55773425540248,-0.2577342554024824,-0.3
-BF,Burkina Faso,2021,health,Mortalité infantile,pour 1 000,82.5,86.42340139740368,-3.92340139740368,-4.76
-BF,Burkina Faso,2022,health,Mortalité infantile,pour 1 000,79.9,83.93096723326028,-4.03096723326027,-5.05
-BF,Burkina Faso,2023,health,Mortalité infantile,pour 1 000,77.3,84.05742162993384,-6.7574216299338445,-8.74
-BJ,Bénin,2000,health,Mortalité infantile,pour 1 000,136.1,137.16996362155064,-1.0699636215506416,-0.79
-BJ,Bénin,2001,health,Mortalité infantile,pour 1 000,132.8,133.59591006155708,-0.7959100615570662,-0.6
-BJ,Bénin,2002,health,Mortalité infantile,pour 1 000,129.6,128.87646755612496,0.7235324438750297,0.56
-BJ,Bénin,2003,health,Mortalité infantile,pour 1 000,126.5,126.050430382144,0.4495696178559996,0.36
-BJ,Bénin,2004,health,Mortalité infantile,pour 1 000,123.5,124.82907718258532,-1.3290771825853227,-1.08
-BJ,Bénin,2005,health,Mortalité infantile,pour 1 000,120.6,120.5974817319448,0.0025182680551978365,0.0
-BJ,Bénin,2006,health,Mortalité infantile,pour 1 000,117.9,117.2600440595556,0.6399559404444091,0.54
-BJ,Bénin,2007,health,Mortalité infantile,pour 1 000,115.4,115.09221175769554,0.30778824230446844,0.27
-BJ,Bénin,2008,health,Mortalité infantile,pour 1 000,113.0,113.11699345080385,-0.1169934508038466,-0.1
-BJ,Bénin,2009,health,Mortalité infantile,pour 1 000,110.6,111.18085467590109,-0.5808546759010937,-0.53
-BJ,Bénin,2010,health,Mortalité infantile,pour 1 000,108.4,108.33685012112431,0.06314987887569146,0.06
-BJ,Bénin,2011,health,Mortalité infantile,pour 1 000,106.2,106.4621627213409,-0.2621627213408999,-0.25
-BJ,Bénin,2012,health,Mortalité infantile,pour 1 000,103.9,103.51653266557896,0.38346733442104153,0.37
-BJ,Bénin,2013,health,Mortalité infantile,pour 1 000,101.6,101.25687199155257,0.3431280084474224,0.34
-BJ,Bénin,2014,health,Mortalité infantile,pour 1 000,99.3,99.41126834797339,-0.11126834797339313,-0.11
-BJ,Bénin,2015,health,Mortalité infantile,pour 1 000,97.1,96.7158217159347,0.38417828406529964,0.4
-BJ,Bénin,2016,health,Mortalité infantile,pour 1 000,95.0,94.51969259316208,0.48030740683792317,0.51
-BJ,Bénin,2017,health,Mortalité infantile,pour 1 000,92.7,93.73416118674282,-1.0341611867428213,-1.12
-BJ,Bénin,2018,health,Mortalité infantile,pour 1 000,90.5,89.86227220149092,0.6377277985090757,0.7
-BJ,Bénin,2019,health,Mortalité infantile,pour 1 000,88.0,88.20066526995552,-0.2006652699555218,-0.23
-BJ,Bénin,2020,health,Mortalité infantile,pour 1 000,85.5,86.0552781736498,-0.5552781736497963,-0.65
-BJ,Bénin,2021,health,Mortalité infantile,pour 1 000,83.1,89.27642553458523,-6.176425534585235,-7.43
-BJ,Bénin,2022,health,Mortalité infantile,pour 1 000,80.4,77.18822947346982,3.211770526530188,3.99
-BJ,Bénin,2023,health,Mortalité infantile,pour 1 000,77.9,75.56395456015724,2.3360454398427635,3.0
-CI,Côte d'Ivoire,2000,health,Mortalité infantile,pour 1 000,140.5,143.55103091538,-3.051030915380011,-2.17
-CI,Côte d'Ivoire,2001,health,Mortalité infantile,pour 1 000,137.1,139.32453194030285,-2.224531940302853,-1.62
-CI,Côte d'Ivoire,2002,health,Mortalité infantile,pour 1 000,133.4,133.00171739580512,0.3982826041948897,0.3
-CI,Côte d'Ivoire,2003,health,Mortalité infantile,pour 1 000,129.6,129.95214362122857,-0.3521436212285778,-0.27
-CI,Côte d'Ivoire,2004,health,Mortalité infantile,pour 1 000,125.7,125.99298985359802,-0.29298985359801577,-0.23
-CI,Côte d'Ivoire,2005,health,Mortalité infantile,pour 1 000,121.6,120.87373903490133,0.7262609650986604,0.6
-CI,Côte d'Ivoire,2006,health,Mortalité infantile,pour 1 000,117.8,117.88018558092806,-0.08018558092805961,-0.07
-CI,Côte d'Ivoire,2007,health,Mortalité infantile,pour 1 000,113.9,116.90822453952065,-3.00822453952064,-2.64
-CI,Côte d'Ivoire,2008,health,Mortalité infantile,pour 1 000,109.5,110.80638730808994,-1.3063873080899384,-1.19
-CI,Côte d'Ivoire,2009,health,Mortalité infantile,pour 1 000,105.8,105.25943166979603,0.5405683302039677,0.51
-CI,Côte d'Ivoire,2010,health,Mortalité infantile,pour 1 000,102.2,100.39728807276597,1.8027119272340286,1.76
-CI,Côte d'Ivoire,2011,health,Mortalité infantile,pour 1 000,99.1,99.0907899044915,0.009210095508493055,0.01
-CI,Côte d'Ivoire,2012,health,Mortalité infantile,pour 1 000,96.0,94.86352076096503,1.1364792390349692,1.18
-CI,Côte d'Ivoire,2013,health,Mortalité infantile,pour 1 000,92.7,91.67527750358882,1.0247224964111865,1.11
-CI,Côte d'Ivoire,2014,health,Mortalité infantile,pour 1 000,89.2,89.29888478597117,-0.09888478597116546,-0.11
-CI,Côte d'Ivoire,2015,health,Mortalité infantile,pour 1 000,86.1,86.43039939506157,-0.33039939506157623,-0.38
-CI,Côte d'Ivoire,2016,health,Mortalité infantile,pour 1 000,83.6,84.11698536839272,-0.5169853683927244,-0.62
-CI,Côte d'Ivoire,2017,health,Mortalité infantile,pour 1 000,81.1,81.80850092024542,-0.7085009202454273,-0.87
-CI,Côte d'Ivoire,2018,health,Mortalité infantile,pour 1 000,78.5,79.92368410925829,-1.4236841092582893,-1.81
-CI,Côte d'Ivoire,2019,health,Mortalité infantile,pour 1 000,75.9,74.11933261697227,1.7806673830277333,2.35
-CI,Côte d'Ivoire,2020,health,Mortalité infantile,pour 1 000,73.7,73.77696329048743,-0.07696329048742712,-0.1
-CI,Côte d'Ivoire,2021,health,Mortalité infantile,pour 1 000,71.4,72.66491567326716,-1.2649156732671543,-1.77
-CI,Côte d'Ivoire,2022,health,Mortalité infantile,pour 1 000,69.2,63.387191337061644,5.812808662938359,8.4
-CI,Côte d'Ivoire,2023,health,Mortalité infantile,pour 1 000,67.1,63.776476841489234,3.32352315851076,4.95
-GW,Guinée-Bissau,2000,health,Mortalité infantile,pour 1 000,173.8,173.56877806868638,0.23122193131362678,0.13
-GW,Guinée-Bissau,2001,health,Mortalité infantile,pour 1 000,168.4,173.56877806868638,-5.168778068686379,-3.07
-GW,Guinée-Bissau,2002,health,Mortalité infantile,pour 1 000,162.8,163.10938245571168,-0.30938245571167045,-0.19
-GW,Guinée-Bissau,2003,health,Mortalité infantile,pour 1 000,157.0,158.81502595604093,-1.8150259560409268,-1.16
-GW,Guinée-Bissau,2004,health,Mortalité infantile,pour 1 000,151.1,150.40014148103646,0.6998585189635378,0.46
-GW,Guinée-Bissau,2005,health,Mortalité infantile,pour 1 000,144.9,142.76390628292734,2.1360937170726686,1.47
-GW,Guinée-Bissau,2006,health,Mortalité infantile,pour 1 000,138.6,138.2149181174872,0.38508188251279307,0.28
-GW,Guinée-Bissau,2007,health,Mortalité infantile,pour 1 000,132.2,132.35274850551946,-0.15274850551946884,-0.12
-GW,Guinée-Bissau,2008,health,Mortalité infantile,pour 1 000,126.1,126.1117560394733,-0.01175603947331183,-0.01
-GW,Guinée-Bissau,2009,health,Mortalité infantile,pour 1 000,120.0,121.17713599192699,-1.1771359919269884,-0.98
-GW,Guinée-Bissau,2010,health,Mortalité infantile,pour 1 000,114.2,117.29559149435744,-3.0955914943574356,-2.71
-GW,Guinée-Bissau,2011,health,Mortalité infantile,pour 1 000,108.7,108.27378600003485,0.42621399996515663,0.39
-GW,Guinée-Bissau,2012,health,Mortalité infantile,pour 1 000,103.7,103.79979932335993,-0.09979932335993169,-0.1
-GW,Guinée-Bissau,2013,health,Mortalité infantile,pour 1 000,99.3,99.8730702608973,-0.5730702608972962,-0.58
-GW,Guinée-Bissau,2014,health,Mortalité infantile,pour 1 000,95.3,95.02643976900082,0.2735602309991805,0.29
-GW,Guinée-Bissau,2015,health,Mortalité infantile,pour 1 000,91.8,92.51817934129231,-0.7181793412923128,-0.78
-GW,Guinée-Bissau,2016,health,Mortalité infantile,pour 1 000,88.4,88.024551198195,0.37544880180500684,0.42
-GW,Guinée-Bissau,2017,health,Mortalité infantile,pour 1 000,85.3,85.04309300725257,0.2569069927474317,0.3
-GW,Guinée-Bissau,2018,health,Mortalité infantile,pour 1 000,82.1,82.98587666543283,-0.8858766654328321,-1.08
-GW,Guinée-Bissau,2019,health,Mortalité infantile,pour 1 000,79.1,81.2336848385954,-2.1336848385954,-2.7
-GW,Guinée-Bissau,2020,health,Mortalité infantile,pour 1 000,76.6,80.4501076808136,-3.8501076808136077,-5.03
-GW,Guinée-Bissau,2021,health,Mortalité infantile,pour 1 000,74.1,80.84197273755329,-6.741972737553297,-9.1
-GW,Guinée-Bissau,2022,health,Mortalité infantile,pour 1 000,71.6,80.70062708110237,-9.100627081102374,-12.71
-GW,Guinée-Bissau,2023,health,Mortalité infantile,pour 1 000,69.3,77.22078852002919,-7.920788520029191,-11.43
-ML,Mali,2000,health,Mortalité infantile,pour 1 000,187.6,186.65931999848843,0.9406800015115664,0.5
-ML,Mali,2001,health,Mortalité infantile,pour 1 000,181.5,181.8189597635905,-0.3189597635904988,-0.18
-ML,Mali,2002,health,Mortalité infantile,pour 1 000,175.2,176.40158843020248,-1.2015884302024915,-0.69
-ML,Mali,2003,health,Mortalité infantile,pour 1 000,169.0,168.56705385013368,0.43294614986632496,0.26
-ML,Mali,2004,health,Mortalité infantile,pour 1 000,163.1,162.73856182356081,0.3614381764391794,0.22
-ML,Mali,2005,health,Mortalité infantile,pour 1 000,157.4,156.41309666160615,0.9869033383938586,0.63
-ML,Mali,2006,health,Mortalité infantile,pour 1 000,152.2,153.2425689165488,-1.0425689165488166,-0.68
-ML,Mali,2007,health,Mortalité infantile,pour 1 000,147.3,147.18702433826397,0.11297566173604423,0.08
-ML,Mali,2008,health,Mortalité infantile,pour 1 000,142.6,143.00896409671273,-0.4089640967127366,-0.29
-ML,Mali,2009,health,Mortalité infantile,pour 1 000,138.2,138.88286787166388,-0.6828678716638876,-0.49
-ML,Mali,2010,health,Mortalité infantile,pour 1 000,133.9,134.42053982737727,-0.520539827377263,-0.39
-ML,Mali,2011,health,Mortalité infantile,pour 1 000,129.9,130.00722773582893,-0.10722773582892842,-0.08
-ML,Mali,2012,health,Mortalité infantile,pour 1 000,126.1,126.72765953034474,-0.6276595303447436,-0.5
-ML,Mali,2013,health,Mortalité infantile,pour 1 000,122.4,122.26539746392928,0.13460253607073014,0.11
-ML,Mali,2014,health,Mortalité infantile,pour 1 000,119.0,119.12710858267671,-0.127108582676712,-0.11
-ML,Mali,2015,health,Mortalité infantile,pour 1 000,115.7,115.78433589252559,-0.08433589252558704,-0.07
-ML,Mali,2016,health,Mortalité infantile,pour 1 000,112.4,112.07755217473459,0.3224478252654137,0.29
-ML,Mali,2017,health,Mortalité infantile,pour 1 000,109.3,109.69684644340614,-0.3968464434061474,-0.36
-ML,Mali,2018,health,Mortalité infantile,pour 1 000,106.1,104.74950880267365,1.350491197326349,1.27
-ML,Mali,2019,health,Mortalité infantile,pour 1 000,103.1,97.96924688837676,5.130753111623235,4.98
-ML,Mali,2020,health,Mortalité infantile,pour 1 000,100.0,94.91629001395883,5.083709986041171,5.08
-ML,Mali,2021,health,Mortalité infantile,pour 1 000,96.9,89.62364469991088,7.276355300089122,7.51
-ML,Mali,2022,health,Mortalité infantile,pour 1 000,94.0,88.88038969111767,5.119610308882329,5.45
-ML,Mali,2023,health,Mortalité infantile,pour 1 000,91.3,76.78228223729924,14.517717762700755,15.9
-NE,Niger,2000,health,Mortalité infantile,pour 1 000,227.8,205.84920535514672,21.95079464485329,9.64
-NE,Niger,2001,health,Mortalité infantile,pour 1 000,217.5,205.84920535514672,11.650794644853278,5.36
-NE,Niger,2002,health,Mortalité infantile,pour 1 000,206.2,204.6973560479399,1.5026439520600832,0.73
-NE,Niger,2003,health,Mortalité infantile,pour 1 000,194.4,196.11183300230428,-1.7118330023042745,-0.88
-NE,Niger,2004,health,Mortalité infantile,pour 1 000,182.8,180.784118043569,2.015881956431002,1.1
-NE,Niger,2005,health,Mortalité infantile,pour 1 000,171.9,173.05507194991804,-1.1550719499180389,-0.67
-NE,Niger,2006,health,Mortalité infantile,pour 1 000,162.0,166.82576517946683,-4.825765179466828,-2.98
-NE,Niger,2007,health,Mortalité infantile,pour 1 000,153.6,156.25288549350486,-2.6528854935048685,-1.73
-NE,Niger,2008,health,Mortalité infantile,pour 1 000,146.6,146.83677299848895,-0.23677299848895927,-0.16
-NE,Niger,2009,health,Mortalité infantile,pour 1 000,140.9,142.5587827072155,-1.6587827072154937,-1.18
-NE,Niger,2010,health,Mortalité infantile,pour 1 000,136.5,137.16334912208,-0.6633491220800067,-0.49
-NE,Niger,2011,health,Mortalité infantile,pour 1 000,133.1,133.27078150701928,-0.17078150701928507,-0.13
-NE,Niger,2012,health,Mortalité infantile,pour 1 000,130.7,130.9226707408623,-0.22267074086229854,-0.17
-NE,Niger,2013,health,Mortalité infantile,pour 1 000,128.9,129.11527735308601,-0.21527735308600882,-0.17
-NE,Niger,2014,health,Mortalité infantile,pour 1 000,127.4,127.42119721745786,-0.021197217457853412,-0.02
-NE,Niger,2015,health,Mortalité infantile,pour 1 000,126.3,126.55108938336845,-0.251089383368452,-0.2
-NE,Niger,2016,health,Mortalité infantile,pour 1 000,125.1,125.12951745905767,-0.029517459057672113,-0.02
-NE,Niger,2017,health,Mortalité infantile,pour 1 000,123.9,124.46219739077358,-0.5621973907735764,-0.45
-NE,Niger,2018,health,Mortalité infantile,pour 1 000,122.8,123.13125644444365,-0.3312564444436532,-0.27
-NE,Niger,2019,health,Mortalité infantile,pour 1 000,121.8,116.6061147542113,5.193885245788692,4.26
-NE,Niger,2020,health,Mortalité infantile,pour 1 000,120.6,117.139866505224,3.460133494775988,2.87
-NE,Niger,2021,health,Mortalité infantile,pour 1 000,119.1,114.94243592942365,4.157564070576342,3.49
-NE,Niger,2022,health,Mortalité infantile,pour 1 000,117.1,116.58945845068898,0.5105415493110144,0.44
-NE,Niger,2023,health,Mortalité infantile,pour 1 000,114.8,120.63942237000222,-5.839422370002225,-5.09
-SN,Sénégal,2000,health,Mortalité infantile,pour 1 000,129.3,127.5161912010619,1.7838087989381108,1.38
-SN,Sénégal,2001,health,Mortalité infantile,pour 1 000,122.1,120.24561320145231,1.8543867985476794,1.52
-SN,Sénégal,2002,health,Mortalité infantile,pour 1 000,113.5,113.21113847807533,0.28886152192467307,0.25
-SN,Sénégal,2003,health,Mortalité infantile,pour 1 000,104.5,105.35837973236664,-0.8583797323666431,-0.82
-SN,Sénégal,2004,health,Mortalité infantile,pour 1 000,95.9,95.69383942313442,0.2061605768655852,0.21
-SN,Sénégal,2005,health,Mortalité infantile,pour 1 000,88.0,89.28471846905504,-1.2847184690550364,-1.46
-SN,Sénégal,2006,health,Mortalité infantile,pour 1 000,81.1,80.45325373431524,0.6467462656847545,0.8
-SN,Sénégal,2007,health,Mortalité infantile,pour 1 000,75.2,74.16640051845545,1.033599481544556,1.37
-SN,Sénégal,2008,health,Mortalité infantile,pour 1 000,70.3,70.80028936358913,-0.5002893635891326,-0.71
-SN,Sénégal,2009,health,Mortalité infantile,pour 1 000,66.3,66.61487789435283,-0.31487789435283275,-0.47
-SN,Sénégal,2010,health,Mortalité infantile,pour 1 000,63.0,63.397327855294726,-0.39732785529472636,-0.63
-SN,Sénégal,2011,health,Mortalité infantile,pour 1 000,60.1,59.25026044718302,0.8497395528169847,1.41
-SN,Sénégal,2012,health,Mortalité infantile,pour 1 000,57.7,57.35680951850202,0.3431904814979845,0.59
-SN,Sénégal,2013,health,Mortalité infantile,pour 1 000,55.7,54.884400423328565,0.8155995766714383,1.46
-SN,Sénégal,2014,health,Mortalité infantile,pour 1 000,53.9,53.73675039992399,0.16324960007600708,0.3
-SN,Sénégal,2015,health,Mortalité infantile,pour 1 000,52.4,52.26834201259629,0.13165798740370604,0.25
-SN,Sénégal,2016,health,Mortalité infantile,pour 1 000,51.1,51.21472349247429,-0.11472349247429037,-0.22
-SN,Sénégal,2017,health,Mortalité infantile,pour 1 000,49.7,50.91436675408996,-1.2143667540899585,-2.44
-SN,Sénégal,2018,health,Mortalité infantile,pour 1 000,48.2,50.35403393106122,-2.154033931061214,-4.47
-SN,Sénégal,2019,health,Mortalité infantile,pour 1 000,46.5,52.80106168997093,-6.301061689970929,-13.55
-SN,Sénégal,2020,health,Mortalité infantile,pour 1 000,44.6,52.37976387453622,-7.779763874536222,-17.44
-SN,Sénégal,2021,health,Mortalité infantile,pour 1 000,42.5,51.756670740812076,-9.256670740812076,-21.78
-SN,Sénégal,2022,health,Mortalité infantile,pour 1 000,40.4,55.51522236062569,-15.115222360625694,-37.41
-SN,Sénégal,2023,health,Mortalité infantile,pour 1 000,38.5,54.23350163214176,-15.73350163214176,-40.87
-TG,Togo,2000,health,Mortalité infantile,pour 1 000,119.6,121.13170083181075,-1.5317008318107526,-1.28
-TG,Togo,2001,health,Mortalité infantile,pour 1 000,116.0,116.74222026236254,-0.7422202623625367,-0.64
-TG,Togo,2002,health,Mortalité infantile,pour 1 000,112.5,112.43014951999771,0.06985048000228744,0.06
-TG,Togo,2003,health,Mortalité infantile,pour 1 000,109.1,109.02722102328576,0.07277897671423261,0.07
-TG,Togo,2004,health,Mortalité infantile,pour 1 000,105.9,106.61998922315559,-0.7199892231555793,-0.68
-TG,Togo,2005,health,Mortalité infantile,pour 1 000,102.7,101.97451320341244,0.7254867965875604,0.71
-TG,Togo,2006,health,Mortalité infantile,pour 1 000,99.7,100.0506792693695,-0.35067926936949334,-0.35
-TG,Togo,2007,health,Mortalité infantile,pour 1 000,96.9,97.82185370529038,-0.9218537052903741,-0.95
-TG,Togo,2008,health,Mortalité infantile,pour 1 000,94.1,93.28721634646328,0.8127836535367123,0.86
-TG,Togo,2009,health,Mortalité infantile,pour 1 000,91.4,91.11706308976933,0.28293691023067424,0.31
-TG,Togo,2010,health,Mortalité infantile,pour 1 000,88.7,88.4261093223207,0.2738906776793044,0.31
-TG,Togo,2011,health,Mortalité infantile,pour 1 000,85.9,86.58578700186845,-0.685787001868448,-0.8
-TG,Togo,2012,health,Mortalité infantile,pour 1 000,83.3,83.32037859147339,-0.020378591473388497,-0.02
-TG,Togo,2013,health,Mortalité infantile,pour 1 000,80.7,80.50249907905031,0.19750092094969318,0.24
-TG,Togo,2014,health,Mortalité infantile,pour 1 000,78.1,78.51570913083063,-0.4157091308306349,-0.53
-TG,Togo,2015,health,Mortalité infantile,pour 1 000,75.6,76.10397699809621,-0.5039769980962205,-0.67
-TG,Togo,2016,health,Mortalité infantile,pour 1 000,73.2,73.57206419749564,-0.37206419749563224,-0.51
-TG,Togo,2017,health,Mortalité infantile,pour 1 000,70.9,70.65533518929786,0.2446648107021474,0.35
-TG,Togo,2018,health,Mortalité infantile,pour 1 000,68.6,67.72440799898972,0.8755920010102756,1.28
-TG,Togo,2019,health,Mortalité infantile,pour 1 000,66.3,66.17374490245686,0.12625509754313669,0.19
-TG,Togo,2020,health,Mortalité infantile,pour 1 000,64.3,65.35031518898452,-1.050315188984527,-1.63
-TG,Togo,2021,health,Mortalité infantile,pour 1 000,62.2,65.46748915266558,-3.2674891526655756,-5.25
-TG,Togo,2022,health,Mortalité infantile,pour 1 000,60.2,64.54148211814581,-4.341482118145805,-7.21
-TG,Togo,2023,health,Mortalité infantile,pour 1 000,58.3,59.37370548058654,-1.0737054805865398,-1.84
-BF,Burkina Faso,2000,access,Taux d'accès à l'électricité,%,9.1,8.211162011212666,0.8888379887873334,9.77
-BF,Burkina Faso,2001,access,Taux d'accès à l'électricité,%,9.5,8.76926217553223,0.73073782446777,7.69
-BF,Burkina Faso,2002,access,Taux d'accès à l'électricité,%,9.9,9.295936825640498,0.6040631743595029,6.1
-BF,Burkina Faso,2003,access,Taux d'accès à l'électricité,%,11.4,11.220591979946196,0.1794080200538044,1.57
-BF,Burkina Faso,2004,access,Taux d'accès à l'électricité,%,10.7,9.837027938373996,0.862972061626003,8.07
-BF,Burkina Faso,2005,access,Taux d'accès à l'électricité,%,11.1,10.689570757423699,0.410429242576301,3.7
-BF,Burkina Faso,2006,access,Taux d'accès à l'électricité,%,11.6,10.785506312054055,0.8144936879459443,7.02
-BF,Burkina Faso,2007,access,Taux d'accès à l'électricité,%,12.0,11.432865750993221,0.567134249006779,4.73
-BF,Burkina Faso,2008,access,Taux d'accès à l'électricité,%,12.5,11.260381238563102,1.2396187614368976,9.92
-BF,Burkina Faso,2009,access,Taux d'accès à l'électricité,%,12.6,11.67921941147617,0.9207805885238294,7.31
-BF,Burkina Faso,2010,access,Taux d'accès à l'électricité,%,13.1,11.997260346031576,1.102739653968424,8.42
-BF,Burkina Faso,2011,access,Taux d'accès à l'électricité,%,14.8,14.22865440035076,0.5713455996492414,3.86
-BF,Burkina Faso,2012,access,Taux d'accès à l'électricité,%,15.1,14.228946209725162,0.8710537902748374,5.77
-BF,Burkina Faso,2013,access,Taux d'accès à l'électricité,%,15.4,14.880683042862913,0.5193169571370877,3.37
-BF,Burkina Faso,2014,access,Taux d'accès à l'électricité,%,19.2,17.239935748272,1.9600642517279994,10.21
-BF,Burkina Faso,2015,access,Taux d'accès à l'électricité,%,16.2,15.402409546277283,0.7975904537227159,4.92
-BF,Burkina Faso,2016,access,Taux d'accès à l'électricité,%,16.6,15.48840613844282,1.111593861557182,6.7
-BF,Burkina Faso,2017,access,Taux d'accès à l'électricité,%,17.0,15.543416627966618,1.456583372033382,8.57
-BF,Burkina Faso,2018,access,Taux d'accès à l'électricité,%,14.4,12.944393163767081,1.4556068362329189,10.11
-BF,Burkina Faso,2019,access,Taux d'accès à l'électricité,%,17.6,17.045838563914685,0.554161436085316,3.15
-BF,Burkina Faso,2020,access,Taux d'accès à l'électricité,%,18.5,17.861087883691063,0.6389121163089371,3.45
-BF,Burkina Faso,2021,access,Taux d'accès à l'électricité,%,19.0,21.11151046029909,-2.1115104602990904,-11.11
-BF,Burkina Faso,2022,access,Taux d'accès à l'électricité,%,19.5,18.560682859349775,0.9393171406502248,4.82
-BF,Burkina Faso,2023,access,Taux d'accès à l'électricité,%,21.7,22.754067725561043,-1.054067725561044,-4.86
-BJ,Bénin,2000,access,Taux d'accès à l'électricité,%,21.5,21.983661927391378,-0.4836619273913776,-2.25
-BJ,Bénin,2001,access,Taux d'accès à l'électricité,%,21.9,22.087808666010677,-0.18780866601067814,-0.86
-BJ,Bénin,2002,access,Taux d'accès à l'électricité,%,23.4,23.850514774442406,-0.4505147744424072,-1.93
-BJ,Bénin,2003,access,Taux d'accès à l'électricité,%,24.3,24.575857568904027,-0.27585756890402635,-1.14
-BJ,Bénin,2004,access,Taux d'accès à l'électricité,%,25.2,25.61653874210101,-0.41653874210101094,-1.65
-BJ,Bénin,2005,access,Taux d'accès à l'électricité,%,26.1,26.04241763125343,0.057582368746572854,0.22
-BJ,Bénin,2006,access,Taux d'accès à l'électricité,%,27.9,28.62810927970506,-0.7281092797050626,-2.61
-BJ,Bénin,2007,access,Taux d'accès à l'électricité,%,28.0,27.67701984266095,0.3229801573390496,1.15
-BJ,Bénin,2008,access,Taux d'accès à l'électricité,%,29.0,28.809576397199663,0.19042360280033677,0.66
-BJ,Bénin,2009,access,Taux d'accès à l'électricité,%,30.0,30.213211388598,-0.21321138859800115,-0.71
-BJ,Bénin,2010,access,Taux d'accès à l'électricité,%,34.2,33.55469390599984,0.645306094000162,1.89
-BJ,Bénin,2011,access,Taux d'accès à l'électricité,%,36.9,37.3473296699991,-0.4473296699990996,-1.21
-BJ,Bénin,2012,access,Taux d'accès à l'électricité,%,38.4,40.08050191127249,-1.6805019112724935,-4.38
-BJ,Bénin,2013,access,Taux d'accès à l'électricité,%,34.7,34.190019511620676,0.5099804883793269,1.47
-BJ,Bénin,2014,access,Taux d'accès à l'électricité,%,34.1,33.60490044563518,0.49509955436482045,1.45
-BJ,Bénin,2015,access,Taux d'accès à l'électricité,%,29.6,27.522446223421646,2.0775537765783554,7.02
-BJ,Bénin,2016,access,Taux d'accès à l'électricité,%,37.0,37.49540482492314,-0.495404824923142,-1.34
-BJ,Bénin,2017,access,Taux d'accès à l'électricité,%,34.5,34.156865479482164,0.343134520517836,0.99
-BJ,Bénin,2018,access,Taux d'accès à l'électricité,%,39.0,39.71016128636434,-0.7101612863643396,-1.82
-BJ,Bénin,2019,access,Taux d'accès à l'électricité,%,40.0,40.02550523543728,-0.02550523543727934,-0.06
-BJ,Bénin,2020,access,Taux d'accès à l'électricité,%,41.0,38.44342902594292,2.556570974057081,6.24
-BJ,Bénin,2021,access,Taux d'accès à l'électricité,%,42.0,48.59668845930196,-6.596688459301959,-15.71
-BJ,Bénin,2022,access,Taux d'accès à l'électricité,%,56.5,58.28540291964451,-1.7854029196445111,-3.16
-BJ,Bénin,2023,access,Taux d'accès à l'électricité,%,57.0,58.639294751812656,-1.6392947518126562,-2.88
-CI,Côte d'Ivoire,2000,access,Taux d'accès à l'électricité,%,48.7,50.26789211579711,-1.5678921157971075,-3.22
-CI,Côte d'Ivoire,2001,access,Taux d'accès à l'électricité,%,49.7,50.406444572634044,-0.7064445726340409,-1.42
-CI,Côte d'Ivoire,2002,access,Taux d'accès à l'électricité,%,51.4,52.02838959966803,-0.6283895996680329,-1.22
-CI,Côte d'Ivoire,2003,access,Taux d'accès à l'électricité,%,51.5,51.67694243022508,-0.1769424302250826,-0.34
-CI,Côte d'Ivoire,2004,access,Taux d'accès à l'électricité,%,52.4,53.098057964845395,-0.6980579648453968,-1.33
-CI,Côte d'Ivoire,2005,access,Taux d'accès à l'électricité,%,58.9,60.8807854943812,-1.9807854943812018,-3.36
-CI,Côte d'Ivoire,2006,access,Taux d'accès à l'électricité,%,60.2,62.01980318031835,-1.8198031803183454,-3.02
-CI,Côte d'Ivoire,2007,access,Taux d'accès à l'électricité,%,55.3,56.12430156074154,-0.8243015607415458,-1.49
-CI,Côte d'Ivoire,2008,access,Taux d'accès à l'électricité,%,60.3,61.267340759659064,-0.9673407596590664,-1.6
-CI,Côte d'Ivoire,2009,access,Taux d'accès à l'électricité,%,57.3,58.26817917192187,-0.9681791719218751,-1.69
-CI,Côte d'Ivoire,2010,access,Taux d'accès à l'électricité,%,58.4,59.326084958337134,-0.9260849583371353,-1.59
-CI,Côte d'Ivoire,2011,access,Taux d'accès à l'électricité,%,55.8,56.05361596397043,-0.2536159639704323,-0.45
-CI,Côte d'Ivoire,2012,access,Taux d'accès à l'électricité,%,55.8,56.17401059486836,-0.3740105948683663,-0.67
-CI,Côte d'Ivoire,2013,access,Taux d'accès à l'électricité,%,61.5,62.15133126019384,-0.6513312601938424,-1.06
-CI,Côte d'Ivoire,2014,access,Taux d'accès à l'électricité,%,61.9,63.00456689071426,-1.1045668907142598,-1.78
-CI,Côte d'Ivoire,2015,access,Taux d'accès à l'électricité,%,62.6,63.283700600969,-0.6837006009689972,-1.09
-CI,Côte d'Ivoire,2016,access,Taux d'accès à l'électricité,%,64.3,65.62956556169769,-1.3295655616976916,-2.07
-CI,Côte d'Ivoire,2017,access,Taux d'accès à l'électricité,%,65.6,66.92865918646737,-1.3286591864673767,-2.03
-CI,Côte d'Ivoire,2018,access,Taux d'accès à l'électricité,%,67.1,68.17882732772361,-1.0788273277236158,-1.61
-CI,Côte d'Ivoire,2019,access,Taux d'accès à l'électricité,%,68.6,67.35352262331172,1.2464773766882757,1.82
-CI,Côte d'Ivoire,2020,access,Taux d'accès à l'électricité,%,69.9,65.77990191473967,4.120098085260338,5.89
-CI,Côte d'Ivoire,2021,access,Taux d'accès à l'électricité,%,71.1,65.35747564998779,5.742524350012204,8.08
-CI,Côte d'Ivoire,2022,access,Taux d'accès à l'électricité,%,72.0,63.58958281676911,8.41041718323089,11.68
-CI,Côte d'Ivoire,2023,access,Taux d'accès à l'électricité,%,72.4,63.852512073353495,8.547487926646511,11.81
-GW,Guinée-Bissau,2000,access,Taux d'accès à l'électricité,%,1.3,0.5165077499958883,0.7834922500041117,60.27
-GW,Guinée-Bissau,2001,access,Taux d'accès à l'électricité,%,1.3,-0.15055740136012852,1.4505574013601286,111.58
-GW,Guinée-Bissau,2002,access,Taux d'accès à l'électricité,%,1.3,-0.04420285158177484,1.344202851581775,103.4
-GW,Guinée-Bissau,2003,access,Taux d'accès à l'électricité,%,2.6,1.5963157995173822,1.0036842004826179,38.6
-GW,Guinée-Bissau,2004,access,Taux d'accès à l'électricité,%,3.9,3.570780306427939,0.3292196935720608,8.44
-GW,Guinée-Bissau,2005,access,Taux d'accès à l'électricité,%,5.2,5.643450250942422,-0.44345025094242185,-8.53
-GW,Guinée-Bissau,2006,access,Taux d'accès à l'électricité,%,14.5,13.744606255631961,0.755393744368039,5.21
-GW,Guinée-Bissau,2007,access,Taux d'accès à l'électricité,%,7.9,7.567131086163597,0.3328689138364034,4.21
-GW,Guinée-Bissau,2008,access,Taux d'accès à l'électricité,%,9.3,7.753376062671869,1.5466239373281319,16.63
-GW,Guinée-Bissau,2009,access,Taux d'accès à l'électricité,%,4.7,2.9027460412611856,1.7972539587388145,38.24
-GW,Guinée-Bissau,2010,access,Taux d'accès à l'électricité,%,6.0,4.3364915788087615,1.6635084211912385,27.73
-GW,Guinée-Bissau,2011,access,Taux d'accès à l'électricité,%,13.5,12.86658646700362,0.6334135329963804,4.69
-GW,Guinée-Bissau,2012,access,Taux d'accès à l'électricité,%,14.9,13.900668276025002,0.9993317239749988,6.71
-GW,Guinée-Bissau,2013,access,Taux d'accès à l'électricité,%,16.3,14.915743359324866,1.3842566406751349,8.49
-GW,Guinée-Bissau,2014,access,Taux d'accès à l'électricité,%,17.2,16.050852518488895,1.149147481511104,6.68
-GW,Guinée-Bissau,2015,access,Taux d'accès à l'électricité,%,20.1,17.35871996756582,2.741280032434183,13.64
-GW,Guinée-Bissau,2016,access,Taux d'accès à l'électricité,%,22.9,22.088723956158393,0.8112760438416053,3.54
-GW,Guinée-Bissau,2017,access,Taux d'accès à l'électricité,%,26.0,24.89285483553998,1.1071451644600216,4.26
-GW,Guinée-Bissau,2018,access,Taux d'accès à l'électricité,%,28.4,24.611017852684093,3.788982147315906,13.34
-GW,Guinée-Bissau,2019,access,Taux d'accès à l'électricité,%,30.9,31.313391894458473,-0.41339189445847424,-1.34
-GW,Guinée-Bissau,2020,access,Taux d'accès à l'électricité,%,33.4,33.17657445345759,0.22342554654240843,0.67
-GW,Guinée-Bissau,2021,access,Taux d'accès à l'électricité,%,35.8,32.36296905051597,3.4370309494840257,9.6
-GW,Guinée-Bissau,2022,access,Taux d'accès à l'électricité,%,37.4,31.83623744373695,5.563762556263047,14.88
-GW,Guinée-Bissau,2023,access,Taux d'accès à l'électricité,%,40.5,40.814883589165575,-0.314883589165575,-0.78
-ML,Mali,2000,access,Taux d'accès à l'électricité,%,9.6,8.959703954351097,0.6402960456489026,6.67
-ML,Mali,2001,access,Taux d'accès à l'électricité,%,10.8,10.612873238194874,0.18712676180512666,1.73
-ML,Mali,2002,access,Taux d'accès à l'électricité,%,13.0,13.429950654932417,-0.42995065493241746,-3.31
-ML,Mali,2003,access,Taux d'accès à l'électricité,%,14.7,15.509946072923483,-0.8099460729234842,-5.51
-ML,Mali,2004,access,Taux d'accès à l'électricité,%,16.4,16.93275761629508,-0.5327576162950827,-3.25
-ML,Mali,2005,access,Taux d'accès à l'électricité,%,18.2,19.00825918837057,-0.8082591883705703,-4.44
-ML,Mali,2006,access,Taux d'accès à l'électricité,%,16.6,16.48097206869646,0.11902793130354183,0.72
-ML,Mali,2007,access,Taux d'accès à l'électricité,%,21.7,23.370278934633987,-1.6702789346339877,-7.7
-ML,Mali,2008,access,Taux d'accès à l'électricité,%,23.4,24.703188885576434,-1.3031888855764358,-5.57
-ML,Mali,2009,access,Taux d'accès à l'électricité,%,24.0,24.88741450364591,-0.8874145036459105,-3.7
-ML,Mali,2010,access,Taux d'accès à l'électricité,%,27.0,27.698680352275552,-0.6986803522755523,-2.59
-ML,Mali,2011,access,Taux d'accès à l'électricité,%,28.8,29.31802105746666,-0.5180210574666582,-1.8
-ML,Mali,2012,access,Taux d'accès à l'électricité,%,25.6,25.18361708050361,0.4163829194963924,1.63
-ML,Mali,2013,access,Taux d'accès à l'électricité,%,32.4,34.128188910273195,-1.7281889102731967,-5.33
-ML,Mali,2014,access,Taux d'accès à l'électricité,%,34.2,34.600092323857865,-0.4000923238578622,-1.17
-ML,Mali,2015,access,Taux d'accès à l'électricité,%,37.6,38.480006622587126,-0.8800066225871248,-2.34
-ML,Mali,2016,access,Taux d'accès à l'électricité,%,38.8,40.19877859645135,-1.3987785964513506,-3.61
-ML,Mali,2017,access,Taux d'accès à l'électricité,%,34.8,35.469139469615996,-0.6691394696159989,-1.92
-ML,Mali,2018,access,Taux d'accès à l'électricité,%,50.9,52.16565211537825,-1.265652115378252,-2.49
-ML,Mali,2019,access,Taux d'accès à l'électricité,%,47.9,43.588937704978264,4.311062295021735,9.0
-ML,Mali,2020,access,Taux d'accès à l'électricité,%,50.6,42.284667667716775,8.315332332283226,16.43
-ML,Mali,2021,access,Taux d'accès à l'électricité,%,53.4,50.058867870094105,3.341132129905894,6.26
-ML,Mali,2022,access,Taux d'accès à l'électricité,%,53.0,48.19967757184173,4.8003224281582675,9.06
-ML,Mali,2023,access,Taux d'accès à l'électricité,%,54.5,46.18152919346075,8.318470806539253,15.26
-NE,Niger,2000,access,Taux d'accès à l'électricité,%,6.5,5.952659314563569,0.5473406854364313,8.42
-NE,Niger,2001,access,Taux d'accès à l'électricité,%,8.4,8.15524119932405,0.24475880067594957,2.91
-NE,Niger,2002,access,Taux d'accès à l'électricité,%,8.8,8.855114105571198,-0.05511410557119767,-0.63
-NE,Niger,2003,access,Taux d'accès à l'électricité,%,9.3,8.909066519570725,0.39093348042927545,4.2
-NE,Niger,2004,access,Taux d'accès à l'électricité,%,9.7,8.907871451942821,0.7921285480571783,8.17
-NE,Niger,2005,access,Taux d'accès à l'électricité,%,7.1,5.652349833717691,1.4476501662823082,20.39
-NE,Niger,2006,access,Taux d'accès à l'électricité,%,9.3,8.382639532010797,0.9173604679892033,9.86
-NE,Niger,2007,access,Taux d'accès à l'électricité,%,11.2,11.278583502796158,-0.07858350279615856,-0.7
-NE,Niger,2008,access,Taux d'accès à l'électricité,%,11.8,11.146500924034715,0.6534990759652857,5.54
-NE,Niger,2009,access,Taux d'accès à l'électricité,%,12.3,11.509532112013545,0.7904678879864555,6.43
-NE,Niger,2010,access,Taux d'accès à l'électricité,%,13.6,13.046210420745485,0.5537895792545147,4.07
-NE,Niger,2011,access,Taux d'accès à l'électricité,%,14.3,13.753511409780337,0.5464885902196635,3.82
-NE,Niger,2012,access,Taux d'accès à l'électricité,%,14.4,13.796168119391476,0.6038318806085243,4.19
-NE,Niger,2013,access,Taux d'accès à l'électricité,%,15.2,14.890458834296696,0.3095411657033029,2.04
-NE,Niger,2014,access,Taux d'accès à l'électricité,%,15.7,15.526243225422157,0.17375677457784278,1.11
-NE,Niger,2015,access,Taux d'accès à l'électricité,%,16.6,16.274051555071743,0.32594844492825814,1.96
-NE,Niger,2016,access,Taux d'accès à l'électricité,%,17.0,16.721335469211038,0.27866453078896214,1.64
-NE,Niger,2017,access,Taux d'accès à l'électricité,%,17.6,17.44257377989551,0.15742622010449026,0.89
-NE,Niger,2018,access,Taux d'accès à l'électricité,%,17.6,17.36286252472368,0.23713747527632023,1.35
-NE,Niger,2019,access,Taux d'accès à l'électricité,%,18.5,16.663744161904923,1.8362558380950773,9.93
-NE,Niger,2020,access,Taux d'accès à l'électricité,%,18.7,17.422108504306077,1.2778914956939218,6.83
-NE,Niger,2021,access,Taux d'accès à l'électricité,%,18.6,17.84970626745005,0.7502937325499524,4.03
-NE,Niger,2022,access,Taux d'accès à l'électricité,%,19.5,17.294550639688975,2.2054493603110252,11.31
-NE,Niger,2023,access,Taux d'accès à l'électricité,%,20.1,17.36950595330216,2.7304940466978422,13.58
-SN,Sénégal,2000,access,Taux d'accès à l'électricité,%,37.7,40.496686581301475,-2.796686581301472,-7.42
-SN,Sénégal,2001,access,Taux d'accès à l'électricité,%,38.9,40.96393335988172,-2.063933359881723,-5.31
-SN,Sénégal,2002,access,Taux d'accès à l'électricité,%,36.8,36.8772988390937,-0.07729883909370017,-0.21
-SN,Sénégal,2003,access,Taux d'accès à l'électricité,%,41.9,42.0889721185402,-0.18897211854019957,-0.45
-SN,Sénégal,2004,access,Taux d'accès à l'électricité,%,36.8,36.59129583087626,0.20870416912373457,0.57
-SN,Sénégal,2005,access,Taux d'accès à l'électricité,%,47.1,46.8214667286376,0.2785332713623987,0.59
-SN,Sénégal,2006,access,Taux d'accès à l'électricité,%,49.9,49.98385870197487,-0.08385870197486867,-0.17
-SN,Sénégal,2007,access,Taux d'accès à l'électricité,%,48.1,47.6703855362326,0.4296144637674004,0.89
-SN,Sénégal,2008,access,Taux d'accès à l'électricité,%,49.7,48.56011573554406,1.1398842644559437,2.29
-SN,Sénégal,2009,access,Taux d'accès à l'électricité,%,53.5,54.093556964586085,-0.5935569645860852,-1.11
-SN,Sénégal,2010,access,Taux d'accès à l'électricité,%,56.5,55.56483970719631,0.9351602928036868,1.66
-SN,Sénégal,2011,access,Taux d'accès à l'électricité,%,56.5,57.28975737181041,-0.7897573718104098,-1.4
-SN,Sénégal,2012,access,Taux d'accès à l'électricité,%,56.5,56.75869542664282,-0.25869542664281653,-0.46
-SN,Sénégal,2013,access,Taux d'accès à l'électricité,%,57.0,58.04303446936899,-1.0430344693689904,-1.83
-SN,Sénégal,2014,access,Taux d'accès à l'électricité,%,61.0,61.470057354833,-0.4700573548330027,-0.77
-SN,Sénégal,2015,access,Taux d'accès à l'électricité,%,60.5,61.69538768095873,-1.1953876809587314,-1.98
-SN,Sénégal,2016,access,Taux d'accès à l'électricité,%,64.5,65.06818445243721,-0.5681844524372082,-0.88
-SN,Sénégal,2017,access,Taux d'accès à l'électricité,%,61.7,62.28912358672669,-0.5891235867266857,-0.95
-SN,Sénégal,2018,access,Taux d'accès à l'électricité,%,66.0,65.84703262989551,0.15296737010449135,0.23
-SN,Sénégal,2019,access,Taux d'accès à l'électricité,%,70.4,64.33363494020556,6.06636505979445,8.62
-SN,Sénégal,2020,access,Taux d'accès à l'électricité,%,64.3,62.105106773441605,2.194893226558392,3.41
-SN,Sénégal,2021,access,Taux d'accès à l'électricité,%,68.0,63.02737851828206,4.972621481717937,7.31
-SN,Sénégal,2022,access,Taux d'accès à l'électricité,%,67.9,62.785154879196526,5.11484512080348,7.53
-SN,Sénégal,2023,access,Taux d'accès à l'électricité,%,74.2,62.28220173077645,11.917798269223553,16.06
-TG,Togo,2000,access,Taux d'accès à l'électricité,%,17.0,16.58743795049305,0.4125620495069491,2.43
-TG,Togo,2001,access,Taux d'accès à l'électricité,%,19.6,18.827091314045326,0.7729086859546754,3.94
-TG,Togo,2002,access,Taux d'accès à l'électricité,%,21.3,19.957654819714016,1.3423451802859852,6.3
-TG,Togo,2003,access,Taux d'accès à l'électricité,%,23.0,22.492625127333355,0.5073748726666452,2.21
-TG,Togo,2004,access,Taux d'accès à l'électricité,%,24.8,24.809485313274042,-0.009485313274041118,-0.04
-TG,Togo,2005,access,Taux d'accès à l'électricité,%,26.5,26.639869887721066,-0.13986988772106557,-0.53
-TG,Togo,2006,access,Taux d'accès à l'électricité,%,27.9,28.198432553242803,-0.2984325532428045,-1.07
-TG,Togo,2007,access,Taux d'accès à l'électricité,%,30.0,29.365603859809504,0.6343961401904963,2.11
-TG,Togo,2008,access,Taux d'accès à l'électricité,%,31.8,31.28800436008864,0.5119956399113619,1.61
-TG,Togo,2009,access,Taux d'accès à l'électricité,%,33.7,33.18490625902058,0.5150937409794238,1.53
-TG,Togo,2010,access,Taux d'accès à l'électricité,%,30.8,29.18437744225526,1.6156225577447394,5.25
-TG,Togo,2011,access,Taux d'accès à l'électricité,%,39.7,40.272926871690316,-0.5729268716903135,-1.44
-TG,Togo,2012,access,Taux d'accès à l'électricité,%,39.1,39.155326472990865,-0.05532647299086335,-0.14
-TG,Togo,2013,access,Taux d'accès à l'électricité,%,41.0,42.10165939324834,-1.1016593932483403,-2.69
-TG,Togo,2014,access,Taux d'accès à l'électricité,%,45.7,45.75465117005882,-0.054651170058818366,-0.12
-TG,Togo,2015,access,Taux d'accès à l'électricité,%,44.7,44.78068151550147,-0.08068151550146752,-0.18
-TG,Togo,2016,access,Taux d'accès à l'électricité,%,46.8,47.97058803458533,-1.170588034585336,-2.5
-TG,Togo,2017,access,Taux d'accès à l'électricité,%,48.0,50.35720708885957,-2.3572070888595675,-4.91
-TG,Togo,2018,access,Taux d'accès à l'électricité,%,50.0,50.75343462627812,-0.7534346262781213,-1.51
-TG,Togo,2019,access,Taux d'accès à l'électricité,%,52.5,53.18807206919473,-0.6880720691947317,-1.31
-TG,Togo,2020,access,Taux d'accès à l'électricité,%,54.1,51.34059316572032,2.7594068342796803,5.1
-TG,Togo,2021,access,Taux d'accès à l'électricité,%,55.7,50.39678676440586,5.303213235594143,9.52
-TG,Togo,2022,access,Taux d'accès à l'électricité,%,57.2,49.54054200081876,7.659457999181242,13.39
-TG,Togo,2023,access,Taux d'accès à l'électricité,%,59.2,53.679317765831286,5.520682234168717,9.33
+country_code,country_name,year,actual,predicted,error,error_pct
+BF,Burkina Faso,2000,341.00000000000045,140.09797356467772,200.90202643532274,58.92
+BF,Burkina Faso,2001,368.99999999999966,141.53275393538772,227.46724606461194,61.64
+BF,Burkina Faso,2002,418.9999999999999,226.67879704530645,192.32120295469343,45.9
+BF,Burkina Faso,2003,444.9999999999994,209.3385704137914,235.661429586208,52.96
+BF,Burkina Faso,2004,493.9999999999999,357.5665117119599,136.43348828804,27.62
+BF,Burkina Faso,2005,560.0000000000003,442.807980404026,117.19201959597433,20.93
+BF,Burkina Faso,2006,601.9999999999993,447.73886899023876,154.26113100976056,25.62
+BF,Burkina Faso,2007,632.9999999999997,455.8390113550047,177.16098864499497,27.99
+BF,Burkina Faso,2008,661.0000000000005,439.461053152863,221.53894684713748,33.52
+BF,Burkina Faso,2009,742.9999999999995,534.8498889044813,208.15011109551824,28.01
+BF,Burkina Faso,2010,1106.999999999999,931.5211359690124,175.47886403098664,15.85
+BF,Burkina Faso,2011,1260.000000000001,1124.907243103937,135.09275689606397,10.72
+BF,Burkina Faso,2012,1481.0000000000005,1331.1135591997154,149.88644080028507,10.12
+BF,Burkina Faso,2013,1629.000000000001,1540.1914014471167,88.80859855288418,5.45
+BF,Burkina Faso,2014,1784.0,1701.6145009383417,82.38549906165827,4.62
+BF,Burkina Faso,2015,2117.999999999999,2155.13630541767,-37.13630541767088,-1.75
+BF,Burkina Faso,2016,2099.9999999999955,1984.4214304330028,115.57856956699266,5.5
+BF,Burkina Faso,2017,2225.999999999998,2217.4159204683583,8.584079531639873,0.39
+BF,Burkina Faso,2018,2401.0000000000014,2582.196359965984,-181.19635996598254,-7.55
+BF,Burkina Faso,2019,2569.000000000001,2324.646739490564,244.35326050943695,9.51
+BF,Burkina Faso,2020,2799.9999999999927,2495.6380360798985,304.36196392009424,10.87
+BF,Burkina Faso,2021,2852.999999999994,2301.4554217191444,551.5445782808497,19.33
+BF,Burkina Faso,2022,2953.000000000001,2340.5775195156357,612.4224804843652,20.74
+BF,Burkina Faso,2023,3020.7917605363687,2336.9745764365825,683.8171840997861,22.64
+BJ,Benin,2000,399.0000000000002,184.50804104562292,214.4919589543773,53.76
+BJ,Benin,2001,434.9999999999999,194.0676950349296,240.93230496507027,55.39
+BJ,Benin,2002,497.99999999999983,263.17580898547084,234.824191014529,47.15
+BJ,Benin,2003,486.0000000000001,314.3344246810314,171.6655753189687,35.32
+BJ,Benin,2004,545.0000000000001,398.78534593953856,146.21465406046156,26.83
+BJ,Benin,2005,589.0000000000003,416.5701067265776,172.42989327342275,29.28
+BJ,Benin,2006,617.0000000000003,431.29887199752704,185.7011280024733,30.1
+BJ,Benin,2007,674.0,511.15729065568667,162.84270934431333,24.16
+BJ,Benin,2008,750.9999999999997,636.6036433916136,114.3963566083861,15.23
+BJ,Benin,2009,786.0000000000001,632.4265219529947,153.57347804700544,19.54
+BJ,Benin,2010,843.0000000000005,547.0704721448718,295.92952785512864,35.1
+BJ,Benin,2011,883.0,611.3343459159886,271.6656540840114,30.77
+BJ,Benin,2012,888.9999999999998,549.7027457353352,339.2972542646646,38.17
+BJ,Benin,2013,979.9999999999995,794.6250215111228,185.37497848887676,18.92
+BJ,Benin,2014,1149.9999999999984,1105.794836075052,44.20516392494642,3.84
+BJ,Benin,2015,1100.9999999999995,940.8902795393667,160.10972046063284,14.54
+BJ,Benin,2016,1077.0,851.0636199973428,225.9363800026572,20.98
+BJ,Benin,2017,1145.0,787.7475659718198,357.25243402818023,31.2
+BJ,Benin,2018,1200.0,404.0978824675806,795.9021175324194,66.33
+BJ,Benin,2019,1256.0000000000002,860.1937781111669,395.8062218888333,31.51
+BJ,Benin,2020,1287.0000000000002,1198.4474758317133,88.55252416828694,6.88
+BJ,Benin,2021,1519.000000000002,1449.490303527099,69.50969647290299,4.58
+BJ,Benin,2022,1449.0000000000036,1455.3372892400844,-6.337289240080736,-0.44
+BJ,Benin,2023,1486.019606815687,3430.4383809512074,-1944.4187741355204,-130.85
+CI,Cote d'Ivoire,2000,2862.999999999993,3263.3596921148783,-400.3596921148851,-13.98
+CI,Cote d'Ivoire,2001,3070.999999999994,3246.5058147266127,-175.5058147266186,-5.71
+CI,Cote d'Ivoire,2002,3044.000000000004,3006.222195188564,37.77780481144009,1.24
+CI,Cote d'Ivoire,2003,3068.999999999998,3000.6645344769695,68.33546552302869,2.23
+CI,Cote d'Ivoire,2004,3115.9999999999927,3016.9671126701205,99.03288732987221,3.18
+CI,Cote d'Ivoire,2005,3150.9999999999927,3024.8958092576886,126.10419074230413,4.0
+CI,Cote d'Ivoire,2006,3407.9999999999927,3234.604131876574,173.39586812341895,5.09
+CI,Cote d'Ivoire,2007,3586.9999999999995,3376.787558496085,210.21244150391476,5.86
+CI,Cote d'Ivoire,2008,3836.000000000001,3768.890695358352,67.10930464164903,1.75
+CI,Cote d'Ivoire,2009,4021.9999999999886,3834.1798874392753,187.82011256071337,4.67
+CI,Cote d'Ivoire,2010,4414.999999999999,4572.13712526403,-157.13712526403106,-3.56
+CI,Cote d'Ivoire,2011,4141.000000000005,3690.2414138717804,450.7585861282241,10.89
+CI,Cote d'Ivoire,2012,5059.000000000004,4395.032246645956,663.967753354048,13.12
+CI,Cote d'Ivoire,2013,5150.000000000011,4065.3147086588415,1084.6852913411694,21.06
+CI,Cote d'Ivoire,2014,6221.999999999992,6290.056710839372,-68.05671083937978,-1.09
+CI,Cote d'Ivoire,2015,6119.000000000009,6039.689515939307,79.31048406070204,1.3
+CI,Cote d'Ivoire,2016,6229.000000000009,6064.529789459464,164.47021054054494,2.64
+CI,Cote d'Ivoire,2017,7287.999999999992,8634.418341947734,-1346.4183419477422,-18.47
+CI,Cote d'Ivoire,2018,7134.000000000008,8267.570408873962,-1133.570408873954,-15.89
+CI,Cote d'Ivoire,2019,7861.000000000013,8022.1501862672685,-161.15018626725578,-2.05
+CI,Cote d'Ivoire,2020,8386.0,8027.470821582479,358.5291784175206,4.28
+CI,Cote d'Ivoire,2021,9131.99999999999,7912.5142325508605,1219.4857674491304,13.35
+CI,Cote d'Ivoire,2022,9839.000000000007,8159.600943332943,1679.3990566670645,17.07
+CI,Cote d'Ivoire,2023,10088.46354759247,8117.3801517981165,1971.0833957943532,19.54
+GW,Guinee-Bissau,2000,129.87174530351135,-10.89295551944413,140.7647008229555,108.39
+GW,Guinee-Bissau,2001,132.6624173119672,0.7921275274063362,131.87028978456087,99.4
+GW,Guinee-Bissau,2002,135.61107173248024,19.306274459536695,116.30479727294355,85.76
+GW,Guinee-Bissau,2003,138.71381685450035,16.07211047147868,122.64170638302167,88.41
+GW,Guinee-Bissau,2004,141.94888013522086,22.17104620174547,119.77783393347539,84.38
+GW,Guinee-Bissau,2005,145.3169978442052,25.14887230643538,120.16812553776981,82.69
+GW,Guinee-Bissau,2006,148.86350315029273,35.07091434088653,113.7925888094062,76.44
+GW,Guinee-Bissau,2007,152.6166898409956,57.57246168065444,95.04422816034116,62.28
+GW,Guinee-Bissau,2008,156.51555272390837,40.742977964170734,115.77257475973764,73.97
+GW,Guinee-Bissau,2009,160.54641822142278,45.608144651346805,114.93827357007598,71.59
+GW,Guinee-Bissau,2010,164.75051742909577,59.90400398662919,104.84651344246657,63.64
+GW,Guinee-Bissau,2011,169.13963065994355,53.36911705238623,115.77051360755732,68.45
+GW,Guinee-Bissau,2012,173.69829625313233,57.32822285405595,116.37007339907638,67.0
+GW,Guinee-Bissau,2013,178.38475720627412,62.47240375983665,115.91235344643746,64.98
+GW,Guinee-Bissau,2014,183.1335907095823,64.80422965506673,118.32936105451557,64.61
+GW,Guinee-Bissau,2015,187.90198794700677,61.693947816654685,126.20804013035209,67.17
+GW,Guinee-Bissau,2016,192.68100850241905,69.41067411867695,123.2703343837421,63.98
+GW,Guinee-Bissau,2017,197.4329974467137,70.42355845819773,127.00943898851597,64.33
+GW,Guinee-Bissau,2018,202.1762563376124,52.2025309525994,149.97372538501298,74.18
+GW,Guinee-Bissau,2019,206.9649535787166,56.73005932689796,150.23489425181864,72.59
+GW,Guinee-Bissau,2020,211.75691144217356,95.7201203170662,116.03679112510736,54.8
+GW,Guinee-Bissau,2021,216.5517092025183,89.6247931610074,126.9269160415109,58.61
+GW,Guinee-Bissau,2022,221.46241682843367,82.79582178352697,138.6665950449067,62.61
+GW,Guinee-Bissau,2023,226.49113794724397,88.36729898415726,138.1238389630867,60.98
+ML,Mali,2000,1215.8219146925762,1619.1024419935006,-403.2805273009244,-33.17
+ML,Mali,2001,1252.9370530266551,1365.7261311082877,-112.78907808163262,-9.0
+ML,Mali,2002,1292.4738871365032,1334.098128332433,-41.6242411959297,-3.22
+ML,Mali,2003,1334.220897294658,1335.0989317818407,-0.878034487182731,-0.07
+ML,Mali,2004,1378.1292793471953,1383.9775396819105,-5.848260334715178,-0.42
+ML,Mali,2005,1424.013388182743,1455.9398368720704,-31.926448689327344,-2.24
+ML,Mali,2006,1471.501933578557,1620.2265217715726,-148.7245881930155,-10.11
+ML,Mali,2007,1520.6885269505703,1671.7750830107186,-151.08655606014827,-9.94
+ML,Mali,2008,1571.4918631026972,1692.849136070428,-121.35727296773075,-7.72
+ML,Mali,2009,1623.5310803078676,1716.4805096211446,-92.94942931327705,-5.73
+ML,Mali,2010,1677.137710232396,1763.7472462265994,-86.60953599420327,-5.16
+ML,Mali,2011,1732.2370741062691,1952.360430901252,-220.12335679498278,-12.71
+ML,Mali,2012,1783.563897918055,1835.958238267175,-52.39434034911983,-2.94
+ML,Mali,2013,1836.4261593138697,1866.036413657696,-29.610254343826227,-1.61
+ML,Mali,2014,1895.396302645876,1926.65524793593,-31.258945290054044,-1.65
+ML,Mali,2015,1955.6394560532,1809.6018726829845,146.03758337021554,7.47
+ML,Mali,2016,2018.5659964754384,1860.7289231479876,157.83707332745075,7.82
+ML,Mali,2017,2083.959565842285,1901.4160728249906,182.5434930172944,8.76
+ML,Mali,2018,2150.120643638414,2279.0191027144565,-128.8984590760424,-5.99
+ML,Mali,2019,2216.003621902266,2034.0316317462277,181.97199015603815,8.21
+ML,Mali,2020,2283.8909362807394,2822.3622922939885,-538.4713560132491,-23.58
+ML,Mali,2021,2354.866691115428,3087.9966876575227,-733.1299965420949,-31.13
+ML,Mali,2022,2426.811797421167,2772.1823251259457,-345.37052770477885,-14.23
+ML,Mali,2023,2500.069251633189,2576.991756512244,-76.92250487905494,-3.08
+NE,Niger,2000,370.9999999999998,272.52841408014734,98.47158591985243,26.54
+NE,Niger,2001,361.99999999999966,179.49703474675226,182.5029652532474,50.42
+NE,Niger,2002,370.99999999999983,186.22344109247348,184.77655890752635,49.81
+NE,Niger,2003,377.0,197.4940431954401,179.5059568045599,47.61
+NE,Niger,2004,440.0000000000002,318.79702791425007,121.20297208575016,27.55
+NE,Niger,2005,500.0,343.7579812800308,156.24201871996922,31.25
+NE,Niger,2006,492.9999999999993,307.61071604279186,185.38928395720745,37.6
+NE,Niger,2007,574.0000000000003,408.8650556631602,165.13494433684014,28.77
+NE,Niger,2008,598.0000000000001,441.2239873463634,156.7760126536367,26.22
+NE,Niger,2009,675.0000000000006,510.4755912096317,164.52440879036885,24.37
+NE,Niger,2010,728.0000000000005,509.12685169815154,218.87314830184891,30.06
+NE,Niger,2011,811.0000000000005,620.750604077469,190.24939592253145,23.46
+NE,Niger,2012,878.0000000000007,708.9101753903417,169.089824609659,19.26
+NE,Niger,2013,892.9999999999992,739.8292170506536,153.1707829493456,17.15
+NE,Niger,2014,985.0000000000008,867.453578253177,117.54642174682374,11.93
+NE,Niger,2015,1104.0,965.5278900572703,138.47210994272973,12.54
+NE,Niger,2016,1349.0,1333.7677812294091,15.232218770590862,1.13
+NE,Niger,2017,1203.9999999999998,1159.7906621112838,44.209337888715936,3.67
+NE,Niger,2018,1233.9999999999998,1321.8100134901451,-87.81001349014537,-7.12
+NE,Niger,2019,1414.0000000000002,1356.3771483196208,57.622851680379426,4.08
+NE,Niger,2020,1452.000000000001,1325.9513336552643,126.0486663447366,8.68
+NE,Niger,2021,1498.000000000001,1229.9545881012632,268.0454118987377,17.89
+NE,Niger,2022,1580.0000000000002,1502.5873398198817,77.41266018011856,4.9
+NE,Niger,2023,1632.9264360387872,1396.6678849927855,236.25855104600168,14.47
+SN,Senegal,2000,1004.999999999996,636.507974225322,368.49202577467406,36.67
+SN,Senegal,2001,1249.999999999997,1010.927053778817,239.07294622118002,19.13
+SN,Senegal,2002,1515.0000000000027,1568.7568251866487,-53.75682518664598,-3.55
+SN,Senegal,2003,1343.9999999999952,1095.955308422966,248.0446915770292,18.46
+SN,Senegal,2004,1517.0000000000057,1227.2494423060737,289.750557693932,19.1
+SN,Senegal,2005,1777.000000000004,1662.9075385228523,114.0924614771518,6.42
+SN,Senegal,2006,1816.0000000000048,1515.7078866461413,300.29211335386344,16.54
+SN,Senegal,2007,2151.000000000004,1767.5392366058697,383.46076339413435,17.83
+SN,Senegal,2008,1931.9999999999984,1267.29915312239,664.7008468776085,34.4
+SN,Senegal,2009,2611.999999999998,2457.8521836046602,154.14781639533794,5.9
+SN,Senegal,2010,2825.000000000005,2860.36440414112,-35.364404141114846,-1.25
+SN,Senegal,2011,2913.000000000002,2811.692723156445,101.30727684355679,3.48
+SN,Senegal,2012,3177.999999999994,3261.969862195341,-83.9698621953471,-2.64
+SN,Senegal,2013,3276.0,3271.2307650411194,4.769234958880588,0.15
+SN,Senegal,2014,3612.000000000006,3457.1341437849605,154.86585621504537,4.29
+SN,Senegal,2015,3852.9999999999927,3714.2615775669256,138.73842243306717,3.6
+SN,Senegal,2016,4146.9999999999945,3976.6376996272347,170.36230037275982,4.11
+SN,Senegal,2017,4070.9999999999945,3723.0355438859633,347.96445611403124,8.55
+SN,Senegal,2018,4322.9999999999945,4360.113754471274,-37.11375447127921,-0.86
+SN,Senegal,2019,5077.999999999994,4364.50556899245,713.4944310075434,14.05
+SN,Senegal,2020,5240.9999999999945,4217.621446578807,1023.3785534211875,19.53
+SN,Senegal,2021,5676.0000000000055,4248.889345984157,1427.110654015848,25.14
+SN,Senegal,2022,7051.999999999999,5558.421116036952,1493.5788839630468,21.18
+SN,Senegal,2023,7414.999999999994,4794.713559213858,2620.2864407861352,35.34
+TG,Togo,2000,468.9999999999999,362.39725843604464,106.60274156395525,22.73
+TG,Togo,2001,500.0000000000002,292.0491713440477,207.95082865595253,41.59
+TG,Togo,2002,500.99999999999983,339.19503183218654,161.80496816781329,32.3
+TG,Togo,2003,549.0000000000002,448.2383065078168,100.76169349218344,18.35
+TG,Togo,2004,586.9999999999976,507.34475857346445,79.65524142653317,13.57
+TG,Togo,2005,614.0000000000027,531.2070430300554,82.79295696994734,13.48
+TG,Togo,2006,626.0000000000007,550.2078104383689,75.79218956163174,12.11
+TG,Togo,2007,605.9999999999999,341.28842772539343,264.71157227460645,43.68
+TG,Togo,2008,637.9999999999985,413.77788412846155,224.22211587153697,35.14
+TG,Togo,2009,775.9999999999973,649.0547843733913,126.945215626606,16.36
+TG,Togo,2010,797.0000000000016,644.8047511144151,152.19524888558647,19.1
+TG,Togo,2011,890.0000000000019,824.3551113426676,65.64488865733438,7.38
+TG,Togo,2012,1045.999999999999,950.8663209676554,95.13367903234371,9.09
+TG,Togo,2013,633.0000000000002,343.744469666515,289.25553033348524,45.7
+TG,Togo,2014,1293.000000000003,1431.5048766183234,-138.5048766183204,-10.71
+TG,Togo,2015,702.0000000000002,429.00326103218924,272.996738967811,38.89
+TG,Togo,2016,995.0000000000032,771.6465122349339,223.3534877650693,22.45
+TG,Togo,2017,1373.000000000004,1461.3656211662098,-88.36562116620576,-6.44
+TG,Togo,2018,1035.9999999999975,573.8428096999126,462.15719030008495,44.61
+TG,Togo,2019,1414.0000000000025,2266.571557438794,-852.5715574387916,-60.3
+TG,Togo,2020,1404.999999999998,2207.6592852383037,-802.6592852383058,-57.13
+TG,Togo,2021,1433.9999999999957,2275.9972137734703,-841.9972137734746,-58.72
+TG,Togo,2022,1744.000000000002,2272.5326298430973,-528.5326298430953,-30.31
+TG,Togo,2023,1785.173976191615,2193.9111615293714,-408.7371853377563,-22.9
