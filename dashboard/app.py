@@ -683,13 +683,19 @@ with t3:
             st.markdown(f'''<div class="sec-header">
                 <span class="sec-icon">🔄</span>
                 <span class="sec-title">Cross-validation temporelle</span>
-                <span class="sec-badge">TimeSeriesSplit · {len(cv_df)} folds</span>
+                <span class="sec-badge">Panel par annee · {len(cv_df)} folds</span>
             </div>''', unsafe_allow_html=True)
 
             cv_mean = cv_df["r2"].mean()
             cv_std = cv_df["r2"].std()
+            has_yr = "test_years" in cv_df.columns
+            if has_yr:
+                x_labels = [f"Fold {int(r['fold'])}\n{r['test_years']}"
+                            for _, r in cv_df.iterrows()]
+            else:
+                x_labels = [f"Fold {int(r)}" for r in cv_df["fold"]]
             fig = go.Figure(go.Bar(
-                x=[f"Fold {int(r)}" for r in cv_df["fold"]],
+                x=x_labels,
                 y=cv_df["r2"],
                 marker_color=[P["emerald"] if v > 0 else P["red"] for v in cv_df["r2"]],
                 text=[f"{v:.3f}" for v in cv_df["r2"]],
@@ -698,16 +704,19 @@ with t3:
             fig.add_hline(y=cv_mean, line_dash="dash", line_color=P["primary"],
                           annotation_text=f"Moyenne: {cv_mean:.3f}",
                           annotation_font_color=P["primary"])
-            fig = fig_layout(fig, f"R² par fold — {cv_df['model'].iloc[0]}", 300, "R²")
+            fig = fig_layout(fig, f"R² par fold temporel — {cv_df['model'].iloc[0]}", 300, "R²")
             st.plotly_chart(fig, key="mod_cv")
 
             st.markdown(f'''<div class="insight-card">
                 <div class="insight-label">🔬 Robustesse du modele</div>
-                <p>La cross-validation temporelle ({len(cv_df)} folds) donne un R² moyen de
-                <span class="val">{cv_mean:.3f} ± {cv_std:.3f}</span>.
-                Les folds negatifs indiquent que certaines periodes historiques
-                ont des patterns differents (ex: chocs economiques), mais le
-                modele reste performant sur le test set reel (R² = {best["r2"]:.3f}).</p>
+                <p>Chaque fold entraine le modele sur des
+                <span class="hl">annees anterieures</span> et le teste sur des
+                <span class="hl">annees futures</span>, tous pays confondus.
+                R² moyen : <span class="val">{cv_mean:.3f} ± {cv_std:.3f}</span>.
+                Cette methode garantit qu'aucune donnee future ne fuit
+                dans l'entrainement — condition essentielle pour valider
+                un modele de prediction temporelle.
+                Score test reel : R² = <span class="val">{best["r2"]:.3f}</span>.</p>
             </div>''', unsafe_allow_html=True)
 
         st.divider()

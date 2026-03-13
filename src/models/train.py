@@ -22,13 +22,14 @@ from sklearn.ensemble import (
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import cross_val_score, TimeSeriesSplit
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.base import clone
 
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from utils.config import MODELS_DIR, RANDOM_STATE, N_CV_FOLDS
-from etl.load import load_processed, temporal_split
+from etl.load import load_processed, temporal_split, prepare_features
 
 try:
     from xgboost import XGBRegressor
@@ -77,6 +78,56 @@ def evaluate(y_true, y_pred, name):
     mape = np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100 if mask.sum() > 0 else np.nan
     print(f"  {name:22s}  RMSE {rmse:10.1f}  MAE {mae:10.1f}  R2 {r2:.4f}  MAPE {mape:.1f}%")
     return {'model': name, 'rmse': rmse, 'mae': mae, 'r2': r2, 'mape': mape}
+
+
+def temporal_cross_validate(model, X, y, years, n_splits=5):
+    """
+    Cross-validation temporelle par annee pour donnees panel multi-pays.
+    Chaque fold entraine sur les annees anciennes et teste sur les recentes,
+    tous pays confondus. Evite le data leakage temporel du TimeSeriesSplit
+    standard applique a des donnees panel triees par pays.
+    """
+    unique_years = sorted(set(years))
+    n_years = len(unique_years)
+    min_train_years = max(8, n_years // 3)
+    available = n_years - min_train_years
+    step = max(1, available // n_splits)
+
+    results = []
+    for i in range(n_splits):
+        cutoff = min_train_years + i * step
+        if cutoff >= n_years:
+            break
+
+        train_yrs = list(unique_years[:cutoff])
+        test_end = min(cutoff + step, n_years)
+        test_yrs = list(unique_years[cutoff:test_end])
+
+        if not test_yrs:
+            continue
+
+        train_mask = np.isin(years, train_yrs)
+        test_mask = np.isin(years, test_yrs)
+
+        scaler_cv = StandardScaler()
+        X_tr_cv = scaler_cv.fit_transform(X[train_mask])
+        X_te_cv = scaler_cv.transform(X[test_mask])
+
+        m = clone(model)
+        m.fit(X_tr_cv, y[train_mask])
+        preds = m.predict(X_te_cv)
+
+        r2 = r2_score(y[test_mask], preds)
+        results.append({
+            'fold': i + 1,
+            'r2': round(r2, 4),
+            'train_years': f"{min(train_yrs)}-{max(train_yrs)}",
+            'test_years': f"{min(test_yrs)}-{max(test_yrs)}",
+            'n_train': int(train_mask.sum()),
+            'n_test': int(test_mask.sum()),
+        })
+
+    return results
 
 
 def train():
@@ -134,21 +185,24 @@ def train():
     best_r2 = res_df.iloc[0]['r2']
     print(f"\n  Meilleur : {best_name} (R2 = {best_r2:.4f})")
 
-    # Cross-validation sur le meilleur modele
-    print(f"\n  Cross-validation ({N_CV_FOLDS} folds) sur {best_name}...")
-    tscv = TimeSeriesSplit(n_splits=N_CV_FOLDS)
-    X_all = np.vstack([X_tr, X_te])
-    y_all = np.concatenate([y_train, y_test])
-    cv_scores = cross_val_score(best_model, X_all, y_all, cv=tscv,
-                                 scoring='r2', n_jobs=-1)
-    print(f"  CV R2 : {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
-    print(f"  Folds : {', '.join(f'{s:.3f}' for s in cv_scores)}")
+    # Cross-validation temporelle par annee (panel multi-pays)
+    print(f"\n  Cross-validation temporelle ({N_CV_FOLDS} folds) sur {best_name}...")
+    df_full = pd.concat([train_df, test_df]).sort_values('year')
+    X_full, y_full, _ = prepare_features(df_full)
+    X_full = np.nan_to_num(X_full, nan=0.0, posinf=0.0, neginf=0.0)
+    years_full = df_full['year'].values
 
-    cv_df = pd.DataFrame({
-        'fold': range(1, len(cv_scores) + 1),
-        'r2': cv_scores,
-        'model': best_name,
-    })
+    cv_results = temporal_cross_validate(best_model, X_full, y_full,
+                                          years_full, N_CV_FOLDS)
+    cv_scores = np.array([r['r2'] for r in cv_results])
+    print(f"  CV R2 : {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
+    for r in cv_results:
+        print(f"    Fold {r['fold']} : R2 {r['r2']:.3f}  |"
+              f"  train {r['train_years']} ({r['n_train']} obs)"
+              f"  test {r['test_years']} ({r['n_test']} obs)")
+
+    cv_df = pd.DataFrame(cv_results)
+    cv_df['model'] = best_name
     cv_path = os.path.join(MODELS_DIR, 'cv_scores.csv')
     cv_df.to_csv(cv_path, index=False)
     print(f"  CV scores : {cv_path}")
