@@ -1,6 +1,6 @@
 """
-Predictions historiques + Projections 2024-2030
-Cible unique : demande electrique totale (GWh) = f(population, contexte)
+Predictions historiques + Projections 2024-2045 pour les 8 pays UEMOA
+Cible : demande electrique totale (GWh) = f(population, contexte macro)
 """
 import os
 import sys
@@ -128,6 +128,16 @@ def predict():
         mae = tg_h['error'].abs().mean()
         print(f"  MAE Togo : {mae:.1f} GWh")
 
+    # Synthese par pays
+    print(f"\n  {'Pays':20s}  {'Obs':>5s}  {'MAE':>10s}  {'MAPE':>8s}")
+    print(f"  {'-'*20}  {'-'*5}  {'-'*10}  {'-'*8}")
+    for code, name in COUNTRIES.items():
+        ch = hist[hist['country_code'] == code]
+        if not ch.empty:
+            mae_c = ch['error'].abs().mean()
+            mape_c = ch['error_pct'].abs().mean()
+            print(f"  {name:20s}  {len(ch):5d}  {mae_c:10.1f}  {mape_c:7.1f}%")
+
     # 2. Projections
     proj = project_future(df)
     proj_path = os.path.join(PREDICTIONS_DIR, 'projections.csv')
@@ -141,6 +151,17 @@ def predict():
             pop_str = f"  pop {r['pop_projected']/1e6:.1f}M" if r['pop_projected'] else ""
             print(f"    {int(r['year'])} : {r['predicted_gwh']:.1f} GWh "
                   f"[{r['ci_lower']:.1f} - {r['ci_upper']:.1f}]{pop_str}")
+
+    # Resume par pays (derniere annee projetee)
+    last_yr = proj['year'].max()
+    proj_last = proj[proj['year'] == last_yr]
+    print(f"\n  Projections {int(last_yr)} — Tous les pays UEMOA :")
+    print(f"  {'Pays':20s}  {'GWh':>10s}  {'IC bas':>10s}  {'IC haut':>10s}  {'Pop (M)':>8s}")
+    print(f"  {'-'*20}  {'-'*10}  {'-'*10}  {'-'*10}  {'-'*8}")
+    for _, r in proj_last.sort_values('predicted_gwh', ascending=False).iterrows():
+        pop_str = f"{r['pop_projected']/1e6:.1f}" if pd.notna(r.get('pop_projected')) else "—"
+        print(f"  {r['country_name']:20s}  {r['predicted_gwh']:10,.0f}  "
+              f"{r['ci_lower']:10,.0f}  {r['ci_upper']:10,.0f}  {pop_str:>8s}")
 
     print(f"  Termine.")
 

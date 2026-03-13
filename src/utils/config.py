@@ -1,9 +1,13 @@
 """
-Configuration — Demande energetique et croissance demographique
-Togo & UEMOA | Cadre BCEAO
+Configuration — Prevision de la Demande Electrique | Zone UEMOA
+=====================================================================
+Ce projet a ete realise dans l'objectif de maitriser les concepts lies a
+l'ingenierie de donnees et au Machine Learning, transposables dans des
+situations reelles de modelisation macroeconomique.
 
-Question : la population croit, combien d'electricite faudra-t-il demain ?
-ETL cible : Population (habitants) -> Consommation electrique (kWh)
+Question : la population croit — combien d'electricite faudra-t-il demain ?
+Pipeline : API Banque Mondiale -> ETL -> Feature Engineering -> ML -> Dashboard
+Perimetre : 8 pays de l'espace UEMOA | 1990-2023 | Horizon 2045
 """
 import os
 
@@ -21,6 +25,7 @@ for d in [RAW_DIR, PROCESSED_DIR, PREDICTIONS_DIR, MODELS_DIR]:
 # ── Pays UEMOA ──────────────────────────────────────────────────────────────
 FOCUS_COUNTRY = 'TG'
 FOCUS_COUNTRY_NAME = 'Togo'
+ALL_COUNTRY_CODES = ['TG', 'SN', 'CI', 'BJ', 'BF', 'ML', 'NE', 'GW']
 
 COUNTRIES = {
     'TG': 'Togo',
@@ -80,3 +85,5 @@ END_YEAR = 2023
 RANDOM_STATE = 42
 TEST_SIZE = 0.2
 FORECAST_HORIZON = 22  # Projections 2024-2045
+N_CV_FOLDS = 5          # Cross-validation temporelle
+TARGET = 'conso_totale_gwh'

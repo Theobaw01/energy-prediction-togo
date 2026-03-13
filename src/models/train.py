@@ -1,6 +1,12 @@
 """
-Entrainement — Prediction de la demande electrique (GWh) a partir de la
-croissance demographique.
+Entrainement — Prediction de la demande electrique (GWh)
+
+Ce module entraine 4+ algorithmes de Machine Learning sur les donnees
+des 8 pays UEMOA, selectionne le meilleur modele, et exporte :
+- le modele sauvegarde (.joblib)
+- les metriques de performance (results.csv)
+- l'importance des features (feature_importance.csv)
+- les scores de cross-validation (cv_scores.csv)
 
 Modeles : Random Forest, Gradient Boosting, XGBoost, LightGBM, Stacking.
 """
@@ -16,11 +22,12 @@ from sklearn.ensemble import (
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score, TimeSeriesSplit
 
 warnings.filterwarnings('ignore')
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from utils.config import MODELS_DIR, RANDOM_STATE
+from utils.config import MODELS_DIR, RANDOM_STATE, N_CV_FOLDS
 from etl.load import load_processed, temporal_split
 
 try:
@@ -127,13 +134,55 @@ def train():
     best_r2 = res_df.iloc[0]['r2']
     print(f"\n  Meilleur : {best_name} (R2 = {best_r2:.4f})")
 
+    # Cross-validation sur le meilleur modele
+    print(f"\n  Cross-validation ({N_CV_FOLDS} folds) sur {best_name}...")
+    tscv = TimeSeriesSplit(n_splits=N_CV_FOLDS)
+    X_all = np.vstack([X_tr, X_te])
+    y_all = np.concatenate([y_train, y_test])
+    cv_scores = cross_val_score(best_model, X_all, y_all, cv=tscv,
+                                 scoring='r2', n_jobs=-1)
+    print(f"  CV R2 : {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
+    print(f"  Folds : {', '.join(f'{s:.3f}' for s in cv_scores)}")
+
+    cv_df = pd.DataFrame({
+        'fold': range(1, len(cv_scores) + 1),
+        'r2': cv_scores,
+        'model': best_name,
+    })
+    cv_path = os.path.join(MODELS_DIR, 'cv_scores.csv')
+    cv_df.to_csv(cv_path, index=False)
+    print(f"  CV scores : {cv_path}")
+
     # Feature importance
+    fi_data = []
     if hasattr(best_model, 'feature_importances_'):
         fi = best_model.feature_importances_
-        top = np.argsort(fi)[::-1][:8]
-        print("\n  Features cles :")
+        top = np.argsort(fi)[::-1][:15]
+        print("\n  Top 15 features :")
         for i in top:
-            print(f"    {feat_names[i]:35s}  {fi[i]:.3f}")
+            print(f"    {feat_names[i]:35s}  {fi[i]:.4f}")
+            fi_data.append({'feature': feat_names[i], 'importance': fi[i]})
+    elif hasattr(best_model, 'estimators_'):
+        # Stacking : moyenne des importances des base estimators
+        all_fi = np.zeros(len(feat_names))
+        count = 0
+        for name_est, est in best_model.named_estimators_.items():
+            if hasattr(est, 'feature_importances_'):
+                all_fi += est.feature_importances_
+                count += 1
+        if count > 0:
+            all_fi /= count
+            top = np.argsort(all_fi)[::-1][:15]
+            print("\n  Top 15 features (moyenne des estimateurs) :")
+            for i in top:
+                print(f"    {feat_names[i]:35s}  {all_fi[i]:.4f}")
+                fi_data.append({'feature': feat_names[i], 'importance': all_fi[i]})
+
+    if fi_data:
+        fi_df = pd.DataFrame(fi_data).sort_values('importance', ascending=False)
+        fi_path = os.path.join(MODELS_DIR, 'feature_importance.csv')
+        fi_df.to_csv(fi_path, index=False)
+        print(f"  Feature importance : {fi_path}")
 
     # Sauvegarder modele
     model_path = os.path.join(MODELS_DIR, 'model_energy.joblib')
@@ -143,6 +192,11 @@ def train():
         'model_name': best_name,
         'feature_names': feat_names,
         'metrics': res_df.iloc[0].to_dict(),
+        'cv_r2_mean': float(cv_scores.mean()),
+        'cv_r2_std': float(cv_scores.std()),
+        'n_features': len(feat_names),
+        'n_train': len(y_train),
+        'n_test': len(y_test),
     }, model_path)
     print(f"\n  Modele : {model_path}")
 

@@ -86,6 +86,39 @@ def engineer(df):
     if 'IT.CEL.SETS.P2' in out.columns and 'SP.POP.TOTL' in out.columns:
         out['mobile_total'] = out['IT.CEL.SETS.P2'] * out['SP.POP.TOTL'] / 100
 
+    # ── Features supplementaires pour robustesse ──
+    # Log population (linearise la relation)
+    if 'SP.POP.TOTL' in out.columns:
+        out['log_pop'] = np.log1p(out['SP.POP.TOTL'])
+
+    # Log PIB total
+    if 'NY.GDP.MKTP.CD' in out.columns:
+        out['log_pib'] = np.log1p(out['NY.GDP.MKTP.CD'].clip(lower=0))
+
+    # PIB par actif (productivite)
+    if 'NY.GDP.MKTP.CD' in out.columns and 'pop_active' in out.columns:
+        out['pib_par_actif'] = out['NY.GDP.MKTP.CD'] / out['pop_active'].replace(0, np.nan)
+
+    # Densite energetique = GWh / PIB  (intensite macro)
+    if 'conso_totale_gwh' in out.columns and 'NY.GDP.MKTP.CD' in out.columns:
+        out['gwh_par_pib'] = out['conso_totale_gwh'] / (out['NY.GDP.MKTP.CD'] / 1e9).replace(0, np.nan)
+
+    # Urbanisation x Population (population urbaine absolue)
+    if 'pop_urbaine' in out.columns:
+        out['log_pop_urb'] = np.log1p(out['pop_urbaine'])
+
+    # Acces x Population = nb personnes avec electricite
+    if 'EG.ELC.ACCS.ZS' in out.columns and 'SP.POP.TOTL' in out.columns:
+        out['pop_electrifiee'] = out['EG.ELC.ACCS.ZS'] * out['SP.POP.TOTL'] / 100
+
+    # Interaction croissance PIB x croissance demo
+    if 'NY.GDP.MKTP.KD.ZG' in out.columns and 'SP.POP.GROW' in out.columns:
+        out['growth_pib_x_pop'] = out['NY.GDP.MKTP.KD.ZG'] * out['SP.POP.GROW']
+
+    # Proxy industrialisation = industrie x PIB
+    if 'NV.IND.TOTL.ZS' in out.columns and 'NY.GDP.MKTP.CD' in out.columns:
+        out['indus_absolue'] = out['NV.IND.TOTL.ZS'] * out['NY.GDP.MKTP.CD'] / 100
+
     # Features par pays : lags, variations, moyennes mobiles
     key_cols = ['SP.POP.TOTL', 'EG.USE.ELEC.KH.PC', 'EG.ELC.ACCS.ZS',
                 'NY.GDP.PCAP.CD', 'SP.URB.TOTL.IN.ZS', 'IT.CEL.SETS.P2',

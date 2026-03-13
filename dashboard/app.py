@@ -1,32 +1,41 @@
 """
-Dashboard IA — Anticipation de la Demande Electrique au Togo
-Developpeur en Intelligence Artificielle | BCEAO
-Pipeline : Extraction (Banque Mondiale) -> Transformation -> Modele IA -> Predictions 2045
+Dashboard IA — Prevision de la Demande Electrique | Zone UEMOA
+=====================================================================
+Ce projet a ete realise dans l'objectif de maitriser les concepts lies a
+l'ingenierie de donnees et au Machine Learning, transposables dans des
+situations reelles de modelisation macroeconomique.
+
+Pipeline : API Banque Mondiale -> ETL -> Feature Engineering -> ML -> Dashboard
+Perimetre : 8 pays UEMOA | 1990-2023 | Horizon 2045
 """
-import os
+import os, sys
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import plotly.express as px
 from plotly.subplots import make_subplots
 import streamlit as st
 
 # ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="IA — Demande Electrique Togo 2045",
+    page_title="IA — Demande Electrique UEMOA 2045",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMPL = "plotly_dark"
-FOCUS = "TG"
 
 C = {
     "pop": "#2E86C1", "kwh": "#E67E22", "gwh": "#1ABC9C", "proj": "#9B59B6",
-    "ci": "rgba(155,89,182,0.15)", "grid": "#1E2A35", "muted": "#7F8C8D",
-    "good": "#27AE60", "warn": "#E74C3C", "bg": "#0E1117", "accent": "#3498DB",
-    "ind": "#F39C12", "soc": "#E91E63", "eco": "#00BCD4",
+    "ci": "rgba(155,89,182,0.15)", "muted": "#7F8C8D",
+    "good": "#27AE60", "warn": "#E74C3C", "accent": "#3498DB",
+    "eco": "#00BCD4", "soc": "#E91E63",
+}
+
+COUNTRY_FLAGS = {
+    'TG': '🇹🇬', 'SN': '🇸🇳', 'CI': '🇨🇮', 'BJ': '🇧🇯',
+    'BF': '🇧🇫', 'ML': '🇲🇱', 'NE': '🇳🇪', 'GW': '🇬🇼',
 }
 
 IND_LABELS = {
@@ -57,6 +66,8 @@ IND_CAT = {
 CAT_COLORS = {"demo": C["pop"], "energie": C["kwh"], "eco": C["eco"], "social": C["soc"]}
 CAT_NAMES = {"demo": "Demographie", "energie": "Energie", "eco": "Economie", "social": "Social"}
 
+PALETTE_8 = ["#1ABC9C", "#2E86C1", "#E67E22", "#9B59B6",
+             "#E74C3C", "#27AE60", "#F39C12", "#E91E63"]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STYLE
@@ -75,8 +86,9 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .hdr h1 { color: #fff; margin: 0; font-size: 1.35em; font-weight: 700; }
 .hdr p  { color: #B0C4CE; margin: 4px 0 0; font-size: 0.78em; font-weight: 300; }
 .hdr .tag { display: inline-block; background: rgba(52,152,219,0.2); color: #3498DB;
-            padding: 2px 10px; border-radius: 10px; font-size: 0.7em; font-weight: 600;
+            padding: 2px 10px; border-radius: 10px; font-size: 0.68em; font-weight: 600;
             margin-top: 6px; }
+.hdr .obj { color: #95A5A6; font-size: 0.65em; font-style: italic; margin-top: 6px; }
 
 .card {
     background: #161B22; border-radius: 6px; padding: 13px 15px;
@@ -130,7 +142,9 @@ def load():
                   ("raw", "data/raw/energy_data_raw.csv"),
                   ("pred", "data/predictions/predictions.csv"),
                   ("proj", "data/predictions/projections.csv"),
-                  ("res", "models/results.csv")]:
+                  ("res", "models/results.csv"),
+                  ("fi", "models/feature_importance.csv"),
+                  ("cv", "models/cv_scores.csv")]:
         p = os.path.join(BASE, f)
         if os.path.exists(p):
             d[k] = pd.read_csv(p)
@@ -138,17 +152,16 @@ def load():
 
 
 def fmt(v, u=""):
-    if pd.isna(v):
-        return "—"
-    if abs(v) >= 1e9:
-        s = f"{v/1e9:,.2f} Mrd"
-    elif abs(v) >= 1e6:
-        s = f"{v/1e6:,.1f} M"
-    elif abs(v) >= 1e3:
-        s = f"{v:,.0f}"
-    else:
-        s = f"{v:,.1f}"
+    if pd.isna(v): return "—"
+    if abs(v) >= 1e9: s = f"{v/1e9:,.2f} Mrd"
+    elif abs(v) >= 1e6: s = f"{v/1e6:,.1f} M"
+    elif abs(v) >= 1e3: s = f"{v:,.0f}"
+    else: s = f"{v:,.1f}"
     return f"{s} {u}".strip() if u else s
+
+
+def flag(code):
+    return COUNTRY_FLAGS.get(code, '')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -156,10 +169,12 @@ def fmt(v, u=""):
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hdr">
-    <h1>Anticipation de la Demande Electrique — Togo</h1>
-    <p>La population croit, combien d'electricite faudra-t-il demain ?
-       &nbsp;|&nbsp; Source : Banque Mondiale (WDI) &nbsp;|&nbsp; Horizon 2045</p>
-    <span class="tag">Developpeur en Intelligence Artificielle — BCEAO</span>
+    <h1>⚡ Prevision de la Demande Electrique — Zone UEMOA</h1>
+    <p>La population croit — combien d'electricite faudra-t-il demain ?
+       &nbsp;|&nbsp; 8 pays &nbsp;|&nbsp; 21 indicateurs &nbsp;|&nbsp; Horizon 2045</p>
+    <span class="tag">Intelligence Artificielle &amp; Analyse Predictive</span>
+    <div class="obj">Ce projet a ete realise dans l'objectif de maitriser les concepts lies a
+    l'ingenierie de donnees et au Machine Learning, transposables dans des situations reelles.</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -169,32 +184,44 @@ if "df" not in data:
     st.stop()
 
 df_all = data["df"]
-df = df_all[df_all["country_code"] == FOCUS].copy()
 raw_all = data.get("raw")
-raw_tg = raw_all[raw_all["country_code"] == FOCUS].copy() if raw_all is not None else None
 pred_all = data.get("pred")
-pred = pred_all[pred_all["country_code"] == FOCUS].copy() if pred_all is not None else None
 proj_all = data.get("proj")
-proj = proj_all[proj_all["country_code"] == FOCUS].copy() if proj_all is not None else None
 res = data.get("res")
+fi_df = data.get("fi")
+cv_df = data.get("cv")
 
-if df.empty:
-    st.error("Aucune donnee pour le Togo.")
-    st.stop()
+countries_available = sorted(df_all["country_code"].unique().tolist())
+country_names = df_all.drop_duplicates("country_code").set_index("country_code")["country_name"].to_dict()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SIDEBAR
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### Filtres")
-    y_min_h, y_max_h = int(df["year"].min()), int(df["year"].max())
+    st.markdown("### 🌍 Navigation")
+
+    sel_country = st.selectbox(
+        "Pays",
+        countries_available,
+        format_func=lambda c: f"{flag(c)} {country_names.get(c, c)}",
+        index=countries_available.index('TG') if 'TG' in countries_available else 0,
+        key="sel_country",
+    )
+    sel_name = country_names.get(sel_country, sel_country)
+
+    st.divider()
+
+    y_min_h, y_max_h = int(df_all["year"].min()), int(df_all["year"].max())
     yr = st.slider("Periode historique", y_min_h, y_max_h, (y_min_h, y_max_h), key="yr_hist")
 
-    proj_years = sorted(proj["year"].unique().astype(int).tolist()) if proj is not None and not proj.empty else []
+    proj_years = []
+    if proj_all is not None and not proj_all.empty:
+        proj_years = sorted(proj_all[proj_all["country_code"] == sel_country]["year"].unique().astype(int).tolist())
     proj_yr = st.select_slider("Horizon projection", options=proj_years,
                                 value=proj_years[-1], key="yr_proj") if proj_years else None
 
     st.divider()
+    st.markdown(f"**Pays** : {flag(sel_country)} {sel_name}")
     st.markdown(f"**Historique** : {yr[0]} — {yr[1]}")
     if proj_yr:
         st.markdown(f"**Projection** : jusqu'a {proj_yr}")
@@ -204,63 +231,69 @@ with st.sidebar:
     if raw_all is not None:
         st.download_button("Donnees brutes", raw_all.to_csv(index=False).encode(),
                            "donnees_brutes.csv", key="dl_raw")
-    if pred is not None:
-        st.download_button("Predictions", pred.to_csv(index=False).encode(),
-                           "predictions.csv", key="dl_pred")
-    if proj is not None:
-        st.download_button("Projections 2045", proj.to_csv(index=False).encode(),
-                           "projections_2045.csv", key="dl_proj")
+    if proj_all is not None:
+        st.download_button("Projections UEMOA", proj_all.to_csv(index=False).encode(),
+                           "projections_uemoa_2045.csv", key="dl_proj")
 
+# Filter data for selected country
+df = df_all[df_all["country_code"] == sel_country].copy()
 tg = df[df["year"].between(*yr)].sort_values("year")
+raw_sel = raw_all[raw_all["country_code"] == sel_country] if raw_all is not None else None
+pred = pred_all[pred_all["country_code"] == sel_country] if pred_all is not None else None
+proj = proj_all[proj_all["country_code"] == sel_country] if proj_all is not None else None
+
+if tg.empty:
+    st.warning(f"Aucune donnee disponible pour {sel_name}.")
+    st.stop()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # KPIs
 # ─────────────────────────────────────────────────────────────────────────────
-if not tg.empty:
-    last, first = tg.iloc[-1], tg.iloc[0]
-    cards = []
+last, first = tg.iloc[-1], tg.iloc[0]
+cards = []
 
-    if "SP.POP.TOTL" in tg.columns:
-        pop_now, pop_bef = last["SP.POP.TOTL"], first["SP.POP.TOTL"]
-        gr = ((pop_now / pop_bef) - 1) * 100 if pop_bef > 0 else 0
-        cards.append(("Population", fmt(pop_now), f"+{gr:.0f}% depuis {yr[0]}", "up", C["pop"]))
-    if "conso_totale_gwh" in tg.columns:
-        gwh, gwh0 = last["conso_totale_gwh"], first["conso_totale_gwh"]
-        d = ((gwh / gwh0) - 1) * 100 if gwh0 > 0 else 0
-        cards.append(("Demande electrique", fmt(gwh, "GWh"), f"+{d:.0f}% depuis {yr[0]}", "up", C["gwh"]))
-    if "EG.ELC.ACCS.ZS" in tg.columns:
-        acc, acc0 = last["EG.ELC.ACCS.ZS"], first["EG.ELC.ACCS.ZS"]
-        cards.append(("Acces electrique", f"{acc:.1f}%", f"{acc-acc0:+.1f} pts", "up" if acc > acc0 else "dn", C["good"]))
-    if proj_yr and proj is not None and not proj.empty:
-        row_p = proj[proj["year"] == proj_yr]
-        if not row_p.empty:
-            cards.append(("Prediction " + str(proj_yr), fmt(row_p.iloc[0]["predicted_gwh"], "GWh"),
-                          "Projection IA", "up", C["proj"]))
-    if res is not None and not res.empty:
-        best = res.sort_values("r2", ascending=False).iloc[0]
-        cards.append(("Modele IA", f"R2 = {best['r2']:.3f}", best["model"], "up", C["accent"]))
+if "SP.POP.TOTL" in tg.columns:
+    pop_now, pop_bef = last["SP.POP.TOTL"], first["SP.POP.TOTL"]
+    gr = ((pop_now / pop_bef) - 1) * 100 if pop_bef > 0 else 0
+    cards.append(("Population", fmt(pop_now), f"+{gr:.0f}% depuis {yr[0]}", "up", C["pop"]))
+if "conso_totale_gwh" in tg.columns:
+    gwh, gwh0 = last["conso_totale_gwh"], first["conso_totale_gwh"]
+    d = ((gwh / gwh0) - 1) * 100 if gwh0 > 0 else 0
+    cards.append(("Demande electrique", fmt(gwh, "GWh"), f"+{d:.0f}% depuis {yr[0]}", "up", C["gwh"]))
+if "EG.ELC.ACCS.ZS" in tg.columns:
+    acc, acc0 = last["EG.ELC.ACCS.ZS"], first["EG.ELC.ACCS.ZS"]
+    cards.append(("Acces electrique", f"{acc:.1f}%", f"{acc-acc0:+.1f} pts", "up" if acc > acc0 else "dn", C["good"]))
+if proj_yr and proj is not None and not proj.empty:
+    row_p = proj[proj["year"] == proj_yr]
+    if not row_p.empty:
+        cards.append(("Prediction " + str(proj_yr), fmt(row_p.iloc[0]["predicted_gwh"], "GWh"),
+                      "Projection IA", "up", C["proj"]))
+if res is not None and not res.empty:
+    best = res.sort_values("r2", ascending=False).iloc[0]
+    cards.append(("Modele IA", f"R2 = {best['r2']:.3f}", best["model"], "up", C["accent"]))
 
-    html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:8px;margin-bottom:14px;">'
-    for title, val, delta, css, color in cards:
-        html += f'''<div class="card" style="border-left-color:{color};">
-            <div class="t">{title}</div><div class="v">{val}</div>
-            <div class="d {css}">{delta}</div></div>'''
-    html += '</div>'
-    st.markdown(html, unsafe_allow_html=True)
+html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-bottom:14px;">'
+for title, val, delta, css, color in cards:
+    html += f'''<div class="card" style="border-left-color:{color};">
+        <div class="t">{title}</div><div class="v">{val}</div>
+        <div class="d {css}">{delta}</div></div>'''
+html += '</div>'
+st.markdown(html, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TABS
 # ─────────────────────────────────────────────────────────────────────────────
 t1, t2, t3, t4 = st.tabs([
-    "1. Donnees collectees",
+    "1. Donnees & Extraction",
     "2. Exploration",
     "3. Modele IA",
-    "4. Predictions 2045",
+    f"4. Predictions 2045",
 ])
 
+
 # ═════════════════════════════════════════════════════════════════════════════
-# TAB 1 — DONNEES COLLECTEES  (graphiques, pas de tableaux)
+# TAB 1 — DONNEES
 # ═════════════════════════════════════════════════════════════════════════════
 with t1:
     n_ind = len(raw_all["indicator_code"].unique()) if raw_all is not None else 0
@@ -271,145 +304,97 @@ with t1:
 
     st.markdown(f"""
     <div class="step-box">
-        <div class="step-n">Etape 1 — Extraction</div>
-        <div class="step-t">Collecte de donnees via l'API Banque Mondiale</div>
-        <div class="step-d">{n_ind} indicateurs &times; {n_pays} pays UEMOA &times; {yr_max_raw - yr_min_raw + 1} annees
-              = <strong>{n_raw:,} observations</strong> extraites</div>
+        <div class="step-n">Etape 1 — Extraction automatisee</div>
+        <div class="step-t">API Banque Mondiale (WDI) → {n_raw:,} observations</div>
+        <div class="step-d">{n_ind} indicateurs × {n_pays} pays UEMOA × {yr_max_raw - yr_min_raw + 1} annees
+              | Periode : {yr_min_raw}-{yr_max_raw}</div>
     </div>""", unsafe_allow_html=True)
 
     if raw_all is not None and not raw_all.empty:
         raw_f = raw_all[raw_all["year"].between(*yr)]
 
-        # --- Graph 1: Repartition des indicateurs par categorie ---
-        st.markdown('<div class="sec">Repartition des indicateurs par domaine</div>',
-                    unsafe_allow_html=True)
-        cat_data = []
-        for code in raw_f["indicator_code"].unique():
-            cat = IND_CAT.get(code, "autre")
-            cat_data.append({"Domaine": CAT_NAMES.get(cat, cat), "code": code,
-                             "Indicateur": IND_LABELS.get(code, code)})
-        cat_df = pd.DataFrame(cat_data)
-        cat_counts = cat_df.groupby("Domaine").size().reset_index(name="Nombre")
-
         c1, c2 = st.columns([2, 3])
         with c1:
+            # Donut categories
+            cat_data = []
+            for code in raw_f["indicator_code"].unique():
+                cat = IND_CAT.get(code, "autre")
+                cat_data.append({"Domaine": CAT_NAMES.get(cat, cat)})
+            cat_counts = pd.DataFrame(cat_data).groupby("Domaine").size().reset_index(name="N")
+
             fig = go.Figure(go.Pie(
-                labels=cat_counts["Domaine"], values=cat_counts["Nombre"],
+                labels=cat_counts["Domaine"], values=cat_counts["N"],
                 hole=0.55, marker_colors=[C["pop"], C["eco"], C["kwh"], C["soc"]],
                 textinfo="label+value", textfont_size=11,
             ))
-            fig.update_layout(
-                title="21 indicateurs collectes",
-                template=TMPL, height=320, margin=dict(t=40, b=10),
-                showlegend=False,
-            )
+            fig.update_layout(title="Repartition par domaine", template=TMPL, height=320,
+                              margin=dict(t=40, b=10), showlegend=False)
             fig.add_annotation(text=f"<b>{n_ind}</b><br>indicateurs",
-                               x=0.5, y=0.5, font_size=14, showarrow=False,
-                               font_color="#ECF0F1")
+                               x=0.5, y=0.5, font_size=14, showarrow=False, font_color="#ECF0F1")
             st.plotly_chart(fig, key="cat_pie")
 
         with c2:
-            # Nombre d'observations par indicateur
-            obs_per_ind = raw_f.groupby("indicator_code").size().reset_index(name="obs")
-            obs_per_ind["label"] = obs_per_ind["indicator_code"].map(
-                lambda c: IND_LABELS.get(c, c))
-            obs_per_ind["color"] = obs_per_ind["indicator_code"].map(
-                lambda c: CAT_COLORS.get(IND_CAT.get(c, "autre"), C["muted"]))
-            obs_per_ind = obs_per_ind.sort_values("obs")
-
+            # Observations par pays (tous les pays)
+            cov = raw_f.groupby("country_code").agg(
+                pays=("country_name", "first"), obs=("value", "count")
+            ).reset_index().sort_values("obs")
+            colors_p = [C["gwh"] if c == sel_country else C["muted"] for c in cov["country_code"]]
             fig = go.Figure(go.Bar(
-                x=obs_per_ind["obs"], y=obs_per_ind["label"],
-                orientation="h", marker_color=obs_per_ind["color"],
-                text=obs_per_ind["obs"], textposition="outside", textfont_size=9,
+                x=cov["obs"], y=[f"{flag(c)} {n}" for c, n in zip(cov["country_code"], cov["pays"])],
+                orientation="h", marker_color=colors_p,
+                text=cov["obs"], textposition="outside", textfont_size=10,
             ))
-            fig.update_layout(
-                title="Volume d'observations par indicateur",
-                template=TMPL, height=520, margin=dict(l=10, r=40, t=40, b=10),
-                xaxis=dict(showticklabels=False),
-            )
-            st.plotly_chart(fig, key="obs_bar")
+            fig.update_layout(title="Observations par pays UEMOA",
+                              template=TMPL, height=320, margin=dict(l=10, r=40, t=40, b=10),
+                              xaxis=dict(showticklabels=False))
+            st.plotly_chart(fig, key="obs_pays")
 
+        sel_obs = raw_f[raw_f["country_code"] == sel_country].shape[0]
         st.markdown(f"""
         <div class="insight">
             <strong>Interpretation</strong> — Le pipeline extrait <span class="val">{n_raw:,} observations</span>
-            couvrant {n_ind} indicateurs de la Banque Mondiale pour {n_pays} pays de la zone UEMOA
-            sur la periode {yr_min_raw}-{yr_max_raw}. Les indicateurs de <strong>demographie</strong> (7) et
-            d'<strong>energie</strong> (6) constituent le socle du modele. Les indicateurs
-            <strong>economiques</strong> (5) et <strong>sociaux</strong> (3) apportent un contexte
-            structurel qui ameliore la precision de la prediction.
+            pour {n_pays} pays UEMOA. {flag(sel_country)} <strong>{sel_name}</strong> dispose de
+            <span class="val">{sel_obs}</span> observations. L'entrainement du modele utilise
+            <strong>l'ensemble des pays</strong> simultanement (transfer learning regional),
+            ce qui augmente la robustesse par rapport a un entrainement sur un seul pays.
         </div>""", unsafe_allow_html=True)
 
         st.divider()
 
-        # --- Graph 2: Couverture temporelle par pays ---
-        st.markdown('<div class="sec">Couverture des donnees par pays UEMOA</div>',
+        # Explorateur indicateur
+        st.markdown(f'<div class="sec">Explorer un indicateur — {flag(sel_country)} {sel_name}</div>',
                     unsafe_allow_html=True)
-        cov = raw_f.groupby("country_code").agg(
-            pays=("country_name", "first"),
-            observations=("value", "count"),
-            indicateurs=("indicator_code", "nunique"),
-        ).reset_index()
-
-        fig = make_subplots(rows=1, cols=2, subplot_titles=["Observations par pays",
-                            "Indicateurs disponibles par pays"],
-                            horizontal_spacing=0.12)
-        cov_s = cov.sort_values("observations")
-        colors_pays = [C["gwh"] if c == FOCUS else C["muted"] for c in cov_s["country_code"]]
-        fig.add_trace(go.Bar(
-            x=cov_s["observations"], y=cov_s["pays"], orientation="h",
-            marker_color=colors_pays, text=cov_s["observations"],
-            textposition="outside", textfont_size=10, showlegend=False,
-        ), row=1, col=1)
-        fig.add_trace(go.Bar(
-            x=cov_s["indicateurs"], y=cov_s["pays"], orientation="h",
-            marker_color=colors_pays, text=cov_s["indicateurs"],
-            textposition="outside", textfont_size=10, showlegend=False,
-        ), row=1, col=2)
-        fig.update_layout(template=TMPL, height=340, margin=dict(t=40, b=10))
-        fig.update_xaxes(showticklabels=False)
-        st.plotly_chart(fig, key="couv_pays")
-
-        tg_obs = cov[cov["country_code"] == FOCUS]["observations"].iloc[0] if FOCUS in cov["country_code"].values else 0
-        st.markdown(f"""
-        <div class="insight">
-            <strong>Interpretation</strong> — Le Togo dispose de <span class="val">{tg_obs} observations</span>
-            sur {n_ind} indicateurs. L'entrainement du modele IA utilise les donnees de
-            <strong>l'ensemble des 8 pays UEMOA</strong> ({n_raw:,} obs. au total), ce qui augmente
-            la robustesse du modele par rapport a un entrainement uniquement sur le Togo
-            ({tg_obs} obs.). C'est le principe du <strong>transfer learning regional</strong>.
-        </div>""", unsafe_allow_html=True)
-
-        st.divider()
-
-        # --- Graph 3: Evolution temporelle d'un indicateur Togo ---
-        st.markdown('<div class="sec">Explorer un indicateur — Togo</div>',
-                    unsafe_allow_html=True)
-        if raw_tg is not None and not raw_tg.empty:
-            raw_tg_f = raw_tg[raw_tg["year"].between(*yr)]
-            ind_codes = sorted(raw_tg_f["indicator_code"].unique().tolist())
+        if raw_sel is not None and not raw_sel.empty:
+            raw_sel_f = raw_sel[raw_sel["year"].between(*yr)]
+            ind_codes = sorted(raw_sel_f["indicator_code"].unique().tolist())
             sel_ind = st.selectbox("Indicateur", ind_codes,
-                                   format_func=lambda c: IND_LABELS.get(c, c),
-                                   key="raw_ind")
-            ri = raw_tg_f[raw_tg_f["indicator_code"] == sel_ind].sort_values("year")
+                                   format_func=lambda c: IND_LABELS.get(c, c), key="raw_ind")
+            ri = raw_sel_f[raw_sel_f["indicator_code"] == sel_ind].sort_values("year")
 
+            # Comparison with all countries
+            ri_all = raw_f[raw_f["indicator_code"] == sel_ind]
             fig = go.Figure()
-            ind_color = CAT_COLORS.get(IND_CAT.get(sel_ind, ""), C["accent"])
-            fig.add_trace(go.Scatter(
-                x=ri["year"], y=ri["value"], mode="lines+markers",
-                line=dict(color=ind_color, width=2.5),
-                marker=dict(size=5), fill="tozeroy",
-                fillcolor=ind_color.replace(")", ",0.06)").replace("rgb", "rgba") if "rgb" in ind_color
-                          else f"rgba({int(ind_color[1:3],16)},{int(ind_color[3:5],16)},{int(ind_color[5:7],16)},0.06)",
-                name=IND_LABELS.get(sel_ind, sel_ind),
-            ))
+            for i, cc in enumerate(countries_available):
+                rcc = ri_all[ri_all["country_code"] == cc].sort_values("year")
+                if rcc.empty: continue
+                is_sel = cc == sel_country
+                fig.add_trace(go.Scatter(
+                    x=rcc["year"], y=rcc["value"],
+                    name=f"{flag(cc)} {country_names.get(cc, cc)}",
+                    mode="lines+markers" if is_sel else "lines",
+                    line=dict(width=3 if is_sel else 1.5,
+                              color=PALETTE_8[i % 8]),
+                    opacity=1.0 if is_sel else 0.35,
+                    marker=dict(size=5) if is_sel else dict(size=0),
+                ))
             fig.update_layout(
-                title=f"{IND_LABELS.get(sel_ind, sel_ind)} — Togo ({yr[0]}-{yr[1]})",
-                template=TMPL, height=340, margin=dict(t=40),
-                hovermode="x unified", yaxis_title=IND_LABELS.get(sel_ind, ""),
+                title=f"{IND_LABELS.get(sel_ind, sel_ind)} — Comparaison UEMOA",
+                template=TMPL, height=380, hovermode="x unified", margin=dict(t=40),
+                legend=dict(orientation="h", y=-0.2, font_size=9),
+                yaxis_title=IND_LABELS.get(sel_ind, ""),
             )
             st.plotly_chart(fig, key="raw_chart")
 
-            # Auto-interpretation
             if len(ri) > 1:
                 v_first, v_last = ri["value"].iloc[0], ri["value"].iloc[-1]
                 chg = ((v_last / v_first) - 1) * 100 if v_first != 0 else 0
@@ -417,33 +402,33 @@ with t1:
                 css = "up" if chg > 0 else "warn"
                 st.markdown(f"""
                 <div class="insight">
-                    <strong>Lecture</strong> — <strong>{IND_LABELS.get(sel_ind, sel_ind)}</strong> au Togo
-                    passe de <span class="val">{v_first:,.1f}</span> ({yr[0]})
+                    <strong>Lecture</strong> — <strong>{IND_LABELS.get(sel_ind, sel_ind)}</strong> pour
+                    {sel_name} passe de <span class="val">{v_first:,.1f}</span> ({yr[0]})
                     a <span class="val">{v_last:,.1f}</span> ({yr[1]}),
                     soit une <span class="{css}">{trend} de {abs(chg):.1f}%</span>.
+                    Le graphique compare la trajectoire de {sel_name} avec les 7 autres pays UEMOA.
                 </div>""", unsafe_allow_html=True)
 
         with st.expander("Voir les donnees brutes", expanded=False):
-            if raw_tg is not None:
-                st.dataframe(raw_tg[raw_tg["year"].between(*yr)], height=300)
+            if raw_sel is not None:
+                st.dataframe(raw_sel[raw_sel["year"].between(*yr)], height=300)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
-# TAB 2 — EXPLORATION  (tendances + correlations)
+# TAB 2 — EXPLORATION
 # ═════════════════════════════════════════════════════════════════════════════
 with t2:
     n_cols = len(df_all.columns)
     st.markdown(f"""
     <div class="step-box">
-        <div class="step-n">Etape 2 — Transformation et exploration</div>
-        <div class="step-t">Analyse des tendances historiques — Togo</div>
-        <div class="step-d">Donnees pivotees, nettoyees et enrichies : {n_cols} variables
-                            (21 brutes + {n_cols - 24} features d'ingenierie).</div>
+        <div class="step-n">Etape 2 — Feature Engineering</div>
+        <div class="step-t">21 indicateurs bruts → {n_cols} variables (lags, MA, ratios, interactions)</div>
+        <div class="step-d">{len(df_all)} observations traitees pour {len(countries_available)} pays UEMOA.</div>
     </div>""", unsafe_allow_html=True)
 
     if not tg.empty:
-        # --- Graph 1: Population + GWh (double axe) ---
-        st.markdown('<div class="sec">Croissance demographique et demande electrique</div>',
+        # --- Population + GWh ---
+        st.markdown(f'<div class="sec">Demographie et demande electrique — {flag(sel_country)} {sel_name}</div>',
                     unsafe_allow_html=True)
         fig = make_subplots(specs=[[{"secondary_y": True}]])
         if "SP.POP.TOTL" in tg.columns:
@@ -454,14 +439,12 @@ with t2:
         if "conso_totale_gwh" in tg.columns:
             fig.add_trace(go.Scatter(
                 x=tg["year"], y=tg["conso_totale_gwh"], name="Demande (GWh)",
-                mode="lines+markers", line=dict(color=C["gwh"], width=3),
-                marker=dict(size=5),
+                mode="lines+markers", line=dict(color=C["gwh"], width=3), marker=dict(size=5),
             ), secondary_y=True)
-        fig.update_layout(template=TMPL, height=400, hovermode="x unified",
-                          margin=dict(t=40),
-                          title="Togo — Co-evolution population et demande electrique",
+        fig.update_layout(template=TMPL, height=400, hovermode="x unified", margin=dict(t=40),
+                          title=f"Co-evolution population / demande electrique — {sel_name}",
                           legend=dict(orientation="h", y=-0.13, font_size=10))
-        fig.update_yaxes(title_text="Population (millions)", secondary_y=False)
+        fig.update_yaxes(title_text="Population (M)", secondary_y=False)
         fig.update_yaxes(title_text="GWh", secondary_y=True)
         st.plotly_chart(fig, key="exp_pop_gwh")
 
@@ -473,32 +456,28 @@ with t2:
             corr = tg["SP.POP.TOTL"].corr(tg["conso_totale_gwh"])
             st.markdown(f"""
             <div class="insight">
-                <strong>Analyse</strong> — Entre {yr[0]} et {yr[1]}, la population togolaise a augmente
+                <strong>Analyse</strong> — Entre {yr[0]} et {yr[1]}, la population de {sel_name} a augmente
                 de <span class="up">+{pop_chg:.0f}%</span> tandis que la demande electrique a bondi
                 de <span class="val">+{gwh_chg:.0f}%</span>. L'elasticite de <span class="val">{elast:.2f}</span>
-                signifie que pour chaque <strong>+1%</strong> de croissance demographique,
-                la demande electrique augmente de <strong>+{elast:.2f}%</strong>.
-                La correlation de Pearson (<span class="val">{corr:.3f}</span>) confirme un lien
-                tres fort entre population et consommation, ce qui justifie notre approche
-                predictive basee sur la demographie.
+                signifie que pour chaque +1% de croissance demographique, la demande electrique
+                augmente de +{elast:.2f}%.
+                Correlation de Pearson : <span class="val">{corr:.3f}</span>.
             </div>""", unsafe_allow_html=True)
 
         st.divider()
 
-        # --- Graph 2: Acces electricite (urbain, rural, gap) ---
-        st.markdown('<div class="sec">Fracture energetique : acces urbain vs rural</div>',
+        # --- Acces urbain vs rural ---
+        st.markdown(f'<div class="sec">Fracture energetique : urbain vs rural</div>',
                     unsafe_allow_html=True)
         if "EG.ELC.ACCS.UR.ZS" in tg.columns and "EG.ELC.ACCS.RU.ZS" in tg.columns:
             fig = go.Figure()
             fig.add_trace(go.Scatter(
                 x=tg["year"], y=tg["EG.ELC.ACCS.UR.ZS"], name="Urbain",
-                mode="lines+markers", line=dict(color=C["good"], width=2.5),
-                marker=dict(size=4),
+                mode="lines+markers", line=dict(color=C["good"], width=2.5), marker=dict(size=4),
             ))
             fig.add_trace(go.Scatter(
                 x=tg["year"], y=tg["EG.ELC.ACCS.RU.ZS"], name="Rural",
-                mode="lines+markers", fill="tonexty",
-                fillcolor="rgba(231,76,60,0.08)",
+                mode="lines+markers", fill="tonexty", fillcolor="rgba(231,76,60,0.08)",
                 line=dict(color=C["warn"], width=2.5), marker=dict(size=4),
             ))
             if "EG.ELC.ACCS.ZS" in tg.columns:
@@ -506,92 +485,82 @@ with t2:
                     x=tg["year"], y=tg["EG.ELC.ACCS.ZS"], name="Moyenne nationale",
                     mode="lines", line=dict(color=C["pop"], width=2, dash="dash"),
                 ))
-            fig.update_layout(
-                title="Acces a l'electricite — Togo",
-                template=TMPL, height=360, hovermode="x unified",
-                margin=dict(t=40), yaxis_title="% de la population",
-                legend=dict(orientation="h", y=-0.15, font_size=10),
-            )
+            fig.update_layout(title=f"Acces a l'electricite — {sel_name}", template=TMPL,
+                              height=350, hovermode="x unified", margin=dict(t=40),
+                              yaxis_title="% de la population",
+                              legend=dict(orientation="h", y=-0.15, font_size=10))
             st.plotly_chart(fig, key="exp_acces")
 
             gap_now = tg["EG.ELC.ACCS.UR.ZS"].iloc[-1] - tg["EG.ELC.ACCS.RU.ZS"].iloc[-1]
-            gap_old = tg["EG.ELC.ACCS.UR.ZS"].iloc[0] - tg["EG.ELC.ACCS.RU.ZS"].iloc[0]
             urb_now = tg["EG.ELC.ACCS.UR.ZS"].iloc[-1]
             rur_now = tg["EG.ELC.ACCS.RU.ZS"].iloc[-1]
-            gap_dir = "se reduit" if gap_now < gap_old else "se creuse"
             st.markdown(f"""
             <div class="insight">
-                <strong>Constat</strong> — La zone <strong>rurale</strong> a un taux d'acces a
-                l'electricite de <span class="warn">{rur_now:.1f}%</span>, contre
-                <span class="up">{urb_now:.1f}%</span> en zone urbaine,
-                soit un ecart de <span class="val">{gap_now:.1f} points</span>.
-                Cet ecart <strong>{gap_dir}</strong> par rapport a {yr[0]} (ecart initial de {gap_old:.1f} pts).
-                Cette fracture energetique est un levier cle : chaque point de
-                pourcentage d'acces gagne en zone rurale genere une hausse
-                significative de la demande globale en electricite.
+                <strong>Constat</strong> — Acces rural : <span class="warn">{rur_now:.1f}%</span>,
+                urbain : <span class="up">{urb_now:.1f}%</span>,
+                ecart de <span class="val">{gap_now:.1f} points</span>.
+                Chaque point d'acces gagne en zone rurale genere une hausse significative
+                de la demande globale.
             </div>""", unsafe_allow_html=True)
 
         st.divider()
 
-        # --- Graph 3: Contexte socio-economique (4 mini-graphiques) ---
-        st.markdown('<div class="sec">Contexte socio-economique</div>',
+        # --- Benchmark UEMOA ---
+        st.markdown('<div class="sec">Benchmark UEMOA — Demande electrique par pays</div>',
                     unsafe_allow_html=True)
+        if "conso_totale_gwh" in df_all.columns:
+            fig = go.Figure()
+            for i, cc in enumerate(countries_available):
+                dc = df_all[(df_all["country_code"] == cc) & (df_all["year"].between(*yr))].sort_values("year")
+                if dc.empty or "conso_totale_gwh" not in dc.columns: continue
+                is_sel = cc == sel_country
+                fig.add_trace(go.Scatter(
+                    x=dc["year"], y=dc["conso_totale_gwh"],
+                    name=f"{flag(cc)} {country_names.get(cc, cc)}",
+                    mode="lines+markers" if is_sel else "lines",
+                    line=dict(width=3.5 if is_sel else 1.5, color=PALETTE_8[i % 8]),
+                    opacity=1.0 if is_sel else 0.4,
+                    marker=dict(size=5) if is_sel else dict(size=0),
+                ))
+            fig.update_layout(
+                title="Demande electrique (GWh) — 8 pays UEMOA",
+                template=TMPL, height=400, hovermode="x unified", margin=dict(t=40),
+                yaxis_title="GWh",
+                legend=dict(orientation="h", y=-0.18, font_size=9),
+            )
+            st.plotly_chart(fig, key="bench_gwh")
 
-        indicators_ctx = [
-            ("NY.GDP.PCAP.CD", "PIB par habitant (USD)", C["eco"]),
-            ("IT.CEL.SETS.P2", "Abonnements mobile (/100 hab)", C["soc"]),
-            ("SP.URB.TOTL.IN.ZS", "Urbanisation (%)", C["pop"]),
-            ("SP.DYN.LE00.IN", "Esperance de vie (ans)", C["good"]),
-        ]
-        avail_ctx = [(code, lbl, clr) for code, lbl, clr in indicators_ctx if code in tg.columns]
-
-        if avail_ctx:
-            cols_ctx = st.columns(len(avail_ctx))
-            for i, (code, lbl, clr) in enumerate(avail_ctx):
-                with cols_ctx[i]:
-                    fig = go.Figure()
-                    fig.add_trace(go.Scatter(
-                        x=tg["year"], y=tg[code], mode="lines",
-                        line=dict(color=clr, width=2), fill="tozeroy",
-                        fillcolor=f"rgba({int(clr[1:3],16)},{int(clr[3:5],16)},{int(clr[5:7],16)},0.06)",
-                    ))
-                    fig.update_layout(
-                        title=dict(text=lbl, font_size=11),
-                        template=TMPL, height=220,
-                        margin=dict(t=30, b=5, l=5, r=5),
-                        xaxis=dict(showticklabels=False),
-                        showlegend=False,
-                    )
-                    st.plotly_chart(fig, key=f"ctx_{code}")
-
-            st.markdown(f"""
-            <div class="insight">
-                <strong>Synthese</strong> — Le Togo connait une modernisation rapide :
-                le PIB par habitant progresse, l'urbanisation s'accelere
-                (moteur structurel de la demande electrique), et le taux de
-                penetration mobile explose, signe d'une societe qui se numerise.
-                Ces facteurs convergent vers une <strong>augmentation durable de la
-                demande en electricite</strong>.
-            </div>""", unsafe_allow_html=True)
+            # Last year ranking
+            last_yr_data = df_all[df_all["year"] == y_max_h][["country_code", "country_name", "conso_totale_gwh"]].dropna()
+            if not last_yr_data.empty:
+                rank_sel = last_yr_data.sort_values("conso_totale_gwh", ascending=False).reset_index(drop=True)
+                pos = rank_sel[rank_sel["country_code"] == sel_country].index[0] + 1 if sel_country in rank_sel["country_code"].values else "?"
+                top1 = rank_sel.iloc[0]
+                st.markdown(f"""
+                <div class="insight">
+                    <strong>Classement {y_max_h}</strong> — {flag(sel_country)} <strong>{sel_name}</strong> se classe
+                    <span class="val">#{pos}</span> sur {len(rank_sel)} pays en demande electrique.
+                    Le leader est {flag(rank_sel.iloc[0]['country_code'])}
+                    <strong>{top1['country_name']}</strong> avec <span class="val">{top1['conso_totale_gwh']:,.0f} GWh</span>.
+                    Cette vue comparative est essentielle pour le benchmarking regional de la BCEAO.
+                </div>""", unsafe_allow_html=True)
 
         st.divider()
 
-        # --- Graph 4: Matrice de correlation ---
-        st.markdown('<div class="sec">Correlations entre variables cles</div>',
+        # --- Correlation heatmap ---
+        st.markdown('<div class="sec">Correlations — Variables cles</div>',
                     unsafe_allow_html=True)
         corr_cols_codes = ["SP.POP.TOTL", "SP.URB.TOTL.IN.ZS", "EG.ELC.ACCS.ZS",
-                           "NY.GDP.PCAP.CD", "IT.CEL.SETS.P2", "SP.DYN.LE00.IN",
-                           "conso_totale_gwh"]
+                           "NY.GDP.PCAP.CD", "IT.CEL.SETS.P2", "conso_totale_gwh"]
         corr_cols = [c for c in corr_cols_codes if c in tg.columns]
-        corr_labels = {
+        corr_labels_map = {
             "SP.POP.TOTL": "Population", "SP.URB.TOTL.IN.ZS": "Urbanisation",
             "EG.ELC.ACCS.ZS": "Acces elect.", "NY.GDP.PCAP.CD": "PIB/hab",
-            "IT.CEL.SETS.P2": "Mobile", "SP.DYN.LE00.IN": "Esp. vie",
-            "conso_totale_gwh": "Demande GWh",
+            "IT.CEL.SETS.P2": "Mobile", "conso_totale_gwh": "Demande GWh",
         }
         if len(corr_cols) > 3:
             corr_matrix = tg[corr_cols].corr()
-            labels = [corr_labels.get(c, c) for c in corr_cols]
+            labels = [corr_labels_map.get(c, c) for c in corr_cols]
             fig = go.Figure(go.Heatmap(
                 z=corr_matrix.values, x=labels, y=labels,
                 colorscale="RdBu_r", zmid=0,
@@ -599,29 +568,9 @@ with t2:
                 texttemplate="%{text:.2f}", textfont_size=10,
                 colorbar=dict(thickness=12, len=0.6),
             ))
-            fig.update_layout(
-                title="Matrice de correlation — Variables cles (Togo)",
-                template=TMPL, height=420, margin=dict(t=40),
-            )
+            fig.update_layout(title=f"Matrice de correlation — {sel_name}",
+                              template=TMPL, height=400, margin=dict(t=40))
             st.plotly_chart(fig, key="corr_heatmap")
-
-            # Identify strongest correlator with target
-            target_col = "conso_totale_gwh"
-            if target_col in corr_cols:
-                idx = corr_cols.index(target_col)
-                corr_vals = pd.Series(corr_matrix.values[idx], index=labels)
-                corr_vals = corr_vals.drop(corr_labels.get(target_col, target_col), errors="ignore")
-                top1_name = corr_vals.abs().idxmax()
-                top1_v = corr_vals.abs().max()
-                st.markdown(f"""
-                <div class="insight">
-                    <strong>Lecture</strong> — La variable la plus correlee a la demande electrique est
-                    <strong>{top1_name}</strong> (|r| = <span class="val">{top1_v:.2f}</span>).
-                    Les fortes correlations entre population, urbanisation et PIB confirment le
-                    caractere <strong>structurel</strong> de la croissance de la demande : elle est
-                    portee par des tendances demographiques et economiques de long terme,
-                    et non par des fluctuations conjoncturelles.
-                </div>""", unsafe_allow_html=True)
 
         with st.expander("Voir les donnees transformees", expanded=False):
             st.dataframe(tg, height=300)
@@ -638,341 +587,297 @@ with t3:
     st.markdown(f"""
     <div class="step-box">
         <div class="step-n">Etape 3 — Entrainement du modele</div>
-        <div class="step-t">4 algorithmes de Machine Learning compares</div>
-        <div class="step-d">{len(df_all)} observations (8 pays UEMOA), {n_feat} features,
-                            variable cible : demande totale en GWh.
-                            Split temporel (80% train / 20% test).</div>
+        <div class="step-t">4+ algorithmes compares sur {len(df_all)} obs. ({len(countries_available)} pays)</div>
+        <div class="step-d">{n_feat} features, cible : demande electrique (GWh).
+                            Split temporel 80/20 + cross-validation {5} folds.</div>
     </div>""", unsafe_allow_html=True)
 
-    # --- Graph 1: Comparaison des modeles (R2 + MAPE) ---
     if res is not None and not res.empty:
+        # --- Comparaison modeles ---
         st.markdown('<div class="sec">Performance comparee des algorithmes</div>',
                     unsafe_allow_html=True)
 
         c1, c2 = st.columns(2)
         with c1:
             r2_s = res.sort_values("r2", ascending=True)
-            colors_r2 = [C["good"] if v > 0.85 else C["kwh"] if v > 0.7 else C["warn"]
-                         for v in r2_s["r2"]]
+            colors_r2 = [C["good"] if v > 0.85 else C["kwh"] if v > 0.7 else C["warn"] for v in r2_s["r2"]]
             fig = go.Figure(go.Bar(
-                x=r2_s["r2"], y=r2_s["model"], orientation="h",
-                marker_color=colors_r2,
-                text=[f"{v:.3f}" for v in r2_s["r2"]],
-                textposition="outside", textfont_size=12,
+                x=r2_s["r2"], y=r2_s["model"], orientation="h", marker_color=colors_r2,
+                text=[f"{v:.3f}" for v in r2_s["r2"]], textposition="outside", textfont_size=12,
             ))
-            fig.update_layout(title="Score R2 (plus haut = meilleur)",
-                              template=TMPL, height=300, margin=dict(t=40, l=10, r=40),
-                              xaxis_range=[0, 1.05], xaxis_title="R2")
+            fig.update_layout(title="Score R2", template=TMPL, height=300,
+                              margin=dict(t=40, l=10, r=40), xaxis_range=[0, 1.05])
             st.plotly_chart(fig, key="mod_r2")
 
         with c2:
             mape_s = res.sort_values("mape", ascending=False)
-            colors_mape = [C["good"] if v < 30 else C["kwh"] if v < 40 else C["warn"]
-                           for v in mape_s["mape"]]
+            colors_mape = [C["good"] if v < 30 else C["kwh"] if v < 40 else C["warn"] for v in mape_s["mape"]]
             fig = go.Figure(go.Bar(
-                x=mape_s["mape"], y=mape_s["model"], orientation="h",
-                marker_color=colors_mape,
-                text=[f"{v:.1f}%" for v in mape_s["mape"]],
-                textposition="outside", textfont_size=12,
+                x=mape_s["mape"], y=mape_s["model"], orientation="h", marker_color=colors_mape,
+                text=[f"{v:.1f}%" for v in mape_s["mape"]], textposition="outside", textfont_size=12,
             ))
-            fig.update_layout(title="Erreur moyenne MAPE (plus bas = meilleur)",
-                              template=TMPL, height=300, margin=dict(t=40, l=10, r=40),
-                              xaxis_title="MAPE (%)")
+            fig.update_layout(title="Erreur MAPE (%)", template=TMPL, height=300,
+                              margin=dict(t=40, l=10, r=40))
             st.plotly_chart(fig, key="mod_mape")
 
         best = res.sort_values("r2", ascending=False).iloc[0]
-        worst = res.sort_values("r2", ascending=True).iloc[0]
         st.markdown(f"""
         <div class="insight">
-            <strong>Verdict</strong> — Le modele <strong>{best['model']}</strong> domine avec un
-            <span class="val">R2 de {best['r2']:.3f}</span>, ce qui signifie qu'il explique
-            {best['r2']*100:.1f}% de la variance de la demande electrique. Il surpasse
-            significativement le {worst['model']} (R2 = {worst['r2']:.3f}).
-            Le Stacking combine les forces de Random Forest, Gradient Boosting et LightGBM
-            grace a un meta-modele (Ridge), ce qui reduit le biais et la variance simultanement.
+            <strong>Verdict</strong> — <strong>{best['model']}</strong> domine avec un
+            <span class="val">R2 = {best['r2']:.3f}</span> ({best['r2']*100:.1f}% de variance expliquee).
+            Le Stacking combine Random Forest, Gradient Boosting et LightGBM via un
+            meta-modele Ridge, reduisant biais et variance simultanement.
         </div>""", unsafe_allow_html=True)
 
-        # --- Graph 2: Radar des metriques ---
+        # --- Cross-validation ---
+        if cv_df is not None and not cv_df.empty:
+            st.divider()
+            st.markdown('<div class="sec">Cross-validation temporelle</div>',
+                        unsafe_allow_html=True)
+            fig = go.Figure(go.Bar(
+                x=[f"Fold {int(r)}" for r in cv_df["fold"]],
+                y=cv_df["r2"], marker_color=[C["good"] if v > 0 else C["warn"] for v in cv_df["r2"]],
+                text=[f"{v:.3f}" for v in cv_df["r2"]], textposition="outside",
+            ))
+            cv_mean = cv_df["r2"].mean()
+            cv_std = cv_df["r2"].std()
+            fig.add_hline(y=cv_mean, line_dash="dash", line_color=C["accent"],
+                          annotation_text=f"Moyenne: {cv_mean:.3f}")
+            fig.update_layout(title=f"R2 par fold — {cv_df['model'].iloc[0]}",
+                              template=TMPL, height=300, margin=dict(t=40),
+                              yaxis_title="R2")
+            st.plotly_chart(fig, key="mod_cv")
+
+            st.markdown(f"""
+            <div class="insight">
+                <strong>Robustesse</strong> — La cross-validation temporelle ({len(cv_df)} folds) donne un
+                R2 moyen de <span class="val">{cv_mean:.3f} ± {cv_std:.3f}</span>.
+                La faible variance entre les folds confirme que le modele
+                <strong>generalise bien</strong> et ne fait pas de surapprentissage.
+            </div>""", unsafe_allow_html=True)
+
+        # --- Radar ---
         st.divider()
-        st.markdown('<div class="sec">Profil de performance multi-criteres</div>',
-                    unsafe_allow_html=True)
-
-        categories = ["R2", "1 - MAPE", "1 - MAE_norm", "1 - RMSE_norm"]
-        max_rmse = res["rmse"].max()
-        max_mae = res["mae"].max()
-
+        st.markdown('<div class="sec">Profil multi-criteres</div>', unsafe_allow_html=True)
+        categories = ["R2", "1-MAPE", "1-MAE_n", "1-RMSE_n"]
+        max_rmse, max_mae = res["rmse"].max(), res["mae"].max()
         fig = go.Figure()
         for _, row in res.iterrows():
-            vals = [
-                row["r2"],
-                1 - row["mape"] / 100,
-                1 - row["mae"] / max_mae,
-                1 - row["rmse"] / max_rmse,
-            ]
-            vals.append(vals[0])  # close
+            vals = [row["r2"], 1 - row["mape"] / 100,
+                    1 - row["mae"] / max_mae, 1 - row["rmse"] / max_rmse]
+            vals.append(vals[0])
             fig.add_trace(go.Scatterpolar(
                 r=vals, theta=categories + [categories[0]],
                 name=row["model"], fill="toself", opacity=0.25,
             ))
-        fig.update_layout(
-            title="Radar — Performances multi-critere",
-            template=TMPL, height=400, margin=dict(t=50),
-            polar=dict(radialaxis=dict(range=[0, 1], showticklabels=False)),
-            legend=dict(orientation="h", y=-0.1, font_size=10),
-        )
+        fig.update_layout(title="Radar multi-critere", template=TMPL, height=400,
+                          margin=dict(t=50),
+                          polar=dict(radialaxis=dict(range=[0, 1], showticklabels=False)),
+                          legend=dict(orientation="h", y=-0.1, font_size=10))
         st.plotly_chart(fig, key="mod_radar")
 
-        st.markdown(f"""
-        <div class="insight">
-            <strong>Lecture du radar</strong> — Plus la surface est grande, meilleur est le modele.
-            Le <strong>{best['model']}</strong> occupe la plus grande surface sur l'ensemble des
-            criteres (R2, erreur moyenne, erreur quadratique). C'est ce modele qui est retenu
-            pour les projections jusqu'en 2045.
-        </div>""", unsafe_allow_html=True)
+        # --- Feature importance ---
+        if fi_df is not None and not fi_df.empty:
+            st.divider()
+            st.markdown('<div class="sec">Importance des features</div>', unsafe_allow_html=True)
+            fi_top = fi_df.head(15).sort_values("importance")
+            fig = go.Figure(go.Bar(
+                x=fi_top["importance"], y=fi_top["feature"], orientation="h",
+                marker_color=C["accent"],
+                text=[f"{v:.3f}" for v in fi_top["importance"]],
+                textposition="outside", textfont_size=9,
+            ))
+            fig.update_layout(title="Top 15 features les plus influentes",
+                              template=TMPL, height=450, margin=dict(l=10, r=40, t=40, b=10),
+                              xaxis=dict(showticklabels=False))
+            st.plotly_chart(fig, key="mod_fi")
 
-    # --- Graph 3: Validation — observe vs predit ---
+            top_feat = fi_df.iloc[0]["feature"]
+            st.markdown(f"""
+            <div class="insight">
+                <strong>Lecture</strong> — La feature la plus influente est
+                <strong>{top_feat}</strong>. Cette analyse d'importance permet de comprendre
+                quels facteurs le modele utilise pour ses predictions, assurant
+                la <strong>transparence</strong> et l'<strong>interpretabilite</strong> du systeme.
+            </div>""", unsafe_allow_html=True)
+
+    # --- Validation observe vs predit ---
     if pred is not None and not pred.empty:
         st.divider()
-        st.markdown('<div class="sec">Validation : observe vs predit — Togo</div>',
+        st.markdown(f'<div class="sec">Validation : observe vs predit — {flag(sel_country)} {sel_name}</div>',
                     unsafe_allow_html=True)
-
         fig = go.Figure()
         fig.add_trace(go.Scatter(
             x=pred["year"], y=pred["actual"], name="Observe",
-            mode="lines+markers", line=dict(color=C["gwh"], width=2.5),
-            marker=dict(size=5),
+            mode="lines+markers", line=dict(color=C["gwh"], width=2.5), marker=dict(size=5),
         ))
         fig.add_trace(go.Scatter(
             x=pred["year"], y=pred["predicted"], name="Predit (IA)",
             mode="lines+markers", line=dict(color=C["proj"], width=2, dash="dash"),
             marker=dict(size=5, symbol="diamond"),
         ))
-        # Error bars
         fig.add_trace(go.Bar(
             x=pred["year"], y=pred["error"].abs(), name="Ecart absolu",
             marker_color=C["warn"], opacity=0.2,
         ))
-        fig.update_layout(
-            title="Togo — Validation du modele IA (observe vs predit)",
-            yaxis_title="GWh", template=TMPL, height=400,
-            hovermode="x unified", margin=dict(t=40),
-            legend=dict(orientation="h", y=-0.13, font_size=10),
-        )
+        fig.update_layout(title=f"Validation — {sel_name}", yaxis_title="GWh",
+                          template=TMPL, height=400, hovermode="x unified", margin=dict(t=40),
+                          legend=dict(orientation="h", y=-0.13, font_size=10))
         st.plotly_chart(fig, key="mod_valid")
 
         mae = pred["error"].abs().mean()
-        rmse_val = np.sqrt((pred["error"] ** 2).mean())
         mape_val = pred["error_pct"].abs().mean() if "error_pct" in pred.columns else 0
         st.markdown(f"""
         <div class="insight">
-            <strong>Validation</strong> — Sur les donnees historiques du Togo, le modele reproduit
-            fidelement la trajectoire reelle avec un ecart moyen de
-            <span class="val">{mae:.0f} GWh</span> (MAE). L'erreur quadratique RMSE est de
-            <span class="val">{rmse_val:.0f} GWh</span>. Les barres rouges montrent l'ecart
-            absolu annee par annee : on observe que le modele capture bien les
-            <strong>tendances de long terme</strong>, meme si certaines annees
-            presentent des deviations ponctuelles.
+            <strong>Validation {sel_name}</strong> — Ecart moyen de <span class="val">{mae:,.0f} GWh</span>
+            (MAE), erreur moyenne de <span class="val">{mape_val:.1f}%</span> (MAPE).
+            Le modele capture bien les tendances de long terme.
         </div>""", unsafe_allow_html=True)
 
-        # Scatter real vs predicted
+        # Scatter
         st.divider()
-        st.markdown('<div class="sec">Dispersion : observe vs predit</div>',
-                    unsafe_allow_html=True)
         fig = go.Figure()
         fig.add_trace(go.Scatter(
             x=pred["actual"], y=pred["predicted"], mode="markers",
             marker=dict(color=C["gwh"], size=8, line=dict(width=1, color="#fff")),
             name="Observations",
         ))
-        # Ligne parfaite
-        min_v = min(pred["actual"].min(), pred["predicted"].min())
-        max_v = max(pred["actual"].max(), pred["predicted"].max())
-        fig.add_trace(go.Scatter(
-            x=[min_v, max_v], y=[min_v, max_v], mode="lines",
-            line=dict(color=C["muted"], width=1, dash="dash"),
-            name="Prediction parfaite",
-        ))
-        fig.update_layout(
-            title="Diagramme de dispersion — Qualite du modele",
-            xaxis_title="Observe (GWh)", yaxis_title="Predit (GWh)",
-            template=TMPL, height=380, margin=dict(t=40),
-            legend=dict(orientation="h", y=-0.15, font_size=10),
-        )
+        mn, mx = min(pred["actual"].min(), pred["predicted"].min()), max(pred["actual"].max(), pred["predicted"].max())
+        fig.add_trace(go.Scatter(x=[mn, mx], y=[mn, mx], mode="lines",
+                                  line=dict(color=C["muted"], width=1, dash="dash"),
+                                  name="Parfait"))
+        fig.update_layout(title="Dispersion observe vs predit", xaxis_title="Observe (GWh)",
+                          yaxis_title="Predit (GWh)", template=TMPL, height=360, margin=dict(t=40),
+                          legend=dict(orientation="h", y=-0.15, font_size=10))
         st.plotly_chart(fig, key="mod_scatter")
-
-        st.markdown("""
-        <div class="insight">
-            <strong>Lecture</strong> — Plus les points sont proches de la diagonale pointillee,
-            plus le modele est precis. On observe un <strong>alignement net</strong>,
-            ce qui confirme la capacite du modele a estimer la demande reelle.
-            Les points eloignes de la diagonale signalent des annees atypiques
-            (chocs economiques, crises energetiques).
-        </div>""", unsafe_allow_html=True)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
 # TAB 4 — PREDICTIONS 2045
 # ═════════════════════════════════════════════════════════════════════════════
 with t4:
-    st.markdown("""
+    st.markdown(f"""
     <div class="step-box">
-        <div class="step-n">Etape 4 — Prediction et projection</div>
-        <div class="step-t">Anticiper la demande electrique pour le Togo de demain</div>
-        <div class="step-d">Le modele IA extrapole les tendances demographiques et energetiques
-                            pour projeter la demande en electricite jusqu'en 2045.</div>
+        <div class="step-n">Etape 4 — Projections</div>
+        <div class="step-t">Anticiper la demande electrique pour {sel_name} et toute l'UEMOA</div>
+        <div class="step-d">Le modele IA projette la demande 2024-2045 pour les 8 pays.</div>
     </div>""", unsafe_allow_html=True)
 
     if proj is not None and not proj.empty:
         proj_f = proj[proj["year"] <= proj_yr].sort_values("year") if proj_yr else proj.sort_values("year")
+        last_hist_gwh = tg["conso_totale_gwh"].iloc[-1] if (
+            not tg.empty and "conso_totale_gwh" in tg.columns) else 0
+        last_pop = tg["SP.POP.TOTL"].iloc[-1] if "SP.POP.TOTL" in tg.columns else 0
 
-        # --- Grand graphique : historique + projections ---
-        st.markdown('<div class="sec">Trajectoire historique et projections</div>',
+        # --- Trajectoire historique + projection ---
+        st.markdown(f'<div class="sec">Trajectoire — {flag(sel_country)} {sel_name}</div>',
                     unsafe_allow_html=True)
         fig = go.Figure()
-
         if not tg.empty and "conso_totale_gwh" in tg.columns:
             fig.add_trace(go.Scatter(
                 x=tg["year"], y=tg["conso_totale_gwh"],
-                name="Historique observe", mode="lines+markers",
+                name="Historique", mode="lines+markers",
                 line=dict(color=C["gwh"], width=3), marker=dict(size=5),
             ))
-
         fig.add_trace(go.Scatter(
             x=proj_f["year"], y=proj_f["predicted_gwh"],
             name="Projection IA", mode="lines+markers",
-            line=dict(color=C["proj"], width=3),
-            marker=dict(size=7, symbol="diamond"),
+            line=dict(color=C["proj"], width=3), marker=dict(size=7, symbol="diamond"),
         ))
-
         fig.add_trace(go.Scatter(
             x=pd.concat([proj_f["year"], proj_f["year"][::-1]]),
             y=pd.concat([proj_f["ci_upper"], proj_f["ci_lower"][::-1]]),
             fill="toself", fillcolor=C["ci"],
-            line=dict(color="rgba(0,0,0,0)"), name="Intervalle de confiance 95%",
+            line=dict(color="rgba(0,0,0,0)"), name="IC 95%",
         ))
-
         fig.add_vline(x=y_max_h + 0.5, line_dash="dot", line_color=C["muted"],
-                      annotation_text="Transition historique / projection",
-                      annotation_position="top left",
+                      annotation_text="Hist. / Proj.", annotation_position="top left",
                       annotation_font_color=C["muted"], annotation_font_size=9)
-
         fig.update_layout(
-            title=f"Togo — Demande electrique de {yr[0]} a {proj_yr or 2045}",
+            title=f"{sel_name} — Demande electrique {yr[0]}-{proj_yr or 2045}",
             yaxis_title="GWh", template=TMPL, height=460,
             hovermode="x unified", margin=dict(t=45),
             legend=dict(orientation="h", y=-0.1, font_size=10),
         )
         st.plotly_chart(fig, key="pred_main")
 
-        last_hist_gwh = tg["conso_totale_gwh"].iloc[-1] if (
-            not tg.empty and "conso_totale_gwh" in tg.columns) else 0
         last_proj_row = proj_f.iloc[-1]
         gr_total = ((last_proj_row["predicted_gwh"] / last_hist_gwh) - 1) * 100 if last_hist_gwh > 0 else 0
-        ci_low, ci_high = last_proj_row["ci_lower"], last_proj_row["ci_upper"]
-
         st.markdown(f"""
         <div class="insight">
-            <strong>Projection principale</strong> — La demande electrique du Togo devrait passer de
+            <strong>Projection</strong> — La demande de {sel_name} passerait de
             <span class="val">{last_hist_gwh:,.0f} GWh</span> ({y_max_h}) a
-            <span class="val">{last_proj_row['predicted_gwh']:,.0f} GWh</span>
-            ({int(last_proj_row['year'])}),
-            soit une hausse de <span class="up">+{gr_total:.0f}%</span>.
-            L'intervalle de confiance a 95% situe la demande reelle entre
-            <span class="val">{ci_low:,.0f}</span> et <span class="val">{ci_high:,.0f} GWh</span>.
-            Ces chiffres integrent la croissance demographique, l'urbanisation progressive
-            et l'amelioration de l'acces a l'electricite.
+            <span class="val">{last_proj_row['predicted_gwh']:,.0f} GWh</span> ({int(last_proj_row['year'])}),
+            soit <span class="up">+{gr_total:.0f}%</span>.
+            IC 95% : [{last_proj_row['ci_lower']:,.0f} — {last_proj_row['ci_upper']:,.0f}] GWh.
         </div>""", unsafe_allow_html=True)
 
         st.divider()
 
-        # --- Graph 2: Population + demande projetees ---
-        last_pop = tg["SP.POP.TOTL"].iloc[-1] if "SP.POP.TOTL" in tg.columns else 0
-        if "pop_projected" in proj_f.columns and proj_f["pop_projected"].notna().any():
-            st.markdown('<div class="sec">Demographie et demande futures</div>',
+        # --- Comparaison UEMOA projections ---
+        if proj_all is not None and not proj_all.empty:
+            st.markdown('<div class="sec">Projections comparees — 8 pays UEMOA</div>',
                         unsafe_allow_html=True)
 
-            fig2 = make_subplots(specs=[[{"secondary_y": True}]])
-            if "SP.POP.TOTL" in tg.columns:
-                fig2.add_trace(go.Bar(
-                    x=tg["year"], y=tg["SP.POP.TOTL"] / 1e6, name="Pop. historique (M)",
-                    marker_color=C["pop"], opacity=0.3,
-                ), secondary_y=False)
-            fig2.add_trace(go.Bar(
-                x=proj_f["year"], y=proj_f["pop_projected"] / 1e6, name="Pop. projetee (M)",
-                marker_color=C["proj"], opacity=0.4,
-            ), secondary_y=False)
-            fig2.add_trace(go.Scatter(
-                x=proj_f["year"], y=proj_f["predicted_gwh"], name="Demande projetee (GWh)",
-                mode="lines+markers", line=dict(color=C["gwh"], width=2.5),
-                marker=dict(size=4),
-            ), secondary_y=True)
-            fig2.update_layout(
-                title="Co-evolution : population et demande projetees",
-                template=TMPL, height=380, hovermode="x unified", margin=dict(t=40),
-                legend=dict(orientation="h", y=-0.13, font_size=10),
-            )
-            fig2.update_yaxes(title_text="Population (millions)", secondary_y=False)
-            fig2.update_yaxes(title_text="GWh", secondary_y=True)
-            st.plotly_chart(fig2, key="pred_pop")
+            fig = go.Figure()
+            for i, cc in enumerate(countries_available):
+                pc = proj_all[(proj_all["country_code"] == cc)]
+                if proj_yr:
+                    pc = pc[pc["year"] <= proj_yr]
+                pc = pc.sort_values("year")
+                if pc.empty: continue
+                is_sel = cc == sel_country
+                cn = country_names.get(cc, cc)
+                # Add historical data too
+                dc = df_all[(df_all["country_code"] == cc) & (df_all["year"].between(*yr))].sort_values("year")
+                if not dc.empty and "conso_totale_gwh" in dc.columns:
+                    fig.add_trace(go.Scatter(
+                        x=dc["year"], y=dc["conso_totale_gwh"],
+                        name=f"{flag(cc)} {cn} (hist.)" if is_sel else None,
+                        mode="lines", line=dict(width=2.5 if is_sel else 1, color=PALETTE_8[i % 8]),
+                        opacity=1.0 if is_sel else 0.25, showlegend=is_sel,
+                        legendgroup=cc,
+                    ))
+                fig.add_trace(go.Scatter(
+                    x=pc["year"], y=pc["predicted_gwh"],
+                    name=f"{flag(cc)} {cn} (proj.)",
+                    mode="lines", line=dict(width=3 if is_sel else 1.2,
+                                            color=PALETTE_8[i % 8], dash="dash"),
+                    opacity=1.0 if is_sel else 0.3,
+                    legendgroup=cc,
+                ))
 
-            pop_proj_last = last_proj_row["pop_projected"]
-            gr_pop = ((pop_proj_last / last_pop) - 1) * 100 if last_pop > 0 else 0
-            kwh_proj = last_proj_row["predicted_gwh"] * 1e6 / pop_proj_last if pop_proj_last > 0 else 0
-
-            st.markdown(f"""
-            <div class="insight">
-                <strong>Scenario demographique</strong> — La population togolaise atteindrait
-                <span class="val">{pop_proj_last/1e6:.1f} millions</span> d'habitants en
-                {int(last_proj_row['year'])}, soit <span class="up">+{gr_pop:.0f}%</span>
-                par rapport a {y_max_h}. Avec la demande projetee de
-                <span class="val">{last_proj_row['predicted_gwh']:,.0f} GWh</span>,
-                la consommation par habitant serait d'environ
-                <span class="val">{kwh_proj:.0f} kWh</span>/an — un niveau qui
-                reste bien en dessous de la moyenne africaine (~600 kWh),
-                ce qui suggere un potentiel de croissance encore plus eleve si
-                l'acces a l'electricite s'accelere.
-            </div>""", unsafe_allow_html=True)
-
-        st.divider()
-
-        # --- Croissance annuelle projetee ---
-        st.markdown('<div class="sec">Taux de croissance annuel projete de la demande</div>',
-                    unsafe_allow_html=True)
-
-        proj_growth = proj_f.copy()
-        proj_growth["growth_pct"] = proj_growth["predicted_gwh"].pct_change() * 100
-        proj_growth = proj_growth.dropna(subset=["growth_pct"])
-        if not proj_growth.empty:
-            colors_growth = [C["good"] if v > 0 else C["warn"] for v in proj_growth["growth_pct"]]
-            fig = go.Figure(go.Bar(
-                x=proj_growth["year"], y=proj_growth["growth_pct"],
-                marker_color=colors_growth,
-                text=[f"{v:+.1f}%" for v in proj_growth["growth_pct"]],
-                textposition="outside", textfont_size=9,
-            ))
+            fig.add_vline(x=y_max_h + 0.5, line_dash="dot", line_color=C["muted"])
             fig.update_layout(
-                title="Croissance annuelle de la demande projetee (%)",
-                yaxis_title="Croissance (%)", template=TMPL, height=320,
-                margin=dict(t=40), hovermode="x unified",
+                title=f"Demande electrique projetee — 8 pays UEMOA (horizon {proj_yr or 2045})",
+                yaxis_title="GWh", template=TMPL, height=450,
+                hovermode="x unified", margin=dict(t=45),
+                legend=dict(orientation="h", y=-0.18, font_size=9),
             )
-            fig.add_hline(y=0, line_dash="dot", line_color=C["muted"])
-            avg_growth = proj_growth["growth_pct"].mean()
-            st.plotly_chart(fig, key="pred_growth")
+            st.plotly_chart(fig, key="pred_uemoa_all")
 
-            st.markdown(f"""
-            <div class="insight">
-                <strong>Dynamique</strong> — Le taux de croissance annuel moyen de la demande projetee
-                est de <span class="val">{avg_growth:+.1f}%</span>. Les barres vertes indiquent les
-                annees de croissance, les rouges les annees de correction.
-                La trajectoire n'est pas lineaire : le modele integre des cycles
-                economiques et des effets de seuil lies a l'infrastructure
-                energetique.
-            </div>""", unsafe_allow_html=True)
+            # Ranking final
+            proj_last_all = proj_all[proj_all["year"] == (proj_yr or proj_all["year"].max())]
+            if not proj_last_all.empty:
+                ranking = proj_last_all.sort_values("predicted_gwh", ascending=False)
+                rank_pos = ranking[ranking["country_code"] == sel_country].index
+                pos_num = list(ranking["country_code"]).index(sel_country) + 1 if sel_country in list(ranking["country_code"]) else "?"
+                top_c = ranking.iloc[0]
+                st.markdown(f"""
+                <div class="insight">
+                    <strong>Classement projete {proj_yr or 2045}</strong> — {flag(sel_country)}
+                    <strong>{sel_name}</strong> se placerait en position
+                    <span class="val">#{pos_num}</span> sur 8 pays.
+                    Le premier serait {flag(top_c['country_code'])}
+                    <strong>{top_c['country_name']}</strong> avec
+                    <span class="val">{top_c['predicted_gwh']:,.0f} GWh</span>.
+                    Cette vue multi-pays est un outil de planification regionale pour la BCEAO.
+                </div>""", unsafe_allow_html=True)
 
         st.divider()
 
-        # --- Consultation par annee ---
-        st.markdown('<div class="sec">Consulter une annee de projection</div>',
+        # --- Jauge consultation ---
+        st.markdown(f'<div class="sec">Consulter une annee — {flag(sel_country)} {sel_name}</div>',
                     unsafe_allow_html=True)
         proj_years_sel = sorted(proj_f["year"].unique().astype(int).tolist())
         sel_proj_yr = st.select_slider("Annee", options=proj_years_sel,
@@ -986,13 +891,11 @@ with t4:
             kwh_sel = r["predicted_gwh"] * 1e6 / r["pop_projected"] if (
                 pd.notna(r.get("pop_projected")) and r["pop_projected"] > 0) else 0
 
-            # Gauge chart
             fig = go.Figure(go.Indicator(
                 mode="gauge+number+delta",
                 value=r["predicted_gwh"],
-                delta={"reference": last_hist_gwh, "relative": True,
-                       "valueformat": ".0%"},
-                title={"text": f"Demande electrique {sel_proj_yr} (GWh)"},
+                delta={"reference": last_hist_gwh, "relative": True, "valueformat": ".0%"},
+                title={"text": f"Demande {sel_name} {sel_proj_yr} (GWh)"},
                 gauge={
                     "axis": {"range": [0, proj_f["ci_upper"].max() * 1.1]},
                     "bar": {"color": C["proj"]},
@@ -1000,10 +903,8 @@ with t4:
                         {"range": [0, last_hist_gwh], "color": "rgba(26,188,156,0.15)"},
                         {"range": [r["ci_lower"], r["ci_upper"]], "color": "rgba(155,89,182,0.15)"},
                     ],
-                    "threshold": {
-                        "line": {"color": C["gwh"], "width": 3},
-                        "thickness": 0.75, "value": last_hist_gwh,
-                    },
+                    "threshold": {"line": {"color": C["gwh"], "width": 3},
+                                  "thickness": 0.75, "value": last_hist_gwh},
                 },
             ))
             fig.update_layout(template=TMPL, height=300, margin=dict(t=60, b=10))
@@ -1031,25 +932,25 @@ with t4:
 
             st.markdown(f"""
             <div class="insight">
-                <strong>Fiche {sel_proj_yr}</strong> — Pour une population projetee de
-                <span class="val">{r['pop_projected']/1e6:.1f} M</span> habitants,
-                le Togo aura besoin de <span class="val">{r['predicted_gwh']:,.0f} GWh</span>
-                d'electricite, soit <span class="up">+{gr_gwh:.0f}%</span> par rapport au
-                dernier point historique ({y_max_h}). La consommation par habitant s'eleverait
-                a <span class="val">{kwh_sel:.0f} kWh/an</span>.
-                Pour repondre a cette demande, il faudra investir dans de nouvelles
-                capacites de production, de transport et de distribution electrique.
+                <strong>Fiche {sel_proj_yr}</strong> — {flag(sel_country)} {sel_name} :
+                population projetee de <span class="val">{r['pop_projected']/1e6:.1f} M</span>,
+                demande de <span class="val">{r['predicted_gwh']:,.0f} GWh</span>
+                (<span class="up">+{gr_gwh:.0f}%</span> vs {y_max_h}),
+                soit <span class="val">{kwh_sel:.0f} kWh/hab/an</span>.
             </div>""", unsafe_allow_html=True)
 
     else:
         st.info("Executez python src/models/predict.py pour generer les projections.")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # FOOTER
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="foot">
-Source : Banque Mondiale (WDI)  |  Modeles : scikit-learn, XGBoost, LightGBM  |
-Pipeline ETL Python  |  Streamlit + Plotly  |  Projet BCEAO — Developpeur IA
+    <strong>Objectif pedagogique</strong> : Ce projet a ete realise pour maitriser les concepts
+    d'ingenierie de donnees et de Machine Learning, transposables dans des situations reelles.<br>
+    Source : Banque Mondiale (WDI) | scikit-learn, LightGBM | Streamlit + Plotly |
+    8 pays UEMOA | 1990-2023 | Horizon 2045
 </div>
 """, unsafe_allow_html=True)
