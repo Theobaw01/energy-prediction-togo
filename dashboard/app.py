@@ -16,23 +16,24 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TMPL = "plotly_dark"
+TMPL = "plotly_white"
 
-# ── Couleurs : LinkedIn blue · Light green · Black ────────────────────
+# ── Couleurs : fond blanc · texte noir · LinkedIn blue · vert clair ──
 C = {
     "bleu":     "#0A66C2",   # LinkedIn blue
     "bleu2":    "#3B8AD9",   # blue clair
-    "vert":     "#86EFAC",   # vert clair / light green
+    "vert":     "#86EFAC",   # vert clair
     "vert2":    "#5CB88A",   # vert moyen
-    "blanc":    "#F0F0F0",
-    "gris":     "#888888",
-    "gris2":    "#555555",
-    "fond":     "#000000",   # noir pur
-    "carte":    "#0A0A0A",
-    "bord":     "#1A1A1A",
+    "noir":     "#1A1A1A",   # texte principal
+    "noir2":    "#333333",   # texte secondaire
+    "gris":     "#666666",   # texte desactive
+    "gris2":    "#999999",   # labels discrets
+    "fond":     "#FFFFFF",   # blanc pur
+    "carte":    "#F8F9FA",   # carte legere
+    "bord":     "#E5E7EB",   # bordure douce
 }
-PAL8 = ["#0A66C2", "#86EFAC", "#3B8AD9", "#5CB88A",
-        "#5CA5E8", "#A8F5C8", "#0D7FE8", "#6EE7A0"]
+PAL8 = ["#0A66C2", "#5CB88A", "#3B8AD9", "#86EFAC",
+        "#0D7FE8", "#6EE7A0", "#5CA5E8", "#A8F5C8"]
 
 FLAGS = {'TG':'🇹🇬','SN':'🇸🇳','CI':'🇨🇮','BJ':'🇧🇯',
          'BF':'🇧🇫','ML':'🇲🇱','NE':'🇳🇪','GW':'🇬🇼'}
@@ -58,129 +59,132 @@ st.markdown("""
 html,body,[class*="css"]{font-family:'Inter',sans-serif;}
 .block-container{padding-top:.5rem;max-width:1420px;}
 
+/* Force Streamlit light background */
+.stApp{background-color:#FFFFFF !important;}
+header[data-testid="stHeader"]{background-color:#FFFFFF !important;}
+
 /* Sidebar */
-section[data-testid="stSidebar"]{
-    background:linear-gradient(180deg,#000000 0%,#0A0A0A 100%);
-}
+section[data-testid="stSidebar"]{background:#FFFFFF !important;border-right:1px solid #E5E7EB;}
 section[data-testid="stSidebar"] .stMarkdown h3{
     color:#0A66C2; font-size:.95em; font-weight:700; letter-spacing:.03em;
 }
+section[data-testid="stSidebar"] *{color:#1A1A1A;}
 .sb-profile{
-    background:linear-gradient(135deg,rgba(10,102,194,.08),rgba(134,239,172,.06));
-    border:1px solid #1A1A1A; border-radius:12px; padding:16px; margin:8px 0 14px 0;
+    background:linear-gradient(135deg,rgba(10,102,194,.05),rgba(134,239,172,.04));
+    border:1px solid #E5E7EB; border-radius:12px; padding:16px; margin:8px 0 14px 0;
 }
-.sb-profile .sb-name{color:#F0F0F0;font-size:.95em;font-weight:700;}
+.sb-profile .sb-name{color:#1A1A1A;font-size:.95em;font-weight:700;}
 .sb-profile .sb-role{color:#0A66C2;font-size:.72em;font-weight:600;margin-top:2px;}
-.sb-profile .sb-desc{color:#888888;font-size:.7em;line-height:1.4;margin-top:6px;}
+.sb-profile .sb-desc{color:#666666;font-size:.7em;line-height:1.4;margin-top:6px;}
 .sb-badge-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
 .sb-badge{
-    background:rgba(10,102,194,.1);border:1px solid rgba(10,102,194,.25);
+    background:rgba(10,102,194,.08);border:1px solid rgba(10,102,194,.2);
     border-radius:6px;padding:2px 8px;font-size:.6em;color:#0A66C2;font-weight:600;
 }
 .sb-stat{
     display:flex;justify-content:space-between;align-items:center;
-    padding:8px 0;border-bottom:1px solid #1A1A1A;
+    padding:8px 0;border-bottom:1px solid #E5E7EB;
 }
-.sb-stat .sb-k{color:#555555;font-size:.7em;font-weight:500;}
-.sb-stat .sb-v{color:#F0F0F0;font-size:.78em;font-weight:700;}
-.sb-stat .sb-v.green{color:#86EFAC;}
+.sb-stat .sb-k{color:#666666;font-size:.7em;font-weight:500;}
+.sb-stat .sb-v{color:#1A1A1A;font-size:.78em;font-weight:700;}
+.sb-stat .sb-v.green{color:#0A66C2;}
 
 /* Header */
 .hdr{
-    background:linear-gradient(135deg,#000000 0%,#050a12 50%,#000000 100%);
-    border:1px solid #1A1A1A; border-radius:14px; padding:28px 34px; margin-bottom:20px;
+    background:linear-gradient(135deg,#FFFFFF 0%,#F0F7FF 50%,#FFFFFF 100%);
+    border:1px solid #E5E7EB; border-radius:14px; padding:28px 34px; margin-bottom:20px;
     position:relative; overflow:hidden;
 }
 .hdr::before{
     content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;
-    background:radial-gradient(circle,rgba(10,102,194,.06) 0%,transparent 70%);
+    background:radial-gradient(circle,rgba(10,102,194,.04) 0%,transparent 70%);
 }
-.hdr .crumb{color:#555555;font-size:.7em;margin-bottom:6px;}
-.hdr h1{color:#F0F0F0;margin:0;font-size:1.55em;font-weight:800;letter-spacing:-.02em;}
-.hdr .sub{color:#888888;font-size:.82em;margin-top:5px;}
+.hdr .crumb{color:#999999;font-size:.7em;margin-bottom:6px;}
+.hdr h1{color:#1A1A1A;margin:0;font-size:1.55em;font-weight:800;letter-spacing:-.02em;}
+.hdr .sub{color:#666666;font-size:.82em;margin-top:5px;}
 .hdr .mission{
     display:inline-block;margin-top:12px;padding:8px 16px;
-    background:linear-gradient(135deg,rgba(10,102,194,.1),rgba(134,239,172,.06));
-    border:1px solid rgba(10,102,194,.25);border-radius:10px;
-    color:#CCCCCC;font-size:.72em;line-height:1.5;
+    background:linear-gradient(135deg,rgba(10,102,194,.06),rgba(134,239,172,.04));
+    border:1px solid rgba(10,102,194,.15);border-radius:10px;
+    color:#333333;font-size:.72em;line-height:1.5;
 }
 .hdr .mission b{color:#0A66C2;}
 
 /* KPI */
 .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:18px;}
 .kpi{
-    background:linear-gradient(135deg,#0A0A0A,#000000);
-    border:1px solid #1A1A1A;border-radius:12px;padding:16px 18px;
+    background:#F8F9FA;
+    border:1px solid #E5E7EB;border-radius:12px;padding:16px 18px;
     transition:border-color .2s;
 }
 .kpi:hover{border-color:#0A66C2;}
 .kpi .kpi-hd{display:flex;justify-content:space-between;align-items:flex-start;}
-.kpi .kpi-lb{color:#555555;font-size:.65em;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+.kpi .kpi-lb{color:#999999;font-size:.65em;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
 .kpi .kpi-ic{font-size:1.2em;}
-.kpi .kpi-vl{color:#F0F0F0;font-size:1.55em;font-weight:800;margin-top:4px;letter-spacing:-.02em;}
+.kpi .kpi-vl{color:#1A1A1A;font-size:1.55em;font-weight:800;margin-top:4px;letter-spacing:-.02em;}
 .kpi .kpi-dt{font-size:.7em;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px;}
-.kpi .kpi-dt.up{color:#86EFAC;} .kpi .kpi-dt.dn{color:#888888;}
-.kpi .kpi-dt .vs{color:#555555;font-weight:400;margin-left:3px;}
+.kpi .kpi-dt.up{color:#5CB88A;} .kpi .kpi-dt.dn{color:#999999;}
+.kpi .kpi-dt .vs{color:#999999;font-weight:400;margin-left:3px;}
 
 /* Section */
-.sec{display:flex;align-items:center;gap:8px;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid #1A1A1A;}
-.sec .ic{font-size:1em;} .sec .tt{color:#F0F0F0;font-size:.92em;font-weight:700;}
+.sec{display:flex;align-items:center;gap:8px;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid #E5E7EB;}
+.sec .ic{font-size:1em;} .sec .tt{color:#1A1A1A;font-size:.92em;font-weight:700;}
 .sec .badge{
-    margin-left:auto;background:rgba(134,239,172,.08);color:#86EFAC;
-    border:1px solid rgba(134,239,172,.2);border-radius:6px;padding:2px 10px;
+    margin-left:auto;background:rgba(10,102,194,.06);color:#0A66C2;
+    border:1px solid rgba(10,102,194,.15);border-radius:6px;padding:2px 10px;
     font-size:.58em;font-weight:700;
 }
 
 /* Interpretation */
 .interp{
-    background:linear-gradient(135deg,rgba(10,102,194,.04),rgba(134,239,172,.03));
+    background:linear-gradient(135deg,rgba(10,102,194,.03),rgba(134,239,172,.02));
     border-left:3px solid #0A66C2;border-radius:0 10px 10px 0;
     padding:14px 18px;margin:10px 0 18px;
 }
 .interp .interp-hd{color:#0A66C2;font-size:.65em;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
-.interp p{color:#CCCCCC;font-size:.8em;line-height:1.7;margin:0;}
-.interp .v{color:#86EFAC;font-weight:700;}
-.interp .w{color:#888888;font-weight:700;}
-.interp .h{color:#F0F0F0;font-weight:600;}
+.interp p{color:#333333;font-size:.8em;line-height:1.7;margin:0;}
+.interp .v{color:#5CB88A;font-weight:700;}
+.interp .w{color:#999999;font-weight:700;}
+.interp .h{color:#1A1A1A;font-weight:600;}
 .interp .b{color:#0A66C2;font-weight:700;}
 
 /* Pipeline steps */
 .pipe{
-    background:#0A0A0A;border:1px solid #1A1A1A;border-radius:12px;
+    background:#F8F9FA;border:1px solid #E5E7EB;border-radius:12px;
     padding:16px 20px;margin-bottom:12px;
 }
 .pipe .pipe-tag{
-    display:inline-block;background:rgba(10,102,194,.12);color:#0A66C2;
+    display:inline-block;background:rgba(10,102,194,.08);color:#0A66C2;
     border-radius:6px;padding:2px 10px;font-size:.6em;font-weight:700;
     text-transform:uppercase;letter-spacing:.08em;
 }
-.pipe .pipe-tt{color:#F0F0F0;font-weight:700;font-size:.92em;margin-top:5px;}
-.pipe .pipe-ds{color:#888888;font-size:.72em;margin-top:3px;line-height:1.5;}
+.pipe .pipe-tt{color:#1A1A1A;font-weight:700;font-size:.92em;margin-top:5px;}
+.pipe .pipe-ds{color:#666666;font-size:.72em;margin-top:3px;line-height:1.5;}
 
 /* Prediction cards */
 .pred-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0;}
-.pred{background:#0A0A0A;border-radius:12px;padding:18px;position:relative;overflow:hidden;}
+.pred{background:#F8F9FA;border:1px solid #E5E7EB;border-radius:12px;padding:18px;position:relative;overflow:hidden;}
 .pred::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .pred.c1::before{background:linear-gradient(90deg,#0A66C2,#3B8AD9);}
 .pred.c2::before{background:linear-gradient(90deg,#86EFAC,#5CB88A);}
 .pred.c3::before{background:linear-gradient(90deg,#0A66C2,#86EFAC);}
-.pred .pred-lb{font-size:.72em;font-weight:600;color:#888888;margin-bottom:4px;}
+.pred .pred-lb{font-size:.72em;font-weight:600;color:#666666;margin-bottom:4px;}
 .pred .pred-vl{font-size:1.7em;font-weight:800;letter-spacing:-.03em;}
-.pred .pred-vl.t1{color:#0A66C2;} .pred .pred-vl.t2{color:#86EFAC;} .pred .pred-vl.t3{color:#3B8AD9;}
-.pred .pred-sub{color:#555555;font-size:.68em;margin-top:2px;}
-.pred .pred-txt{color:#888888;font-size:.7em;margin-top:8px;line-height:1.5;}
+.pred .pred-vl.t1{color:#0A66C2;} .pred .pred-vl.t2{color:#5CB88A;} .pred .pred-vl.t3{color:#3B8AD9;}
+.pred .pred-sub{color:#999999;font-size:.68em;margin-top:2px;}
+.pred .pred-txt{color:#666666;font-size:.7em;margin-top:8px;line-height:1.5;}
 
 /* Welcome hero */
 .hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
-.hero-item{background:#0A0A0A;border:1px solid #1A1A1A;border-radius:12px;padding:16px;text-align:center;}
+.hero-item{background:#F8F9FA;border:1px solid #E5E7EB;border-radius:12px;padding:16px;text-align:center;}
 .hero-item .hero-num{font-size:1.6em;font-weight:800;letter-spacing:-.02em;}
-.hero-item .hero-num.n1{color:#0A66C2;} .hero-item .hero-num.n2{color:#86EFAC;}
-.hero-item .hero-num.n3{color:#3B8AD9;} .hero-item .hero-num.n4{color:#86EFAC;}
-.hero-item .hero-lb{color:#888888;font-size:.68em;margin-top:2px;}
+.hero-item .hero-num.n1{color:#0A66C2;} .hero-item .hero-num.n2{color:#5CB88A;}
+.hero-item .hero-num.n3{color:#3B8AD9;} .hero-item .hero-num.n4{color:#5CB88A;}
+.hero-item .hero-lb{color:#666666;font-size:.68em;margin-top:2px;}
 
 /* Footer */
-.foot{text-align:center;color:#555555;font-size:.65em;padding:20px 0;margin-top:28px;border-top:1px solid #1A1A1A;}
-.foot b{color:#888888;}
+.foot{text-align:center;color:#999999;font-size:.65em;padding:20px 0;margin-top:28px;border-top:1px solid #E5E7EB;}
+.foot b{color:#666666;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -213,14 +217,14 @@ def chg(a,b):
 
 def lay(fig, title="", h=400, yt="", mb=60):
     fig.update_layout(
-        title=dict(text=title,font=dict(size=13,color="#F0F0F0",family="Inter"),x=0,xanchor="left"),
+        title=dict(text=title,font=dict(size=13,color="#1A1A1A",family="Inter"),x=0,xanchor="left"),
         template=TMPL, height=h, hovermode="x unified",
         margin=dict(t=44,b=mb,l=55,r=18),
-        legend=dict(orientation="h",y=-0.15,font=dict(size=10,color="#888888")),
-        yaxis_title=yt, plot_bgcolor="#000000", paper_bgcolor="#000000",
-        font=dict(family="Inter",color="#888888"),
-        xaxis=dict(gridcolor="#1A1A1A",zerolinecolor="#1A1A1A"),
-        yaxis=dict(gridcolor="#1A1A1A",zerolinecolor="#1A1A1A"),
+        legend=dict(orientation="h",y=-0.15,font=dict(size=10,color="#666666")),
+        yaxis_title=yt, plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF",
+        font=dict(family="Inter",color="#666666"),
+        xaxis=dict(gridcolor="#E5E7EB",zerolinecolor="#E5E7EB"),
+        yaxis=dict(gridcolor="#E5E7EB",zerolinecolor="#E5E7EB"),
     )
     return fig
 
@@ -450,7 +454,7 @@ with t0:
             fig = go.Figure(go.Bar(
                 x=r2s["r2"],y=r2s["model"],orientation="h",marker_color=clrs,
                 text=[f"{v:.3f}" for v in r2s["r2"]],textposition="outside",
-                textfont=dict(size=12,color="#F0F0F0"),
+                textfont=dict(size=12,color="#1A1A1A"),
             ))
             fig = lay(fig, "Performance des modeles (R²)", 350)
             fig.update_layout(xaxis_range=[0,1.08])
@@ -627,8 +631,8 @@ with t2:
             mode="lines+markers",line=dict(color=C["vert"],width=3),marker=dict(size=5),
         ),secondary_y=True)
         fig = lay(fig, f"Population vs demande — {sel_name}", 400)
-        fig.update_yaxes(title_text="Population (M)",secondary_y=False,gridcolor="#1A1A1A")
-        fig.update_yaxes(title_text="GWh",secondary_y=True,gridcolor="#1A1A1A")
+        fig.update_yaxes(title_text="Population (M)",secondary_y=False,gridcolor="#E5E7EB")
+        fig.update_yaxes(title_text="GWh",secondary_y=True,gridcolor="#E5E7EB")
         st.plotly_chart(fig, key="t2_pop")
 
         pop_c = chg(tg["SP.POP.TOTL"].iloc[0], tg["SP.POP.TOTL"].iloc[-1])
@@ -662,7 +666,7 @@ with t2:
         fig.add_trace(go.Scatter(
             x=tg["year"],y=tg["EG.ELC.ACCS.UR.ZS"],name="Acces urbain (%)",
             mode="lines+markers",line=dict(color=C["vert"],width=2.5),marker=dict(size=4),
-            fill="tonexty",fillcolor="rgba(134,239,172,0.05)",
+            fill="tonexty",fillcolor="rgba(134,239,172,0.08)",
         ))
         fig.add_trace(go.Scatter(
             x=tg["year"],y=tg["EG.ELC.ACCS.RU.ZS"],name="Acces rural (%)",
@@ -707,7 +711,7 @@ with t2:
         labels=[lbl_map.get(c,c) for c in corr_cols]
         fig=go.Figure(go.Heatmap(
             z=cm.values,x=labels,y=labels,
-            colorscale=[[0,"#0A66C2"],[0.5,"#000000"],[1,"#86EFAC"]],
+            colorscale=[[0,"#0A66C2"],[0.5,"#FFFFFF"],[1,"#5CB88A"]],
             zmid=0,zmin=-1,zmax=1,
             text=np.round(cm.values,2),texttemplate="%{text:.2f}",
             textfont_size=11,colorbar=dict(thickness=12,len=0.6),
@@ -764,7 +768,7 @@ with t3:
             fig = go.Figure(go.Bar(
                 x=r2s["r2"],y=r2s["model"],orientation="h",marker_color=clrs,
                 text=[f"{v:.3f}" for v in r2s["r2"]],textposition="outside",
-                textfont=dict(size=12,color="#F0F0F0"),
+                textfont=dict(size=12,color="#1A1A1A"),
             ))
             fig = lay(fig, "Score R² — plus haut = meilleur", 300)
             fig.update_layout(xaxis_range=[0,1.08])
@@ -776,7 +780,7 @@ with t3:
             fig = go.Figure(go.Bar(
                 x=ms["mape"],y=ms["model"],orientation="h",marker_color=clrs_m,
                 text=[f"{v:.1f}%" for v in ms["mape"]],textposition="outside",
-                textfont=dict(size=12,color="#F0F0F0"),
+                textfont=dict(size=12,color="#1A1A1A"),
             ))
             fig = lay(fig, "Erreur MAPE — plus bas = meilleur", 300)
             st.plotly_chart(fig, key="t3_mape")
@@ -815,7 +819,7 @@ with t3:
                 x=xlb,y=cv_df["r2"],
                 marker_color=[C["vert"] if v>0.8 else C["bleu"] if v>0.5 else C["gris"] for v in cv_df["r2"]],
                 text=[f"{v:.3f}" for v in cv_df["r2"]],textposition="outside",
-                textfont=dict(size=11,color="#F0F0F0"),
+                textfont=dict(size=11,color="#1A1A1A"),
             ))
             fig.add_hline(y=cv_mean,line_dash="dash",line_color=C["bleu"],
                           annotation_text=f"Moyenne: {cv_mean:.3f}",
@@ -851,7 +855,7 @@ with t3:
                 x=fi_top["importance"],y=fi_top["feature"],orientation="h",
                 marker_color=fi_colors,
                 text=[f"{v:.3f}" for v in fi_top["importance"]],textposition="outside",
-                textfont=dict(size=9,color="#888888"),
+                textfont=dict(size=9,color="#666666"),
             ))
             fig = lay(fig, "Importance relative de chaque variable", 450)
             fig.update_layout(xaxis=dict(showticklabels=False))
@@ -891,8 +895,8 @@ with t3:
             ))
         fig = lay(fig, "Profil multi-criteres par modele", 420)
         fig.update_layout(polar=dict(
-            radialaxis=dict(range=[0,1],showticklabels=False,gridcolor="#1A1A1A"),
-            angularaxis=dict(gridcolor="#1A1A1A"),bgcolor="#000000"))
+            radialaxis=dict(range=[0,1],showticklabels=False,gridcolor="#E5E7EB"),
+            angularaxis=dict(gridcolor="#E5E7EB"),bgcolor="#FFFFFF"))
         st.plotly_chart(fig, key="t3_radar")
 
         st.markdown(f"""<div class="interp">
@@ -974,7 +978,7 @@ with t4:
         fig.add_trace(go.Scatter(
             x=pd.concat([proj_s["year"],proj_s["year"][::-1]]),
             y=pd.concat([proj_s["ci_upper"],proj_s["ci_lower"][::-1]]),
-            fill="toself",fillcolor="rgba(10,102,194,0.08)",
+            fill="toself",fillcolor="rgba(10,102,194,0.06)",
             line=dict(color="rgba(0,0,0,0)"),name="Intervalle de confiance 95%",
         ))
         fig.add_trace(go.Scatter(
@@ -1112,20 +1116,20 @@ with t4:
                 mode="gauge+number+delta",
                 value=r["predicted_gwh"],
                 delta={"reference":last_gwh,"relative":True,"valueformat":".0%"},
-                title={"text":f"Demande {sel_name} en {sel_yr} (GWh)","font":{"size":14,"color":"#E0E0E0"}},
-                number={"font":{"size":32,"color":"#F0F0F0"}},
+                title={"text":f"Demande {sel_name} en {sel_yr} (GWh)","font":{"size":14,"color":"#1A1A1A"}},
+                number={"font":{"size":32,"color":"#1A1A1A"}},
                 gauge={
-                    "axis":{"range":[0,proj_s["ci_upper"].max()*1.1],"tickcolor":"#1A1A1A"},
+                    "axis":{"range":[0,proj_s["ci_upper"].max()*1.1],"tickcolor":"#E5E7EB"},
                     "bar":{"color":C["bleu"]},
-                    "bgcolor":"#0A0A0A","bordercolor":"#1A1A1A",
+                    "bgcolor":"#F8F9FA","bordercolor":"#E5E7EB",
                     "steps":[
-                        {"range":[0,last_gwh],"color":"rgba(134,239,172,0.08)"},
+                        {"range":[0,last_gwh],"color":"rgba(134,239,172,0.12)"},
                         {"range":[r["ci_lower"],r["ci_upper"]],"color":"rgba(10,102,194,0.08)"},
                     ],
                     "threshold":{"line":{"color":C["vert"],"width":3},"thickness":0.75,"value":last_gwh},
                 },
             ))
-            fig.update_layout(template=TMPL,height=280,margin=dict(t=50,b=10),paper_bgcolor="#000000")
+            fig.update_layout(template=TMPL,height=280,margin=dict(t=50,b=10),paper_bgcolor="#FFFFFF")
             st.plotly_chart(fig, key="t4_gauge")
 
             c1,c2,c3 = st.columns(3)
