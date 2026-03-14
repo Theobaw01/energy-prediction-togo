@@ -34,15 +34,24 @@ def predict_historical(df):
     saved = load_model()
     model = saved['model']
     scaler = saved['scaler']
+    log_target = saved.get('log_target', False)
 
-    X, y, _ = prepare_features(df)
+    X, y_log, _ = prepare_features(df, log_target=log_target)
     X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
     X_sc = scaler.transform(X)
-    preds = model.predict(X_sc)
+    preds_log = model.predict(X_sc)
+
+    # Revenir en GWh
+    if log_target:
+        y_gwh = np.expm1(y_log)
+        preds_gwh = np.expm1(preds_log)
+    else:
+        y_gwh = y_log
+        preds_gwh = preds_log
 
     out = df[['country_code', 'country_name', 'year']].copy()
-    out['actual'] = y
-    out['predicted'] = preds
+    out['actual'] = y_gwh
+    out['predicted'] = preds_gwh
     out['error'] = out['actual'] - out['predicted']
     out['error_pct'] = np.where(out['actual'] != 0,
                                  (out['error'] / out['actual'] * 100).round(2), 0)
@@ -91,6 +100,7 @@ def project_future(df, horizon=FORECAST_HORIZON):
     model = saved['model']
     scaler = saved['scaler']
     feat_names = saved['feature_names']
+    log_target = saved.get('log_target', False)
 
     # Calculer le MAPE residuel du modele pour IC
     hist = predict_historical(df)
@@ -122,7 +132,10 @@ def project_future(df, horizon=FORECAST_HORIZON):
         for h in range(1, horizon + 1):
             future = {}
             for f in feat_names:
-                if f in recent.columns:
+                # One-hot country features
+                if f.startswith('country_'):
+                    future[f] = 1.0 if f == f'country_{code}' else 0.0
+                elif f in recent.columns:
                     vals = recent[f].values
                     future[f] = _extrapolate_feature(vals, h, f)
                 else:
@@ -130,7 +143,8 @@ def project_future(df, horizon=FORECAST_HORIZON):
 
             X = np.array([[future.get(f, 0) for f in feat_names]])
             X = np.nan_to_num(X, nan=0.0, posinf=0.0, neginf=0.0)
-            ml_pred = model.predict(scaler.transform(X))[0]
+            ml_pred_raw = model.predict(scaler.transform(X))[0]
+            ml_pred = np.expm1(ml_pred_raw) if log_target else ml_pred_raw
 
             # Projection par tendance (CAGR)
             trend_pred = last_gwh * (1 + cagr) ** h

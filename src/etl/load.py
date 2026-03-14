@@ -13,6 +13,9 @@ from utils.config import PROCESSED_DIR, RANDOM_STATE, TEST_SIZE, FOCUS_COUNTRY
 
 TARGET = 'conso_totale_gwh'
 
+# Liste fixe des pays UEMOA pour encodage one-hot coherent
+_COUNTRY_LIST = ['BEN', 'BFA', 'CIV', 'GNB', 'MLI', 'NER', 'SEN', 'TGO']
+
 
 def load_processed():
     path = os.path.join(PROCESSED_DIR, 'energy_data_processed.csv')
@@ -21,10 +24,13 @@ def load_processed():
     return pd.read_csv(path)
 
 
-def prepare_features(df):
+def prepare_features(df, log_target=True):
     """
-    X = features demographiques + contexte
-    y = consommation electrique totale (GWh)
+    X = features demographiques + contexte + one-hot pays
+    y = log(conso_totale_gwh) si log_target=True, sinon GWh brut
+
+    Le one-hot pays permet au modele de distinguer les niveaux par pays.
+    Le log-target reduit l'ecrasement des petits pays par les grands.
     """
     exclude = {'country_code', 'country_name', 'year', TARGET,
                 'EG.USE.ELEC.KH.PC'}  # exclure kWh/hab pour eviter data leak
@@ -37,7 +43,22 @@ def prepare_features(df):
                     and df[c].dtype in ['float64', 'int64', 'float32', 'int32']]
 
     X = df[feature_cols].values
-    y = df[TARGET].values
+
+    # One-hot encoding pays (colonnes fixes)
+    codes = df['country_code'].values if 'country_code' in df.columns else None
+    if codes is not None:
+        dummies = np.zeros((len(df), len(_COUNTRY_LIST)), dtype=np.float64)
+        for i, cc in enumerate(_COUNTRY_LIST):
+            dummies[:, i] = (codes == cc).astype(float)
+        X = np.hstack([X, dummies])
+        country_cols = [f'country_{cc}' for cc in _COUNTRY_LIST]
+        feature_cols = feature_cols + country_cols
+
+    y_raw = df[TARGET].values
+    if log_target:
+        y = np.log1p(np.clip(y_raw, 0, None))  # log(1+x), safe pour 0
+    else:
+        y = y_raw
     return X, y, feature_cols
 
 

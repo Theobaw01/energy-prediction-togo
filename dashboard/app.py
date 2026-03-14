@@ -392,8 +392,9 @@ with t0:
         st.markdown(f"""<div class="pipe">
             <span class="pipe-tag">Etape 3 · Modelisation</span>
             <div class="pipe-tt">5 algorithmes entraines et compares rigoureusement</div>
-            <div class="pipe-ds">J'ai entraine Random Forest, Gradient Boosting, XGBoost, LightGBM,
-            puis un <b>Stacking Regressor</b> qui combine les 4 modeles via un meta-modele Ridge.
+            <div class="pipe-ds">J'ai entraine 7 algorithmes : <b>Ridge, ElasticNet</b> (lineaires), Random Forest, Gradient Boosting,
+            XGBoost, LightGBM, et Stacking. Avec une <b>transformation log</b> de la cible et un <b>encodage one-hot</b>
+            des pays pour que le modele distingue chaque marche energetique.
             Le tout avec un <b>split temporel</b> (pas aleatoire !) et une <b>cross-validation
             par annees</b> pour garantir zero fuite de donnees futures.</div>
         </div>""", unsafe_allow_html=True)
@@ -487,9 +488,9 @@ with t0:
     with sk2:
         st.markdown("""<div class="pipe">
             <span class="pipe-tag">Machine Learning</span>
-            <div class="pipe-ds">5 algorithmes (RF, GB, XGBoost, LightGBM, Stacking),
-            cross-validation temporelle panel, optimisation hyperparametres,
-            selection de modele, interpretabilite (feature importance).</div>
+            <div class="pipe-ds">7 algorithmes (Ridge, ElasticNet, RF, GB, XGBoost, LightGBM, Stacking),
+            transformation log-cible + encodage pays,
+            cross-validation temporelle panel, selection de modele, interpretabilite (feature importance).</div>
         </div>""", unsafe_allow_html=True)
     with sk3:
         st.markdown("""<div class="pipe">
@@ -1163,7 +1164,7 @@ with t4:
 st.markdown("""
 <div class="foot">
     <b>Projet realise dans le cadre d'une candidature BCEAO — Developpeur en Intelligence Artificielle</b><br>
-    Architecture : API Banque Mondiale (WDI) → ETL Python → Stacking Regressor (RF + GB + XGBoost + LightGBM / Ridge) → Dashboard Streamlit + Plotly<br>
+    Architecture : API Banque Mondiale (WDI) → ETL Python → Log-Transform + Country Encoding → Ridge Regression (meilleur R²=0.97) → Dashboard Streamlit + Plotly<br>
     8 pays UEMOA · 21 indicateurs · 82 features · 1990-2023 · Horizon 2045
 </div>
 """, unsafe_allow_html=True)

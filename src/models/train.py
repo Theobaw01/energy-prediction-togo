@@ -19,7 +19,7 @@ import joblib
 from sklearn.ensemble import (
     RandomForestRegressor, GradientBoostingRegressor, StackingRegressor
 )
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, ElasticNet
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import TimeSeriesSplit
@@ -46,31 +46,41 @@ except ImportError:
 
 def get_models():
     models = {
+        'Ridge': Ridge(
+            alpha=10.0,
+        ),
+        'ElasticNet': ElasticNet(
+            alpha=0.1, l1_ratio=0.3, max_iter=5000,
+            random_state=RANDOM_STATE,
+        ),
         'RandomForest': RandomForestRegressor(
-            n_estimators=300, max_depth=8, min_samples_split=5,
-            min_samples_leaf=3, random_state=RANDOM_STATE, n_jobs=-1,
+            n_estimators=200, max_depth=6, min_samples_split=8,
+            min_samples_leaf=5, random_state=RANDOM_STATE, n_jobs=-1,
         ),
         'GradientBoosting': GradientBoostingRegressor(
-            n_estimators=200, max_depth=5, learning_rate=0.05,
-            subsample=0.8, random_state=RANDOM_STATE,
+            n_estimators=150, max_depth=4, learning_rate=0.03,
+            subsample=0.75, min_samples_leaf=5, random_state=RANDOM_STATE,
         ),
     }
     if HAS_XGB:
         models['XGBoost'] = XGBRegressor(
-            n_estimators=300, max_depth=6, learning_rate=0.05,
-            subsample=0.8, colsample_bytree=0.8,
+            n_estimators=200, max_depth=4, learning_rate=0.03,
+            subsample=0.75, colsample_bytree=0.7,
+            min_child_weight=8, reg_alpha=1.0, reg_lambda=5.0, gamma=0.3,
             random_state=RANDOM_STATE, verbosity=0, n_jobs=-1,
         )
     if HAS_LGB:
         models['LightGBM'] = LGBMRegressor(
-            n_estimators=300, max_depth=6, learning_rate=0.05,
-            subsample=0.8, colsample_bytree=0.8, num_leaves=31,
+            n_estimators=200, max_depth=4, learning_rate=0.03,
+            subsample=0.75, colsample_bytree=0.7, num_leaves=16,
+            min_child_samples=8, reg_alpha=1.0, reg_lambda=5.0,
             random_state=RANDOM_STATE, verbose=-1, n_jobs=-1,
         )
     return models
 
 
 def evaluate(y_true, y_pred, name):
+    """Evaluate in original GWh space (y may be in log-space)."""
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
     mae = mean_absolute_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
@@ -115,9 +125,10 @@ def temporal_cross_validate(model, X, y, years, n_splits=5):
 
         m = clone(model)
         m.fit(X_tr_cv, y[train_mask])
-        preds = m.predict(X_te_cv)
+        preds_log = m.predict(X_te_cv)
 
-        r2 = r2_score(y[test_mask], preds)
+        # Evaluate in GWh space
+        r2 = r2_score(np.expm1(y[test_mask]), np.expm1(preds_log))
         results.append({
             'fold': i + 1,
             'r2': round(r2, 4),
@@ -157,8 +168,11 @@ def train():
     print()
     for name, model in models.items():
         model.fit(X_tr, y_train)
-        y_pred = model.predict(X_te)
-        res = evaluate(y_test, y_pred, name)
+        y_pred_log = model.predict(X_te)
+        # Evaluate in original GWh space
+        y_pred_gwh = np.expm1(y_pred_log)
+        y_test_gwh = np.expm1(y_test)
+        res = evaluate(y_test_gwh, y_pred_gwh, name)
         results.append(res)
         trained[name] = model
 
@@ -171,8 +185,10 @@ def train():
         )
         try:
             stack.fit(X_tr, y_train)
-            y_pred = stack.predict(X_te)
-            res = evaluate(y_test, y_pred, 'Stacking')
+            y_pred_log = stack.predict(X_te)
+            y_pred_gwh = np.expm1(y_pred_log)
+            y_test_gwh = np.expm1(y_test)
+            res = evaluate(y_test_gwh, y_pred_gwh, 'Stacking')
             results.append(res)
             trained['Stacking'] = stack
         except Exception as e:
@@ -251,6 +267,7 @@ def train():
         'n_features': len(feat_names),
         'n_train': len(y_train),
         'n_test': len(y_test),
+        'log_target': True,  # flag pour predict.py
     }, model_path)
     print(f"\n  Modele : {model_path}")
 
